@@ -4,11 +4,7 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-import { 
-  ArrowLeft, 
-  Save, 
-  Loader2 
-} from "lucide-react";
+import { ArrowLeft, Save, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -95,7 +91,9 @@ export default function NewCAPAPage() {
           </Button>
         </Link>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">New CAPA Request</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            New CAPA Request
+          </h1>
           <p className="text-muted-foreground">
             Initiate a Corrective and Preventive Action.
           </p>
@@ -106,7 +104,9 @@ export default function NewCAPAPage() {
         <Card>
           <CardHeader>
             <CardTitle>Issue Details</CardTitle>
-            <CardDescription>Describe the non-conformance or issue requiring action.</CardDescription>
+            <CardDescription>
+              Describe the non-conformance or issue requiring action.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -128,15 +128,23 @@ export default function NewCAPAPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="PRODUCT_NONCONFORMANCE">Product Non-Conformance</SelectItem>
-                    <SelectItem value="PROCESS_DEVIATION">Process Deviation</SelectItem>
+                    <SelectItem value="PRODUCT_NONCONFORMANCE">
+                      Product Non-Conformance
+                    </SelectItem>
+                    <SelectItem value="PROCESS_DEVIATION">
+                      Process Deviation
+                    </SelectItem>
                     <SelectItem value="AUDIT_FINDING">Audit Finding</SelectItem>
-                    <SelectItem value="CUSTOMER_COMPLAINT">Customer Complaint</SelectItem>
-                    <SelectItem value="SAFETY_INCIDENT">Safety Incident</SelectItem>
+                    <SelectItem value="CUSTOMER_COMPLAINT">
+                      Customer Complaint
+                    </SelectItem>
+                    <SelectItem value="SAFETY_INCIDENT">
+                      Safety Incident
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="priority">Priority</Label>
                 <Select value={priority} onValueChange={setPriority}>
@@ -176,15 +184,24 @@ export default function NewCAPAPage() {
             </div>
 
             {sourceId && (
-               <div className="p-4 bg-muted/50 rounded text-sm text-muted-foreground">
-                  Linked from {sourceType} ID: <span className="font-mono">{sourceId}</span>
-               </div>
+              <div className="p-4 bg-muted/50 rounded text-sm text-muted-foreground">
+                Linked from {sourceType} ID:{" "}
+                <span className="font-mono">{sourceId}</span>
+              </div>
             )}
           </CardContent>
           <CardFooter className="justify-end space-x-2">
-            <Button variant="outline" type="button" onClick={() => router.back()}>Cancel</Button>
+            <Button
+              variant="outline"
+              type="button"
+              onClick={() => router.back()}
+            >
+              Cancel
+            </Button>
             <Button type="submit" disabled={createMutation.isPending}>
-              {createMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {createMutation.isPending && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
               <Save className="mr-2 h-4 w-4" />
               Create CAPA
             </Button>

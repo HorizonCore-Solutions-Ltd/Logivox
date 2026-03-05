@@ -14,6 +14,7 @@ import {
   Trash2,
   Crown,
   Eye,
+  Printer as PrinterIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,6 +27,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
@@ -73,6 +81,20 @@ interface Member {
   };
 }
 
+interface Printer {
+  id: string;
+  name: string;
+  type: string;
+  ipAddress: string | null;
+  location: string | null;
+}
+
+interface UserProfile {
+  id: string;
+  defaultPrinterId: string | null;
+  defaultPrinter: Printer | null;
+}
+
 interface Invitation {
   id: string;
   email: string;
@@ -94,6 +116,50 @@ export default function OrganizationSettingsPage() {
   const [orgName, setOrgName] = React.useState("");
   const [orgDescription, setOrgDescription] = React.useState("");
   const [orgWebsite, setOrgWebsite] = React.useState("");
+
+  const { data: userProfile, isLoading: isLoadingProfile } = useQuery<{
+    user: UserProfile;
+  }>({
+    queryKey: ["userProfile"],
+    queryFn: async () => {
+      const response = await fetch("/api/user");
+      if (!response.ok) throw new Error("Failed to fetch profile");
+      return response.json();
+    },
+  });
+
+  const { data: printersData, isLoading: isLoadingPrinters } = useQuery<{
+    printers: Printer[];
+  }>({
+    queryKey: ["printers"],
+    queryFn: async () => {
+      const response = await fetch("/api/printers");
+      if (!response.ok) throw new Error("Failed to fetch printers");
+      return response.json();
+    },
+  });
+
+  const updateProfileMutation = useMutation({
+    mutationFn: async (data: { defaultPrinterId?: string | null }) => {
+      const response = await fetch("/api/user", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to update profile");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["userProfile"] });
+      toast.success("Preferences updated successfully");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
 
   // Assume first organization for now (we'll add org switcher later)
   const orgId = session?.user?.organizations?.[0]?.id;
@@ -314,6 +380,7 @@ export default function OrganizationSettingsPage() {
                     0 &&
                   `(${invitations.filter((i) => i.status === "PENDING").length})`}
               </TabsTrigger>
+              <TabsTrigger value="preferences">My Preferences</TabsTrigger>
             </TabsList>
 
             {/* General Settings */}
@@ -629,6 +696,50 @@ export default function OrganizationSettingsPage() {
                       No pending invitations
                     </p>
                   )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Preferences Tab */}
+            <TabsContent value="preferences" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <PrinterIcon className="h-5 w-5" />
+                    Printer Settings
+                  </CardTitle>
+                  <CardDescription>
+                    Configure your default printer for this device/login.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="printer">Default Printer</Label>
+                    <Select
+                      value={userProfile?.user?.defaultPrinterId || "none"}
+                      onValueChange={(value) => {
+                        updateProfileMutation.mutate({
+                          defaultPrinterId: value === "none" ? null : value,
+                        });
+                      }}
+                      disabled={isLoadingPrinters || isLoadingProfile}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a printer" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">None (Use System Default)</SelectItem>
+                        {printersData?.printers?.map((printer) => (
+                          <SelectItem key={printer.id} value={printer.id}>
+                            {printer.name} ({printer.type})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <p className="text-sm text-muted-foreground">
+                      This printer will be pre-selected for any print jobs generated by you.
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>

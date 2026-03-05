@@ -26,7 +26,10 @@ export default async function PortalLayout({
   }
 
   const user = session.user as any;
-  if (user.role !== "CUSTOMER") {
+  const role = user.role;
+
+  // Allow CUSTOMER, SUPPLIER, and CARRIER
+  if (!["CUSTOMER", "SUPPLIER", "CARRIER"].includes(role)) {
     redirect("/dashboard"); // Redirect staff to dashboard
   }
 
@@ -43,38 +46,62 @@ export default async function PortalLayout({
                   LogiVox Portal
                 </span>
               </Link>
-
+              
               <nav className="hidden md:flex space-x-4">
                 <Link
-                  href="/portal"
-                  className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+                   href="/portal"
+                   className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
                 >
-                  Dashboard
+                   Dashboard
                 </Link>
-                <Link
-                  href="/portal/orders/new"
-                  className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  New Order
-                </Link>
-                <Link
-                  href="/portal/orders"
-                  className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  My Orders
-                </Link>
-                <Link
-                  href="/portal/tracking"
-                  className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  Track Shipments
-                </Link>
-                <Link
-                  href="/portal/returns"
-                  className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  My Returns
-                </Link>
+
+                {role === "CUSTOMER" && (
+                  <>
+                    <Link
+                      href="/portal/orders/new"
+                      className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      New Order
+                    </Link>
+                    <Link
+                      href="/portal/orders"
+                      className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      My Orders
+                    </Link>
+                    <Link
+                      href="/portal/tracking"
+                      className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      Track Shipments
+                    </Link>
+                    <Link
+                      href="/portal/returns"
+                      className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      My Returns
+                    </Link>
+                  </>
+                )}
+
+                {role === "SUPPLIER" && (
+                    <Link
+                      href="/portal/supplier"
+                      className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      Process ASNs
+                    </Link>
+                )}
+
+                {role === "CARRIER" && (
+                    <Link
+                      href="/portal/carrier"
+                      className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      Book Appointments
+                    </Link>
+                )}
+
                 <Link
                   href="/portal/documents"
                   className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"

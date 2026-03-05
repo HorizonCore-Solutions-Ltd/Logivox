@@ -19,14 +19,17 @@ import {
   Clock,
   CheckCircle2,
   XCircle,
+  FileText,
+  Calendar
 } from "lucide-react";
 
-interface DashboardStats {
-  totalOrders: number;
-  pendingOrders: number;
-  shippedOrders: number;
-  completedOrders: number;
-  recentOrders: Array<{
+interface DashboardData {
+  role: string;
+  totalOrders?: number;
+  pendingOrders?: number;
+  shippedOrders?: number;
+  completedOrders?: number;
+  recentOrders?: Array<{
     id: string;
     soNumber: string;
     orderDate: string;
@@ -36,8 +39,8 @@ interface DashboardStats {
   }>;
 }
 
-export default function CustomerPortalPage() {
-  const [stats, setStats] = useState<DashboardStats | null>(null);
+export default function PortalDashboardPage() {
+  const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -48,8 +51,8 @@ export default function CustomerPortalPage() {
     try {
       const response = await fetch("/api/portal/dashboard");
       if (response.ok) {
-        const data = await response.json();
-        setStats(data);
+        const result = await response.json();
+        setData(result);
       }
     } catch (error) {
       console.error("Error fetching dashboard stats:", error);
@@ -58,6 +61,97 @@ export default function CustomerPortalPage() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (!data) return <div className="p-8 text-center text-red-600">Failed to load portal data.</div>;
+
+  // SUPPLIER VIEW
+  if (data.role === "SUPPLIER") {
+      return (
+          <div className="space-y-8">
+              <div className="flex justify-between items-start">
+                  <div>
+                      <h1 className="text-3xl font-bold text-gray-900">Supplier Dashboard</h1>
+                      <p className="mt-2 text-gray-600">Welcome back. Manage your shipments and ASNs.</p>
+                  </div>
+                  <Link href="/portal/supplier">
+                      <Button size="lg" className="shadow-lg">
+                          <Plus className="h-5 w-5 mr-2" />
+                          Create ASN
+                      </Button>
+                  </Link>
+              </div>
+
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  <Card className="hover:shadow-md transition-shadow cursor-pointer">
+                      <Link href="/portal/supplier">
+                          <CardHeader className="flex flex-row items-center justify-between pb-2">
+                              <CardTitle className="text-sm font-medium text-gray-600">Active Shipments</CardTitle>
+                              <TruckIcon className="h-4 w-4 text-blue-500" />
+                          </CardHeader>
+                          <CardContent>
+                              <div className="text-2xl font-bold">Process ASN</div>
+                              <p className="text-xs text-gray-500 mt-1">Submit shipping notices</p>
+                          </CardContent>
+                      </Link>
+                  </Card>
+                   <Card className="hover:shadow-md transition-shadow">
+                      <CardHeader className="flex flex-row items-center justify-between pb-2">
+                          <CardTitle className="text-sm font-medium text-gray-600">Purchase Orders</CardTitle>
+                          <FileText className="h-4 w-4 text-green-500" />
+                      </CardHeader>
+                      <CardContent>
+                          <div className="text-2xl font-bold">View POs</div>
+                          <p className="text-xs text-gray-500 mt-1">Check open orders</p>
+                      </CardContent>
+                  </Card>
+              </div>
+          </div>
+      );
+  }
+
+  // CARRIER VIEW
+  if (data.role === "CARRIER") {
+      return (
+          <div className="space-y-8">
+              <div className="flex justify-between items-start">
+                  <div>
+                      <h1 className="text-3xl font-bold text-gray-900">Carrier Dashboard</h1>
+                      <p className="mt-2 text-gray-600">Manage dock appointments and deliveries.</p>
+                  </div>
+                  <Link href="/portal/carrier">
+                      <Button size="lg" className="shadow-lg">
+                          <Calendar className="h-5 w-5 mr-2" />
+                          Book Appointment
+                      </Button>
+                  </Link>
+              </div>
+
+               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  <Card className="hover:shadow-md transition-shadow cursor-pointer">
+                      <Link href="/portal/carrier">
+                          <CardHeader className="flex flex-row items-center justify-between pb-2">
+                              <CardTitle className="text-sm font-medium text-gray-600">Schedule</CardTitle>
+                              <Clock className="h-4 w-4 text-blue-500" />
+                          </CardHeader>
+                          <CardContent>
+                              <div className="text-2xl font-bold">Book Slot</div>
+                              <p className="text-xs text-gray-500 mt-1">Reserve dock time</p>
+                          </CardContent>
+                      </Link>
+                  </Card>
+              </div>
+          </div>
+      );
+  }
+
+  // CUSTOMER VIEW (Existing Logic)
   const getStatusBadge = (status: string) => {
     const statusConfig: Record<string, { color: string; icon: any }> = {
       PENDING: { color: "bg-yellow-100 text-yellow-800", icon: Clock },
@@ -81,14 +175,6 @@ export default function CustomerPortalPage() {
       </span>
     );
   };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-8">
@@ -121,7 +207,7 @@ export default function CustomerPortalPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-gray-900">
-              {stats?.totalOrders || 0}
+              {data.totalOrders || 0}
             </div>
             <p className="text-xs text-gray-500 mt-1">All time</p>
           </CardContent>
@@ -136,7 +222,7 @@ export default function CustomerPortalPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-yellow-600">
-              {stats?.pendingOrders || 0}
+              {data.pendingOrders || 0}
             </div>
             <p className="text-xs text-gray-500 mt-1">Awaiting fulfillment</p>
           </CardContent>
@@ -151,7 +237,7 @@ export default function CustomerPortalPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-blue-600">
-              {stats?.shippedOrders || 0}
+              {data.shippedOrders || 0}
             </div>
             <p className="text-xs text-gray-500 mt-1">In transit</p>
           </CardContent>
@@ -166,7 +252,7 @@ export default function CustomerPortalPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-green-600">
-              {stats?.completedOrders || 0}
+              {data.completedOrders || 0}
             </div>
             <p className="text-xs text-gray-500 mt-1">Delivered</p>
           </CardContent>
@@ -264,9 +350,9 @@ export default function CustomerPortalPage() {
           </Link>
         </CardHeader>
         <CardContent>
-          {stats?.recentOrders && stats.recentOrders.length > 0 ? (
+          {data.recentOrders && data.recentOrders.length > 0 ? (
             <div className="space-y-4">
-              {stats.recentOrders.map((order) => (
+              {data.recentOrders.map((order) => (
                 <Link
                   key={order.id}
                   href={`/portal/orders/${order.id}`}

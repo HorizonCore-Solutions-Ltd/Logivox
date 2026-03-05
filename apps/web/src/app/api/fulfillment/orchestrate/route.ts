@@ -8,8 +8,16 @@ import { z } from "zod";
 
 const orchestrateSchema = z.object({
   type: z.enum([
-    "PICK", "PUT", "MOVE", "COUNT", "REPLENISH", "RESTOCK", 
-    "PACK", "INSPECT", "LABEL", "CUSTOM"
+    "PICK",
+    "PUT",
+    "MOVE",
+    "COUNT",
+    "REPLENISH",
+    "RESTOCK",
+    "PACK",
+    "INSPECT",
+    "LABEL",
+    "CUSTOM",
   ]),
   workflowType: z.enum(["REPLENISHMENT", "RETURNS", "OUTBOUND", "INVENTORY"]),
   warehouseId: z.string(),
@@ -30,9 +38,12 @@ export async function POST(req: NextRequest) {
   }
 
   const organizationId = (session.user as any).organizationId;
-  
+
   if (!organizationId) {
-      return NextResponse.json({ error: "Organization ID missing" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Organization ID missing" },
+      { status: 400 },
+    );
   }
 
   try {
@@ -57,14 +68,17 @@ export async function POST(req: NextRequest) {
         title: validated.title,
         description: validated.description,
         // Assignee is left null for auto-orchestration
-      }
+      },
     );
 
     return NextResponse.json(result);
   } catch (error: any) {
     console.error("[FulfillmentOrchestrator] Error:", error);
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: "Validation failed", details: error.errors }, { status: 400 });
+      return NextResponse.json(
+        { error: "Validation failed", details: error.errors },
+        { status: 400 },
+      );
     }
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

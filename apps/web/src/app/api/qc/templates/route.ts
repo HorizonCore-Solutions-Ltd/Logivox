@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     console.error("GET /api/qc/templates error:", error);
     return NextResponse.json(
       { error: "Failed to fetch templates" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -34,12 +34,20 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { name, code, description, category, checkpoints, samplingType, requiresApproval } = body;
+    const {
+      name,
+      code,
+      description,
+      category,
+      checkpoints,
+      samplingType,
+      requiresApproval,
+    } = body;
 
     if (!name || !code || !checkpoints) {
       return NextResponse.json(
         { error: "Missing required fields" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -49,7 +57,8 @@ export async function POST(request: NextRequest) {
         name,
         code,
         description,
-        category: (category as InspectionCategory) || InspectionCategory.INCOMING,
+        category:
+          (category as InspectionCategory) || InspectionCategory.INCOMING,
         samplingType: (samplingType as SamplingType) || SamplingType.FULL,
         requiresApproval: requiresApproval ?? true,
         checkpoints: checkpoints, // JSON
@@ -62,7 +71,7 @@ export async function POST(request: NextRequest) {
     console.error("POST /api/qc/templates error:", error);
     return NextResponse.json(
       { error: "Failed to create template" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

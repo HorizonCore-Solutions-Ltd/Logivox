@@ -38,6 +38,7 @@ export async function GET(
             sku: true,
             name: true,
             description: true,
+            imageUrl: true,
           },
         },
         fromLocation: {

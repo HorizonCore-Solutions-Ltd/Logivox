@@ -169,6 +169,20 @@ const ALL_FEATURES: FeatureTile[] = [
     color: "#10b981",
     feature: "delivery",
   },
+  {
+    label: "Cognitive",
+    icon: "brain-outline",
+    route: "/(tabs)/cognitive",
+    color: "#2563EB",
+    feature: "cognitive",
+  },
+  {
+    label: "Transfers",
+    icon: "git-network-outline",
+    route: "/(tabs)/transfers",
+    color: "#be185d",
+    feature: "transfers",
+  },
 ];
 
 const SCREEN_W = Dimensions.get("window").width;

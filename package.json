@@ -1,7 +1,7 @@
 {
   "name": "logivox",
   "version": "1.0.0",
-  "description": "LogiVox - Voice-First Warehouse Management System",
+  "description": "LogiVox - The Autonomous Cognitive WMS (Enterprise v1)",
   "private": true,
   "engines": {
     "node": ">=18.0.0",
@@ -100,9 +100,6 @@
     ]
   },
   "packageManager": "npm@10.2.4",
-  "prisma": {
-    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
-  },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.0",
     "@aws-sdk/client-secrets-manager": "^3.1000.0",
@@ -115,7 +112,9 @@
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
     "crypto": "^1.0.1",
+    "framer-motion": "^12.34.5",
     "lru-cache": "^11.2.5",
+    "lucide-react": "^0.577.0",
     "next-auth": "^4.24.11",
     "nodemailer": "^6.10.1",
     "otplib": "^12.0.1",

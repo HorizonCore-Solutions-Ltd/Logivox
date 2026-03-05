@@ -8,11 +8,12 @@ import { z } from "zod";
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user?.id)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const organizationId = (session.user as any).organizationId;
 
   let config = await prisma.autonomousConfig.findUnique({
-    where: { organizationId }
+    where: { organizationId },
   });
 
   if (!config) {
@@ -24,8 +25,8 @@ export async function GET(req: NextRequest) {
         requireVerification: true,
         enableAutoReorders: false,
         enableAutoTransfers: false,
-        enableAutoAdjustments: false
-      }
+        enableAutoAdjustments: false,
+      },
     });
   }
 
@@ -39,12 +40,13 @@ const updateSchema = z.object({
   enableAutoTransfers: z.boolean().optional(),
   enableAutoAdjustments: z.boolean().optional(),
   maxOrderValue: z.number().optional(),
-  approvalThreshold: z.number().optional()
+  approvalThreshold: z.number().optional(),
 });
 
 export async function PATCH(req: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user?.id)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const organizationId = (session.user as any).organizationId;
 
   try {
@@ -55,11 +57,11 @@ export async function PATCH(req: NextRequest) {
       where: { organizationId },
       create: {
         organizationId,
-        ...data
+        ...data,
       },
       update: {
-        ...data
-      }
+        ...data,
+      },
     });
 
     return NextResponse.json(config);

@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   const auth = await requireApiAuth();
   if ("error" in auth) return auth.error;
@@ -26,13 +26,16 @@ export async function GET(
     return NextResponse.json(capa);
   } catch (error) {
     console.error("GET /api/capa/[id] error:", error);
-    return NextResponse.json({ error: "Failed to fetch CAPA" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch CAPA" },
+      { status: 500 },
+    );
   }
 }
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   const auth = await requireApiAuth();
   if ("error" in auth) return auth.error;
@@ -40,7 +43,7 @@ export async function PATCH(
 
   try {
     const body = await request.json();
-    
+
     // Basic update logic
     const updated = await prisma.correctivePreventiveAction.update({
       where: { id: params.id, organizationId },
@@ -53,6 +56,9 @@ export async function PATCH(
     return NextResponse.json(updated);
   } catch (error) {
     console.error("PATCH /api/capa/[id] error:", error);
-    return NextResponse.json({ error: "Failed to update CAPA" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to update CAPA" },
+      { status: 500 },
+    );
   }
 }

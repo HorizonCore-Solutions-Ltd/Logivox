@@ -14,6 +14,7 @@ import {
   Play,
   Square,
   XCircle,
+  Mic,
 } from "lucide-react";
 
 interface Task {
@@ -360,6 +361,19 @@ export default function PickingTasksPage() {
                     {getStatusIcon(task.status)}
                     {task.status.replace("_", " ")}
                   </span>
+                  
+                  {/* Start Voice Mode Button */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/picking-tasks/${task.id}/execute`);
+                    }}
+                    className="flex items-center gap-1 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-700 px-3 py-1.5 rounded-full transition-colors"
+                  >
+                    <Mic className="w-3 h-3" />
+                    Start Voice
+                  </button>
+
                   <span className="text-sm text-gray-500">
                     {task.progress.toFixed(0)}% Complete
                   </span>

@@ -37,6 +37,8 @@ import {
   Gauge,
   Workflow,
   Layers,
+  Leaf,
+  GitMerge,
 } from "lucide-react";
 
 export default function FeaturesPage() {
@@ -382,6 +384,36 @@ export default function FeaturesPage() {
       description:
         "The engine analyses real-time labor rate calendars and warehouse traffic patterns, then schedules heavy replenishment tasks during off-peak windows. Peak-hour surcharges are avoided entirely without manual planning.",
       impact: "30% labor cost reduction, eliminates scheduling manual effort",
+    {
+      category: "Warehouse Operations",
+      tier: "enterprise",
+      icon: Users,
+      name: "Real-Time Labor Management",
+      benefit: "Track productivity and optimize workforce allocation",
+      description: "Comprehensive labor tracking with engineered standards, gamification, and biometric authentication to maximize workforce efficiency.",
+      impact: "15-20% increase in productivity, reduced overtime costs",
+      usedBy: ["Enterprise"],
+    },
+    {
+      category: "Enterprise Features",
+      tier: "enterprise",
+      icon: Leaf,
+      name: "Sustainability & ESG Suite",
+      benefit: "Monitor and reduce your environmental footprint",
+      description: "Automated carbon accounting, energy tracking, and waste reduction analytics to help you meet corporate responsibility goals.",
+      impact: "Compliance with ESG regulations, lower energy bills",
+      usedBy: ["Enterprise"],
+    },
+    {
+      category: "AI & Optimization",
+      tier: "enterprise",
+      icon: GitMerge,
+      name: "Intelligent Task Interleaving",
+      benefit: "Eliminate deadhead travel with dual-cycle operations",
+      description: "AI-driven task assignment that combines put-away and picking tasks into single trips based on location and priority.",
+      impact: "30-40% reduction in travel time, increased throughput",
+      usedBy: ["Enterprise"],
+    },
       usedBy: ["Enterprise"],
     },
   ];

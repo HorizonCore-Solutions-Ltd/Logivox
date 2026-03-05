@@ -30,6 +30,14 @@ A concise guide to our newest capabilities for demos, training, and marketing.
 - Audit streaming to SIEM; retention tuned for compliance
 - See blog: /blog/zero-trust-warehouse-security
 
+## Cognitive Orchestration & Autonomous Supply Chain
+
+- **Self-Healing Logistics**: Automated "Pass-Through" cross-docking and inter-org transfers.
+- **Profit-Aware Execution**: Financial Governor automatically holds unprofitable orders.
+- **Predictive Optimization**: Simulation-backed decision making for carrier selection and labor.
+- **Network Load Balancing**: Dynamic routing to prevent FC congestion.
+- See documentation: /docs/modules/COGNITIVE_ORCHESTRATION_ENGINE.md
+
 ## How to Demo
 
 1. Show landing “Modern Logistics” section linking to the deep dives.

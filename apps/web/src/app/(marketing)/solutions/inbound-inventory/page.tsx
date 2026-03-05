@@ -1,13 +1,29 @@
-import { Metadata } from 'next';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight, CheckCircle2, Factory, BarChart3, ScanLine, Truck, ArrowLeftRight, Component } from 'lucide-react';
-import Link from 'next/link';
+import { Metadata } from "next";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  ArrowRight,
+  CheckCircle2,
+  Factory,
+  BarChart3,
+  ScanLine,
+  Truck,
+  ArrowLeftRight,
+  Component,
+} from "lucide-react";
+import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: 'Inbound & Inventory Management | Flowstock Enterprise',
-  description: 'Optimize receiving, cross-docking, and smart slotting with Flowstock\'s advanced inbound module.',
+  title: "Inbound & Inventory Management | Flowstock Enterprise",
+  description:
+    "Optimize receiving, cross-docking, and smart slotting with Flowstock's advanced inbound module.",
 };
 
 export default function InboundInventoryPage() {
@@ -25,12 +41,17 @@ export default function InboundInventoryPage() {
                 Smart Inbound & Inventory Intelligence
               </h1>
               <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
-                Transform your receiving dock into a strategic asset. Automate put-away decisions, enable cross-docking on the fly, and optimize warehouse density with our new Inbound Brain technology.
+                Transform your receiving dock into a strategic asset. Automate
+                put-away decisions, enable cross-docking on the fly, and
+                optimize warehouse density with our new Inbound Brain
+                technology.
               </p>
             </div>
             <div className="space-x-4">
               <Button asChild size="lg">
-                <Link href="/auth/signup">Start Free Trial <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                <Link href="/auth/signup">
+                  Start Free Trial <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
               </Button>
               <Button variant="outline" size="lg" asChild>
                 <Link href="/contact-sales">Request Demo</Link>
@@ -52,7 +73,10 @@ export default function InboundInventoryPage() {
                 The Inbound Brain
               </h2>
               <p className="text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                Our proprietary algorithm analyzes incoming shipments in real-time to determine the optimal storage location based on velocity, dimensions, and current stock levels. Say goodbye to manual put-away decisions.
+                Our proprietary algorithm analyzes incoming shipments in
+                real-time to determine the optimal storage location based on
+                velocity, dimensions, and current stock levels. Say goodbye to
+                manual put-away decisions.
               </p>
               <ul className="grid gap-2 py-4">
                 <li className="flex items-center gap-2">
@@ -70,16 +94,18 @@ export default function InboundInventoryPage() {
               </ul>
             </div>
             <div className="flex flex-col items-start space-y-4">
-               <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">
+              <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">
                 Cross-Docking
               </div>
               <h2 className="lg:leading-tighter text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl xl:text-[3.4rem] 2xl:text-[3.75rem]">
                 Immediate Fulfillment
               </h2>
-               <p className="text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                Why store what you need to ship? Our system identifies backorders immediately upon receipt and directs items straight to the packing station, skipping storage entirely.
+              <p className="text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                Why store what you need to ship? Our system identifies
+                backorders immediately upon receipt and directs items straight
+                to the packing station, skipping storage entirely.
               </p>
-               <ul className="grid gap-2 py-4">
+              <ul className="grid gap-2 py-4">
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-primary" />
                   <span>Zero-touch cross-docking logic</span>
@@ -103,7 +129,9 @@ export default function InboundInventoryPage() {
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Capabilities at a Glance</h2>
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
+                Capabilities at a Glance
+              </h2>
               <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                 Everything you need to manage complex inventory workflows.
               </p>
@@ -114,11 +142,15 @@ export default function InboundInventoryPage() {
               <CardHeader>
                 <Truck className="h-10 w-10 text-primary mb-2" />
                 <CardTitle>Receiving Operations</CardTitle>
-                <CardDescription>Mobile-first receiving workflows for dock staff.</CardDescription>
+                <CardDescription>
+                  Mobile-first receiving workflows for dock staff.
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Scan GS1 barcodes, verify quantities against POs, and capture lot/expiry data at the point of entry. Failed inspections trigger automated quarantine workflows.
+                  Scan GS1 barcodes, verify quantities against POs, and capture
+                  lot/expiry data at the point of entry. Failed inspections
+                  trigger automated quarantine workflows.
                 </p>
               </CardContent>
             </Card>
@@ -126,11 +158,15 @@ export default function InboundInventoryPage() {
               <CardHeader>
                 <Component className="h-10 w-10 text-primary mb-2" />
                 <CardTitle>Smart Slotting</CardTitle>
-                <CardDescription>Data-driven location assignment.</CardDescription>
+                <CardDescription>
+                  Data-driven location assignment.
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Our algorithm considers item dimensions, weight constraints, and pick frequency to suggest the perfect bin location, maximizing warehouse density.
+                  Our algorithm considers item dimensions, weight constraints,
+                  and pick frequency to suggest the perfect bin location,
+                  maximizing warehouse density.
                 </p>
               </CardContent>
             </Card>
@@ -138,47 +174,60 @@ export default function InboundInventoryPage() {
               <CardHeader>
                 <ArrowLeftRight className="h-10 w-10 text-primary mb-2" />
                 <CardTitle>Cross-Docking</CardTitle>
-                <CardDescription>Direct-to-shipping efficient routing.</CardDescription>
+                <CardDescription>
+                  Direct-to-shipping efficient routing.
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Items needed for open orders are flagged immediately. Skip put-away and move goods directly to outbound staging lanes.
+                  Items needed for open orders are flagged immediately. Skip
+                  put-away and move goods directly to outbound staging lanes.
                 </p>
               </CardContent>
             </Card>
-             <Card>
+            <Card>
               <CardHeader>
                 <ScanLine className="h-10 w-10 text-primary mb-2" />
                 <CardTitle>License Plate (LPN)</CardTitle>
-                <CardDescription>Container-level tracking efficiency.</CardDescription>
+                <CardDescription>
+                  Container-level tracking efficiency.
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Generate and track License Plate Numbers for pallets and cartons. Move entire LPNs with a single scan rather than item-by-item.
+                  Generate and track License Plate Numbers for pallets and
+                  cartons. Move entire LPNs with a single scan rather than
+                  item-by-item.
                 </p>
               </CardContent>
             </Card>
-             <Card>
+            <Card>
               <CardHeader>
                 <BarChart3 className="h-10 w-10 text-primary mb-2" />
                 <CardTitle>Inbound Analytics</CardTitle>
-                <CardDescription>Detailed vendor performance metrics.</CardDescription>
+                <CardDescription>
+                  Detailed vendor performance metrics.
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Track vendor compliance, receipt accuracy, and dock-to-stock cycle times. Identify bottlenecks in your receiving process.
+                  Track vendor compliance, receipt accuracy, and dock-to-stock
+                  cycle times. Identify bottlenecks in your receiving process.
                 </p>
               </CardContent>
             </Card>
-             <Card>
+            <Card>
               <CardHeader>
                 <Factory className="h-10 w-10 text-primary mb-2" />
                 <CardTitle>Quality Assurance</CardTitle>
-                <CardDescription>Integrated inspection workflows.</CardDescription>
+                <CardDescription>
+                  Integrated inspection workflows.
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Define custom inspection criteria by SKU or category. Enforce mandatory photo capture for damaged goods before acceptance.
+                  Define custom inspection criteria by SKU or category. Enforce
+                  mandatory photo capture for damaged goods before acceptance.
                 </p>
               </CardContent>
             </Card>
@@ -191,9 +240,12 @@ export default function InboundInventoryPage() {
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl">Ready to optimize your inbound flow?</h2>
+              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl">
+                Ready to optimize your inbound flow?
+              </h2>
               <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl">
-                Join high-growth brands using Flowstock to streamline their warehouse operations.
+                Join high-growth brands using Flowstock to streamline their
+                warehouse operations.
               </p>
             </div>
             <div className="w-full max-w-sm space-y-2">

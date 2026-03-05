@@ -23,7 +23,7 @@ export class InboundBrain {
 
     // 1. Check Quality Constraints (e.g. Supplier Rating)
     let requiresQC = false;
-    
+
     // Check if supplier has low quality score
     if (supplierId) {
       const supplier = await prisma.supplier.findUnique({
@@ -43,7 +43,7 @@ export class InboundBrain {
         where: {
           organizationId,
           warehouseId,
-          type: "QUARANTINE", 
+          type: "QUARANTINE",
           isActive: true,
         },
       });
@@ -56,7 +56,7 @@ export class InboundBrain {
     }
 
     // 2. Check for Cross-Dock Opportunities (Backorders)
-    // Find Sales Orders in status 'CONFIRMED' or 'PROCESSING' that contain this item 
+    // Find Sales Orders in status 'CONFIRMED' or 'PROCESSING' that contain this item
     // and are unfulfilled (logic simplified: if any open order has this item, we flag it)
     // In a real scenario, we would check quantity - quantityShipped > 0
     const backorders = await prisma.salesOrderItem.findMany({
@@ -64,21 +64,23 @@ export class InboundBrain {
         inventoryItemId: itemId,
         salesOrder: {
           organizationId,
-          status: { in: ["CONFIRMED", "PROCESSING"] }
+          status: { in: ["CONFIRMED", "PROCESSING"] },
         },
         // We want items where quantity > quantityShipped
         // Prisma doesn't support field comparison in where easily without raw query or iterating.
         // We'll fetch potential candidates and filter in memory since we take 1 only.
       },
       include: {
-        salesOrder: true
+        salesOrder: true,
       },
-      take: 5
+      take: 5,
     });
-    
+
     // Filter in memory for performance on small set
     // A simplified check: if quantity > quantityShipped
-    const validBackorder = backorders.find((bo: any) => bo.quantity > (bo.quantityShipped || 0));
+    const validBackorder = backorders.find(
+      (bo: any) => bo.quantity > (bo.quantityShipped || 0),
+    );
 
     if (validBackorder) {
       const stagingLocation = await prisma.location.findFirst({
@@ -99,10 +101,10 @@ export class InboundBrain {
 
     // 3. Regular Put-Away (Slotting)
     const slottingResult = await SlottingEngine.getPutAwayRecommendation({
-        itemId,
-        warehouseId,
-        quantity: context.quantity,
-        organizationId
+      itemId,
+      warehouseId,
+      quantity: context.quantity,
+      organizationId,
     });
 
     return {

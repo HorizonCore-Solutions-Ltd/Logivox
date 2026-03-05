@@ -37,6 +37,8 @@ import {
   Gift,
   RefreshCw,
   LayoutGrid,
+  Leaf,
+  GitMerge,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -68,6 +70,42 @@ export function Navigation() {
       description: "Complete WMS with real-time inventory control",
       icon: Warehouse,
       href: "/solutions/warehouse-management",
+    },
+    {
+      title: "Labor Management",
+      description: "Workforce optimization and productivity tracking",
+      icon: Users,
+      href: "/solutions/labor-management",
+    },
+    {
+      title: "Sustainability Suite",
+      description: "Carbon tracking and green logistics optimization",
+      icon: Leaf,
+      href: "/solutions/sustainability",
+    },
+    {
+      title: "Task Interleaving",
+      description: "Smart task combining to reduce deadhead travel",
+      icon: GitMerge,
+      href: "/solutions/task-interleaving",
+    },
+    {
+      title: "Labor Management",
+      description: "Workforce optimization and productivity tracking",
+      icon: Users,
+      href: "/solutions/labor-management",
+    },
+    {
+      title: "Sustainability Suite",
+      description: "Carbon tracking and green logistics optimization",
+      icon: Leaf,
+      href: "/solutions/sustainability",
+    },
+    {
+      title: "Task Interleaving",
+      description: "Smart task combining to reduce deadhead travel",
+      icon: GitMerge,
+      href: "/solutions/task-interleaving",
     },
     {
       title: "AI Slotting Optimization",

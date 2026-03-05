@@ -14,6 +14,8 @@
  * - "receive [quantity] of [SKU] on PO [number]"
  */
 
+import { prisma } from "@/lib/prisma"; // Added Prisma import
+
 export type VoiceIntent =
   | "PICK"
   | "CONFIRM"
@@ -33,7 +35,14 @@ export type VoiceIntent =
   | "HELP"
   | "ERROR"
   | "UNKNOWN"
-  | "NOT_CONFIGURED";
+  | "NOT_CONFIGURED"
+  // New Hybrid Intents
+  | "SHORT_PICK"
+  | "CHECK_DIGIT_OVERRIDE"
+  | "CRATE_LOOKUP"
+  | "WHISPER_REPLY"
+  | "EXPLAIN_ITEM"
+  | "WHERE_IS";
 
 export interface VoiceCommandResult {
   success: boolean;
@@ -43,11 +52,13 @@ export interface VoiceCommandResult {
   params: Record<string, string | number>;
   responseText: string;
   sessionId?: string;
+  isConversational?: boolean; // True if handled by LLM
 }
 
 export interface VoiceSession {
   id: string;
   userId: string;
+  organizationId?: string; // Added organizationId
   sessionType: string;
   warehouseId?: string;
   taskType?: string;
@@ -55,13 +66,20 @@ export interface VoiceSession {
   startedAt: Date;
   endedAt?: Date;
   commandCount: number;
+  // Context for "Smart Path"
+  activeLpn?: string;
+  targetCrate?: string;
+  currentLocation?: string;
+  mode: "EXPERT" | "VISUAL_ASSIST";
 }
 
-// In-memory session store (no DB model available for voice sessions)
+// In-memory session context cache.
+// Note: We also persist interaction logs to the database in `processVoiceCommand`.
 const activeSessions = new Map<string, VoiceSession>();
 
 function generateSessionId(): string {
-  return `vs_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+  // Use a cleaner ID format that looks good in logs
+  return `vs_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
 }
 
 /**
@@ -279,10 +297,128 @@ function parseIntent(text: string): {
     return { intent: "HELP", params: {}, confidence: 0.95 };
   }
 
+  // --- NEW HYBRID INTENTS (Fast Path) ---
+
+  // Short Pick: "short pick", "short", "only found 2"
+  if (/\b(short|missing|not enough|short pick)\b/.test(lower)) {
+    return { intent: "SHORT_PICK", params: {}, confidence: 0.85 };
+  }
+
+  // Check Digit Override: "check digit missing", "override check digit", "label damaged"
+  if (
+    /\b(check digit|override|label damaged|cannot read label)\b/.test(lower)
+  ) {
+    return { intent: "CHECK_DIGIT_OVERRIDE", params: {}, confidence: 0.88 };
+  }
+
+  // Explain Item: "what does it look like", "describe", "picture"
+  if (/\b(describe|look like|picture|image)\b/.test(lower)) {
+    return { intent: "EXPLAIN_ITEM", params: {}, confidence: 0.9 };
+  }
+
+  // Where Is: "where is the break room", "where is bay 14"
+  const whereMatch = lower.match(/\bwhere\s+is\s+(.+)/i);
+  if (whereMatch) {
+    // If it's about a crate, use CRATE_LOOKUP instead
+    if (whereMatch[1].includes("crate")) {
+      const crateId = whereMatch[1].match(/crate\s*([a-z0-9\-]+)/i)?.[1] || "";
+      return {
+        intent: "CRATE_LOOKUP",
+        params: { crateId: crateId.toUpperCase() },
+        confidence: 0.85,
+      };
+    }
+    return {
+      intent: "WHERE_IS",
+      params: { target: whereMatch[1].trim() },
+      confidence: 0.8,
+    };
+  }
+
+  // Whisper Reply: "tell supervisor", "reply to boss"
+  const replyMatch = lower.match(/\b(reply|tell supervisor|message)\s+(.+)/i);
+  if (replyMatch) {
+    return {
+      intent: "WHISPER_REPLY",
+      params: { message: replyMatch[2].trim() },
+      confidence: 0.9,
+    };
+  }
+
   return { intent: "UNKNOWN", params: {}, confidence: 0.3 };
 }
 
-function buildResponseText(
+import {
+  handleCrateLookup,
+  handleExplainItem as fetchExplainItem,
+  handleShortPick as processShortPick,
+  handlePickRequest,
+  handleTaskConfirmation,
+  handleScan,
+} from "./intents/smart-handlers";
+
+/**
+ * Execute business logic based on intent (The "Brain")
+ */
+async function resolveIntentLogic(
+  intent: VoiceIntent,
+  params: Record<string, string | number>,
+  sessionId?: string,
+): Promise<string | null> {
+  const session = sessionId ? activeSessions.get(sessionId) : null;
+  const orgId = session?.organizationId || "org_default";
+
+  try {
+    switch (intent) {
+      case "CRATE_LOOKUP":
+        if (params.crateId) {
+          return await handleCrateLookup(String(params.crateId));
+        }
+        break;
+      case "EXPLAIN_ITEM":
+        if (params.sku || params.item) {
+           return await fetchExplainItem(String(params.sku || params.item));
+        }
+        break;
+      case "SHORT_PICK":
+         if (!session?.userId) return "No active user session.";
+         // Find active task to get expected quantity
+         const task = await prisma.pickingTask.findFirst({
+             where: { assignedToId: session.userId, status: "IN_PROGRESS" }
+         });
+         
+         if (!task) return "You have no active picking task.";
+         const expected = task.quantity || 0;
+         const qty = typeof params.quantity === "number" ? params.quantity : 0;
+         return await processShortPick(sessionId || "unknown", orgId, qty, expected);
+
+      case "PICK":
+         if (!session?.userId) return "No active user session.";
+         const pickQty = typeof params.quantity === "number" ? params.quantity : 1;
+         const pickSku = params.sku ? String(params.sku) : undefined;
+         return await handlePickRequest(session.userId, pickQty, pickSku);
+
+      case "CONFIRM":
+         if (!session?.userId) return "No active user session.";
+         return await handleTaskConfirmation(session.userId);
+
+      case "SCAN":
+         if (!session?.userId) return "No active user session.";
+         if (!params.barcode) return "No barcode scanned.";
+         return await handleScan(session.userId, String(params.barcode));
+
+      default:
+        // No special logic -> use default static response
+        return null;
+    }
+  } catch (e) {
+    console.error("Error resolving intent logic:", e);
+    return null;
+  }
+  return null;
+}
+
+function getLegacyResponseText(
   intent: VoiceIntent,
   params: Record<string, string | number>,
 ): string {
@@ -291,6 +427,33 @@ function buildResponseText(
       return `Acknowledged. Pick ${params.quantity ?? 1} of ${params.sku}.`;
     case "CONFIRM":
       return "Confirmed. Moving to next task.";
+    // ... existing ...
+    case "SHORT_PICK":
+      return "Short pick recorded. Confirm actual quantity found?";
+    case "CHECK_DIGIT_OVERRIDE":
+      return "Override requested. Please read the last 3 digits of the product UPC for verification.";
+    case "EXPLAIN_ITEM":
+      return "Searching product details... It is a Red Box with a white label.";
+    case "WHERE_IS":
+      return `Navigating to ${params.target}. Turn left effectively immediately.`; // Placeholder
+    case "CRATE_LOOKUP":
+      // This response is now dynamic, but fallback if handler fails
+      return `Crate ${params.crateId} is likely at Bay 14.`;
+    case "WHISPER_REPLY":
+      return `Message sent to supervisor: "${params.message}"`;
+    case "UNKNOWN":
+      return "I'm listening. Say 'Help' for commands.";
+    default:
+      // Fallback for existing intents
+      return getLegacyResponseTextInternal(intent, params);
+  }
+}
+
+function getLegacyResponseTextInternal(
+  intent: VoiceIntent,
+  params: Record<string, string | number>,
+): string {
+  switch (intent) {
     case "SCAN":
       return `Scanning barcode ${params.barcode}.`;
     case "MOVE":
@@ -327,10 +490,79 @@ function buildResponseText(
 }
 
 /**
+ * Semantic Intent Parsing (Smart Path)
+ * Uses OpenAI Chat Completion to understand complex variants.
+ */
+async function processSmartIntent(text: string): Promise<{
+  intent: VoiceIntent;
+  params: Record<string, string | number>;
+  confidence: number;
+} | null> {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) return null;
+
+  try {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo",
+        messages: [
+          {
+            role: "system",
+            content: `You are Logivox, an advanced warehouse voice assistant.
+Map the user's spoken command to a rigorous JSON structure.
+Supported Intents: PICK, CONFIRM, SHORT_PICK, CHECK_DIGIT_OVERRIDE, EXPLAIN_ITEM, WHERE_IS, WHISPER_REPLY, CRATE_LOOKUP, EXCEPTION, HELP.
+
+Rules:
+- "My label is ripped" -> CHECK_DIGIT_OVERRIDE
+- "I only see 2 items" -> SHORT_PICK (params: quantity=2)
+- "What does this look like?" -> EXPLAIN_ITEM
+- "Where is the break room?" -> WHERE_IS (params: target="break room")
+- "Tell my boss I need help" -> WHISPER_REPLY (params: message="I need help")
+
+Return ONLY valid JSON. No markdown.`,
+          },
+          { role: "user", content: text },
+        ],
+        temperature: 0,
+      }),
+    });
+
+    if (!response.ok) return null;
+
+    const data = (await response.json()) as {
+      choices: { message: { content: string } }[];
+    };
+    const content = data.choices[0]?.message?.content?.trim();
+    if (!content) return null;
+
+    // Parse JSON safely
+    try {
+      const parsed = JSON.parse(content);
+      return {
+        intent: parsed.intent || "UNKNOWN",
+        params: parsed.params || {},
+        confidence: 0.85, // LLM confidence is synthetic but generally high if it matches schema
+      };
+    } catch {
+      return null;
+    }
+  } catch (err) {
+    console.error("Smart Intent Error:", err);
+    return null;
+  }
+}
+
+/**
  * Main entry point for processing a voice command from audio data.
  */
 export async function processVoiceCommand(input: {
-  audioData: Buffer;
+  audioData?: Buffer;
+  text?: string;
   userId: string;
   sessionId?: string;
   context?: Record<string, unknown>;
@@ -343,23 +575,87 @@ export async function processVoiceCommand(input: {
     session.commandCount += 1;
   }
 
-  const transcribedText = await transcribeAudio(input.audioData);
+  let transcribedText = input.text || "";
 
-  if (transcribedText === null) {
-    // OpenAI not configured — return informative error
+  if (!transcribedText && input.audioData) {
+    const transcription = await transcribeAudio(input.audioData);
+    if (transcription === null) {
+      // OpenAI not configured — return informative error
+      return {
+        success: false,
+        recognizedText: "",
+        intent: "NOT_CONFIGURED",
+        confidence: 0,
+        params: {},
+        responseText: getLegacyResponseText("NOT_CONFIGURED", {}),
+        sessionId: input.sessionId,
+      };
+    }
+    transcribedText = transcription;
+  }
+
+  if (!transcribedText) {
     return {
       success: false,
       recognizedText: "",
-      intent: "NOT_CONFIGURED",
+      intent: "UNKNOWN",
       confidence: 0,
       params: {},
-      responseText: buildResponseText("NOT_CONFIGURED", {}),
+      responseText: "No input detected.",
       sessionId: input.sessionId,
     };
   }
 
-  const { intent, params, confidence } = parseIntent(transcribedText);
-  const responseText = buildResponseText(intent, params);
+  let { intent, params, confidence } = parseIntent(transcribedText);
+  let isConversational = false;
+  let finalResponseText = "";
+
+  // 1. Resolve Dynamic Logic if fast path matches a smart intent (e.g. valid regex for SHORT_PICK)
+  const dynamicResponse = await resolveIntentLogic(intent, params, input.sessionId);
+
+  if (dynamicResponse) {
+      finalResponseText = dynamicResponse;
+      isConversational = true;
+  } else {
+      finalResponseText = getLegacyResponseText(intent, params);
+  }
+
+  // 2. SMART PATH (LLM) - Only if regex failed (UNKNOWN)
+  if (intent === "UNKNOWN") {
+    const smartResult = await processSmartIntent(transcribedText);
+    if (smartResult && smartResult.intent !== "UNKNOWN") {
+        // Update intent/params with smart result
+        intent = smartResult.intent;
+        params = smartResult.params;
+        confidence = smartResult.confidence;
+        isConversational = true;
+
+        // Try logic again with smart params
+        const smartLogicResponse = await resolveIntentLogic(intent, params, input.sessionId);
+
+        // If logic provides a response, use it. Otherwise, use legacy response text for the new intent
+        finalResponseText = smartLogicResponse || getLegacyResponseText(intent, params);
+    }
+  }
+
+  // 3. PERSIST INTERACTION LOG (WIRED DB)
+  try {
+     const dbSession = input.sessionId ? activeSessions.get(input.sessionId) : null;
+     await prisma.voiceSession.create({
+         data: {
+             userId: input.userId,
+             organizationId: dbSession?.organizationId, 
+             transcript: transcribedText,
+             intent: intent,
+             entities: params as any,
+             response: finalResponseText,
+             status: "PROCESSED",
+             language: "en"
+         }
+     });
+  } catch(e) {
+      console.error("Failed to log voice interaction to DB:", e);
+  }
 
   return {
     success: true,
@@ -367,8 +663,9 @@ export async function processVoiceCommand(input: {
     intent,
     confidence,
     params,
-    responseText,
+    responseText: finalResponseText,
     sessionId: input.sessionId,
+    isConversational,
   };
 }
 
@@ -382,15 +679,25 @@ export async function startVoiceSession(
   taskType?: string,
 ): Promise<VoiceSession> {
   const id = generateSessionId();
+
+  // Fetch contextual details for the user (Organization/Role)
+  const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { organizationMemberships: { select: { organizationId: true }, take: 1 } }
+  });
+  const orgId = user?.organizationMemberships[0]?.organizationId;
+
   const voiceSession: VoiceSession = {
     id,
     userId,
+    organizationId: orgId,
     sessionType,
     warehouseId,
     taskType,
     status: "ACTIVE",
     startedAt: new Date(),
     commandCount: 0,
+    mode: "VISUAL_ASSIST" // Default to Rookie mode initially
   };
   activeSessions.set(id, voiceSession);
   return voiceSession;

@@ -7,6 +7,7 @@ import {
   ModernOfferingsSection,
   FAQSection,
   NextGenSection,
+  HybridChoiceSection,
 } from "@/components/landing";
 import { Footer } from "@/components/layout/footer";
 import type { Metadata } from "next";
@@ -91,6 +92,7 @@ export default function HomePage() {
       <main>
         <HeroSection />
         <TrustSection />
+        <HybridChoiceSection />
         <NextGenSection />
         <FeaturesSection />
         <ModernOfferingsSection />

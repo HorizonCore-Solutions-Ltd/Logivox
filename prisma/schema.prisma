@@ -47,6 +47,8 @@ model User {
   password                     String?
   role                         UserRole                 @default(USER)
   isActive                     Boolean                  @default(true)
+  defaultPrinterId             String?
+  defaultPrinter               Printer?                 @relation(fields: [defaultPrinterId], references: [id])
   createdAt                    DateTime                 @default(now())
   updatedAt                    DateTime                 @updatedAt
   acknowledgedAlerts           Alert[]                  @relation("AlertAcknowledger")
@@ -96,6 +98,7 @@ model User {
   receivedGRNs                 GoodsReceiptNote[]       @relation("GRNReceivedBy")
   createdInventoryItems        InventoryItem[]          @relation("InventoryCreator")
   organizationMemberships      OrganizationMember[]
+  processedRefunds             Refund[]                 @relation("RefundProcessor")
   createdOrganizations         Organization[]           @relation("OrganizationCreator")
   initiatedPacks               Pack[]                   @relation("PackInitiator")
   createdPacks                 Pack[]                   @relation("PackCreator")
@@ -129,6 +132,9 @@ model User {
   voiceSessions                VoiceSession[]
   securityProfile              SecurityProfile?
   securityLogs                 SecurityLog[]
+  assignedVasRequests          VASRequest[]
+
+  requestedTransferRequests TransferRequest[] @relation("TransferRequestor")
 
   @@index([email])
   @@map("users")
@@ -189,6 +195,8 @@ model Organization {
   audits                     Audit[]
   autonomousConfig           AutonomousConfig?
   autonomousDecisions        AutonomousDecision[]
+  cognitivePolicies          CognitivePolicy[]
+  decisionLogs               DecisionLog[]
   rateCards                  BillingRateCard[]
   billingTransactions        BillingTransaction[]
   billsOfMaterials           BillOfMaterials[]
@@ -226,6 +234,7 @@ model Organization {
   documents                  Document[]
   duties                     Duty[]
   dutyTypes                  DutyType[]
+  printers                   Printer[]
   employees                  Employee[]
   equipment                  equipment[]
   fmeas                      FMEA[]
@@ -282,6 +291,7 @@ model Organization {
   returnsForecasts           ReturnsForecast[]
   riskRegister               RiskRegister[]
   rmas                       RMA[]
+  refunds                    Refund[]
   rootCauseAnalyses          RootCauseAnalysis[]
   rtvRequests                RTVRequest[]
   rtvs                       RTV[]
@@ -325,10 +335,16 @@ model Organization {
   warehouses                 Warehouse[]
   weather_logs               weather_logs[]
   yardLocations              YardLocation[]
-  AutonomousRobot            AutonomousRobot[]
+  fleetVehicleTypes          FleetVehicleType[]
   IoTSensorEvent             IoTSensorEvent[]
   bayDoors                   BayDoor[]
   loadSheets                 LoadSheet[]
+  vasRequests                VASRequest[]
+  chargebacks                SupplierChargeback[]
+
+  // Inter-Org Transfers
+  transfersAsSource TransferRequest[] @relation("TransferSourceOrg")
+  transfersAsTarget TransferRequest[] @relation("TransferTargetOrg")
 
   @@index([slug])
   @@index([createdById])
@@ -378,10 +394,13 @@ model Warehouse {
   organization           Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   replenishmentRules     ReplenishmentRule[]     @relation("ReplenRuleWarehouse")
   replenishmentTasks     ReplenishmentTask[]     @relation("ReplenTaskWarehouse")
-  autonomousRobots       AutonomousRobot[]       @relation("WarehouseRobots")
   iotSensorEvents        IoTSensorEvent[]        @relation("WarehouseIoT")
   bayDoors               BayDoor[]
   loadSheets             LoadSheet[]
+
+  // Transfers
+  transfersAsSource TransferRequest[] @relation("TransferSourceWh")
+  transfersAsTarget TransferRequest[] @relation("TransferTargetWh")
 
   @@unique([organizationId, code])
   @@index([organizationId])
@@ -456,6 +475,8 @@ model InventoryItem {
   organization            Organization                 @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   supplier                Supplier?                    @relation(fields: [supplierId], references: [id])
   warehouse               Warehouse                    @relation(fields: [warehouseId], references: [id])
+  locationId              String?
+  location                Location?                    @relation(fields: [locationId], references: [id])
   movements               InventoryMovement[]
   lots                    Lot[]
   packageItems            PackageItem[]
@@ -478,7 +499,7 @@ model InventoryItem {
   replenishmentForecasts  ReplenishmentForecastCache[] @relation("ReplenForecastItem")
   replenIoTTriggers       ReplenishmentIoTTrigger[]    @relation("ReplenIoTItem")
 
-  containerItems        ContainerItem[]
+  containerItems ContainerItem[]
 
   @@unique([organizationId, sku])
   @@index([organizationId])
@@ -625,6 +646,7 @@ model Supplier {
   qualityScore               VendorQualityScore?         @relation("VendorQualityScore")
   vendorPolicies             VendorReturnPolicy[]        @relation("VendorReturnPolicy")
   replenishmentRules         ReplenishmentRule[]         @relation("ReplenRuleSupplier")
+  supplierChargebacks        SupplierChargeback[]
 
   @@unique([organizationId, code])
   @@index([organizationId])
@@ -713,6 +735,7 @@ model PurchaseOrder {
   qcInspections       QCReceivingInspection[]
   rtvs                RTV[]
   replenishmentTasks  ReplenishmentTask[]
+  chargebacks         SupplierChargeback[]
 
   @@index([organizationId])
   @@index([supplierId])
@@ -875,6 +898,7 @@ model SalesOrder {
   pickLists       PickList[]
   qcInspections   QCInspection[]
   rmas            RMA[]
+  refunds         Refund[]
   invoices        Invoice[]
   items           SalesOrderItem[]
   approvedBy      User?            @relation("SOApprover", fields: [approvedById], references: [id])
@@ -887,7 +911,7 @@ model SalesOrder {
   serialNumbers   SerialNumber[]
   shipments       Shipment[]
 
-  containerItems        ContainerItem[]
+  containerItems ContainerItem[]
 
   @@unique([organizationId, soNumber])
   @@index([organizationId])
@@ -1199,6 +1223,7 @@ model Location {
   transfersTo     WarehouseTransfer[]      @relation("TransferToLocation")
   replenFromTasks ReplenishmentTask[]      @relation("ReplenFromLocation")
   replenToTasks   ReplenishmentTask[]      @relation("ReplenToLocation")
+  inventoryItems  InventoryItem[]
 
   @@unique([organizationId, locationCode])
   @@index([organizationId])
@@ -1211,26 +1236,33 @@ model Location {
 }
 
 model WarehouseTransfer {
-  id                  String               @id @default(cuid())
-  organizationId      String
-  transferNumber      String               @unique
-  status              TransferStatus       @default(PENDING)
-  fromLocationId      String
-  toLocationId        String
-  inventoryId         String
-  quantity            Int
-  reason              String?
-  notes               String?
-  priority            String?
-  requestedById       String
-  approvedById        String?
-  completedById       String?
-  requestedDate       DateTime             @default(now())
-  scheduledDate       DateTime?
-  approvedDate        DateTime?
-  startedDate         DateTime?
-  completedDate       DateTime?
-  metadata            Json?
+  id             String         @id @default(cuid())
+  organizationId String
+  transferNumber String         @unique
+  status         TransferStatus @default(PENDING)
+  fromLocationId String
+  toLocationId   String
+  inventoryId    String
+  quantity       Int
+  reason         String?
+  notes          String?
+  priority       String?
+  requestedById  String
+  approvedById   String?
+  completedById  String?
+  requestedDate  DateTime       @default(now())
+  scheduledDate  DateTime?
+  approvedDate   DateTime?
+  startedDate    DateTime?
+  completedDate  DateTime?
+  metadata       Json?
+
+  // Advanced Orchestration Fields
+  type             String  @default("STANDARD") // STANDARD, INTER_ORG, RECTIFICATION, CROSS_DOCK
+  billingStatus    String  @default("NONE") // NONE, PENDING, INVOICED, CREDITED
+  parentTransferId String? // For chaining (e.g. Hub -> Branch)
+  destinationOrgId String? // For inter-org moves
+
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
   autonomousDecisions AutonomousDecision[]
@@ -1474,6 +1506,7 @@ model RMA {
   qr_returns            qr_returns?
   returnLabels          ReturnLabel[]
   items                 RMAItem[]
+  refunds               Refund[]
   approvedBy            User?                  @relation("RMAApprovedBy", fields: [approvedById], references: [id])
   customer              Customer               @relation(fields: [customerId], references: [id])
   inspectedBy           User?                  @relation("RMAInspectedBy", fields: [inspectedById], references: [id])
@@ -3460,6 +3493,7 @@ model Client {
   rateCards      BillingRateCard[]
   transactions   BillingTransaction[]
   invoices       ClientInvoice[]
+  vasRequests    VASRequest[]
   organization   Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@unique([organizationId, clientCode])
@@ -3534,6 +3568,71 @@ model BillingTransaction {
   @@index([transactionDate])
   @@index([billingStatus])
   @@map("billing_transactions")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// VALUE-ADDED SERVICES (VAS)
+// ─────────────────────────────────────────────────────────────────────────────
+
+model VASRequest {
+  id                   String       @id @default(cuid())
+  organizationId       String
+  clientId             String?
+  serviceCode          String
+  serviceName          String
+  description          String?
+  status               VASStatus    @default(PENDING)
+  quantity             Int          @default(1)
+  targetType           String? // "InventoryItem", "Order", "Shipment"
+  targetId             String?
+  assignedToId         String?
+  startedAt            DateTime?
+  completedAt          DateTime?
+  durationMinutes      Int?
+  materialsUsed        Json? // List of materials consumed
+  evidencePhotos       String[]
+  billable             Boolean      @default(true)
+  billingTransactionId String?
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+  organization         Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  client               Client?      @relation(fields: [clientId], references: [id])
+  assignedTo           User?        @relation(fields: [assignedToId], references: [id])
+
+  @@index([organizationId])
+  @@index([status])
+  @@index([targetId])
+  @@map("vas_requests")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SUPPLIER CHARGEBACKS
+// ─────────────────────────────────────────────────────────────────────────────
+
+model SupplierChargeback {
+  id              String           @id @default(cuid())
+  organizationId  String
+  supplierId      String
+  referenceNumber String           @unique
+  issueType       ChargebackReason
+  description     String?
+  amount          Decimal          @db.Decimal(10, 2)
+  currency        String           @default("USD")
+  status          ChargebackStatus @default(DRAFT)
+  evidenceDocs    String[]
+  poId            String?
+  asnId           String?
+  qcInspectionId  String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  supplier        Supplier         @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  purchaseOrder   PurchaseOrder?   @relation(fields: [poId], references: [id])
+
+  @@index([organizationId])
+  @@index([supplierId])
+  @@index([status])
+  @@map("supplier_chargebacks")
 }
 
 model Invoice {
@@ -7063,6 +7162,11 @@ enum UserRole {
   MANAGER
   USER
   VIEWER
+  SUPPLIER
+  CARRIER
+  CUSTOMER
+  CLIENT_3PL
+  AUDITOR
 }
 
 enum OrganizationRole {
@@ -7174,6 +7278,7 @@ enum SalesOrderStatus {
   CLOSED // Payment confirmed, order fully closed
   CANCELLED
   ON_HOLD
+  BACKORDERED
 }
 
 enum InvoiceTrigger {
@@ -8191,6 +8296,7 @@ enum BillingTransactionType {
   TRANSPORTATION
   EQUIPMENT
   OTHER
+  SUPPLIER_CHARGEBACK
 }
 
 enum BillingStatus {
@@ -8253,6 +8359,7 @@ enum IoTDeviceType {
   MOTION_DETECTOR
   CAMERA
   GPS_TRACKER
+  PRINTER
   OTHER
 }
 
@@ -9633,28 +9740,6 @@ enum ASNStatus {
 // NEXT-GEN ROBOTICS & IoT SENSORS (V2)
 // ─────────────────────────────────────────────────────────────────────────────
 
-model AutonomousRobot {
-  id             String      @id @default(cuid())
-  organizationId String
-  warehouseId    String
-  name           String
-  model          String // e.g. "AMR-Heavy-Lift", "Case-Picker-Arm"
-  status         RobotStatus @default(IDLE)
-  batteryLevel   Float       @default(100.0)
-  currentTask    String? // Links to a ReplenishmentTask.id loosely or formally
-  lastPingAt     DateTime    @default(now())
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
-
-  warehouse    Warehouse    @relation("WarehouseRobots", fields: [warehouseId], references: [id])
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-
-  @@index([organizationId])
-  @@index([warehouseId])
-  @@index([status])
-  @@map("autonomous_robots")
-}
-
 model IoTSensorEvent {
   id             String   @id @default(cuid())
   organizationId String
@@ -9675,35 +9760,25 @@ model IoTSensorEvent {
   @@map("iot_sensor_events")
 }
 
-enum RobotStatus {
-  IDLE
-  CHARGING
-  IN_TRANSIT
-  PICKING
-  PLACING
-  MAINTENANCE
-  ERROR
-}
-
 // ─── Voice System (V-2) ────────────────────────────────────────────────────────
 
 model VoiceSession {
-  id             String            @id @default(cuid())
+  id             String             @id @default(cuid())
   userId         String
   organizationId String?
-  transcript     String            // raw text sent to the engine
-  intent         String?           // parsed intent label, e.g. "PICK"
-  entities       Json?             // extracted entities (sku, qty, location …)
-  response       String?           // text response returned to the user
-  audioUrl       String?           // optional URL to stored audio file
-  language       String            @default("en")
+  transcript     String // raw text sent to the engine
+  intent         String? // parsed intent label, e.g. "PICK"
+  entities       Json? // extracted entities (sku, qty, location …)
+  response       String? // text response returned to the user
+  audioUrl       String? // optional URL to stored audio file
+  language       String             @default("en")
   status         VoiceSessionStatus @default(PENDING)
   errorMessage   String?
-  durationMs     Int?              // processing time in milliseconds
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
+  durationMs     Int? // processing time in milliseconds
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
 
-  user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([organizationId])
@@ -9721,17 +9796,17 @@ enum VoiceSessionStatus {
 // ─── Auth Security (required by apps/web/src/lib/auth.ts) ─────────────────────
 
 model SecurityProfile {
-  id                   String    @id @default(cuid())
-  userId               String    @unique
-  failedLoginAttempts  Int       @default(0)
-  lastFailedLogin      DateTime?
-  lockedUntil          DateTime?
-  mfaEnabled           Boolean   @default(false)
-  mfaSecret            String?
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
+  id                  String    @id @default(cuid())
+  userId              String    @unique
+  failedLoginAttempts Int       @default(0)
+  lastFailedLogin     DateTime?
+  lockedUntil         DateTime?
+  mfaEnabled          Boolean   @default(false)
+  mfaSecret           String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
-  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("security_profiles")
 }
@@ -9739,11 +9814,11 @@ model SecurityProfile {
 model SecurityLog {
   id        String   @id @default(cuid())
   userId    String
-  event     String   // e.g. "LOGIN_ATTEMPT", "LOGIN_FAILED", "LOGIN_SUCCESS"
+  event     String // e.g. "LOGIN_ATTEMPT", "LOGIN_FAILED", "LOGIN_SUCCESS"
   metadata  Json?
   timestamp DateTime @default(now())
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([event])
@@ -9754,18 +9829,18 @@ model SecurityLog {
 // ─── LoadSheet & related models ─────────────────────────────────────────────
 
 model BayDoor {
-  id             String      @id @default(cuid())
+  id             String       @id @default(cuid())
   organizationId String
   warehouseId    String?
   doorNumber     String
-  doorType       String?     // INBOUND | OUTBOUND | CROSS_DOCK
-  status         String      @default("AVAILABLE") // AVAILABLE | OCCUPIED | MAINTENANCE | CLOSED
-  isActive       Boolean     @default(true)
+  doorType       String? // INBOUND | OUTBOUND | CROSS_DOCK
+  status         String       @default("AVAILABLE") // AVAILABLE | OCCUPIED | MAINTENANCE | CLOSED
+  isActive       Boolean      @default(true)
   notes          String?
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  warehouse      Warehouse?  @relation(fields: [warehouseId], references: [id])
+  warehouse      Warehouse?   @relation(fields: [warehouseId], references: [id])
   loadSheets     LoadSheet[]
 
   @@unique([organizationId, doorNumber])
@@ -9775,49 +9850,59 @@ model BayDoor {
 }
 
 model LoadSheet {
-  id                    String            @id @default(cuid())
-  organizationId        String
-  warehouseId           String?
-  loadSheetNumber       String
-  status                String            @default("BUILDING") // BUILDING | CONFIRMED | APPROVED | DISTRIBUTED | DEPARTED | CANCELLED
-  generationMethod      String            @default("MANUAL")   // REALTIME | MANUAL
-  autoGenerated         Boolean           @default(false)
-  shipmentDate          DateTime
-  customerId            String?
-  destinationAddress    String?
-  destinationBranch     String?
-  routeCode             String?
-  carrierName           String?
-  carrierCode           String?
-  driverName            String?
-  driverPhone           String?
-  trailerNumber         String?
-  bayDoorId             String?
-  totalContainers       Int               @default(0)
-  totalWeight           Float             @default(0)
-  totalVolume           Float             @default(0)
-  totalPallets          Int               @default(0)
-  totalBoxes            Int               @default(0)
-  totalItems            Int               @default(0)
-  totalOrders           Int               @default(0)
-  approved              Boolean           @default(false)
-  approvedBy            String?
-  approvedAt            DateTime?
-  approvalNotes         String?
-  distributed           Boolean           @default(false)
-  distributedAt         DateTime?
-  actualDeparture       DateTime?
-  notes                 String?
-  metadata              Json?
-  createdAt             DateTime          @default(now())
-  updatedAt             DateTime          @updatedAt
+  id                 String    @id @default(cuid())
+  organizationId     String
+  warehouseId        String?
+  loadSheetNumber    String
+  status             String    @default("BUILDING") // BUILDING | CONFIRMED | APPROVED | DISTRIBUTED | DEPARTED | CANCELLED
+  generationMethod   String    @default("MANUAL") // REALTIME | MANUAL
+  autoGenerated      Boolean   @default(false)
+  shipmentDate       DateTime
+  customerId         String?
+  destinationAddress String?
+  destinationBranch  String?
+  routeCode          String?
+  carrierName        String?
+  carrierCode        String?
+  driverName         String?
+  driverPhone        String?
+  trailerNumber      String?
+  bayDoorId          String?
+  totalContainers    Int       @default(0)
+  totalWeight        Float     @default(0)
+  totalVolume        Float     @default(0)
+  totalPallets       Int       @default(0)
+  totalBoxes         Int       @default(0)
+  totalItems         Int       @default(0)
+  totalOrders        Int       @default(0)
+  approved           Boolean   @default(false)
+  approvedBy         String?
+  approvedAt         DateTime?
+  approvalNotes      String?
+  distributed        Boolean   @default(false)
+  distributedAt      DateTime?
+
+  // Timing & KPI Fields
+  scheduledDeparture DateTime? // Target departure time
+  startedLoadingAt   DateTime? // When the first item was scanned/loaded
+  finishedLoadingAt  DateTime? // When the last item was loaded
+  actualDeparture    DateTime? // When the truck left the geofence/gate
+  delayReason        String? // "Traffic", "Warehouse Delay", "Paperwork", etc.
+  detentionMinutes   Int?      @default(0) // Billable detention time
+
+  notes                  String?
+  metadata               Json?
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
   loadSheetDistributions LoadSheetDistribution[]
-  events                LoadSheetEvent[]
-  containers            Container[]
-  bayDoor               BayDoor?          @relation(fields: [bayDoorId], references: [id])
-  customer              Customer?         @relation(fields: [customerId], references: [id])
-  organization          Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  warehouse             Warehouse?        @relation(fields: [warehouseId], references: [id])
+  events                 LoadSheetEvent[]
+  containers             Container[]
+  bayDoor                BayDoor?                @relation(fields: [bayDoorId], references: [id])
+  customer               Customer?               @relation(fields: [customerId], references: [id])
+  organization           Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  warehouse              Warehouse?              @relation(fields: [warehouseId], references: [id])
+  vehicleType            FleetVehicleType?       @relation(fields: [vehicleTypeId], references: [id])
+  vehicleTypeId          String?
 
   @@unique([organizationId, loadSheetNumber])
   @@index([organizationId])
@@ -9826,6 +9911,27 @@ model LoadSheet {
   @@index([shipmentDate])
   @@index([status])
   @@map("load_sheets")
+}
+
+model FleetVehicleType {
+  id             String       @id @default(cuid())
+  organizationId String
+  name           String // e.g. "53ft Dry Van", "26ft Box Truck"
+  description    String?
+  length         Float // in meters or feet
+  width          Float
+  height         Float
+  maxWeight      Float // kg
+  maxVolume      Float // cubic meters
+  metadata       Json?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  loadSheets     LoadSheet[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+  @@map("fleet_vehicle_types")
 }
 
 model LoadSheetDistribution {
@@ -9846,7 +9952,7 @@ model LoadSheetDistribution {
 model LoadSheetEvent {
   id             String    @id @default(cuid())
   loadSheetId    String
-  eventType      String    // CREATED | APPROVED | DISTRIBUTED | DEPARTED | MODIFIED
+  eventType      String // CREATED | APPROVED | DISTRIBUTED | DEPARTED | MODIFIED
   userId         String?
   userName       String?
   automated      Boolean   @default(false)
@@ -9917,7 +10023,7 @@ model YardMove {
   appointmentId  String?
   status         YardMoveStatus @default(PENDING)
   priority       Int            @default(1)
-  assignedToId   String?       // Yard jockey user ID
+  assignedToId   String? // Yard jockey user ID
   completedBy    String?
   completedAt    DateTime?
   startedAt      DateTime?
@@ -9926,12 +10032,12 @@ model YardMove {
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 
-  fromLocation   YardLocation    @relation("MovesFrom", fields: [fromLocationId], references: [id])
-  toLocation     YardLocation    @relation("MovesTo", fields: [toLocationId], references: [id])
-  appointment    DockAppointment? @relation(fields: [appointmentId], references: [id])
-  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  assignedTo     User?           @relation("YardMoveAssignee", fields: [assignedToId], references: [id])
-  
+  fromLocation YardLocation     @relation("MovesFrom", fields: [fromLocationId], references: [id])
+  toLocation   YardLocation     @relation("MovesTo", fields: [toLocationId], references: [id])
+  appointment  DockAppointment? @relation(fields: [appointmentId], references: [id])
+  organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  assignedTo   User?            @relation("YardMoveAssignee", fields: [assignedToId], references: [id])
+
   @@index([organizationId])
   @@index([warehouseId])
   @@index([status])
@@ -9945,4 +10051,318 @@ enum YardMoveStatus {
   IN_PROGRESS
   COMPLETED
   CANCELLED
+}
+
+// --------------------------------------------------------
+// AUTOMATION & ROBOTICS ORCHESTRATION MODULE
+// --------------------------------------------------------
+
+enum RobotType {
+  AMR // Autonomous Mobile Robot
+  AGV // Automated Guided Vehicle
+  CONVEYOR
+  ASRS // Automated Storage & Retrieval
+  COBOT
+  PICKING_ARM
+  SORTER
+  DRONE
+  OTHER
+}
+
+enum RobotStatus {
+  IDLE
+  WORKING
+  CHARGING
+  ERROR
+  MAINTENANCE
+  OFFLINE
+}
+
+enum RobotTaskType {
+  MOVE_PALLET
+  MOVE_TOTE
+  DELIVER_PICK
+  REPLENISHMENT
+  CYCLE_COUNT
+  SORTATION
+  DISPOSAL
+  CUSTOM
+}
+
+enum RobotTaskStatus {
+  PENDING
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum VASStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  ON_HOLD
+}
+
+enum ChargebackReason {
+  LATE_DELIVERY
+  DAMAGED_GOODS
+  INCORRECT_QUANTITY
+  WRONG_ITEM
+  PACKAGING_VIOLATION
+  LABELING_ERROR
+  DOCUMENT_MISSING
+  QC_FAILURE
+  OTHER
+}
+
+enum ChargebackStatus {
+  DRAFT
+  ISSUED
+  ACCEPTED
+  DISPUTED
+  RESOLVED
+  CANCELLED
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// COGNITIVE ORCHESTRATION & AUTONOMOUS DECISION ENGINE
+// ─────────────────────────────────────────────────────────────────────────────
+
+enum CognitiveGoalType {
+  MINIMIZE_COST
+  MAXIMIZE_SPEED
+  MINIMIZE_CARBON
+  MAXIMIZE_ACCURACY
+  BALANCE_ALL
+}
+
+enum DecisionStatus {
+  EVALUATING
+  PROPOSED
+  EXECUTED
+  FAILED
+  OVERRIDDEN
+}
+
+enum ActionCategory {
+  LABOR_ALLOCATION
+  INVENTORY_ROUTING
+  CARRIER_SELECTION
+  WAVE_MANAGEMENT
+  BILLING_ADJUSTMENT
+}
+
+model CognitivePolicy {
+  id             String            @id @default(cuid())
+  organizationId String
+  name           String
+  description    String?
+  goalType       CognitiveGoalType @default(BALANCE_ALL)
+  priority       Int               @default(1) // 1 = High, 10 = Low
+  isActive       Boolean           @default(true)
+  constraints    Json? // e.g., { "maxCost": 50, "minSLA": 98 }
+  learningRate   Float             @default(0.1) // For RL models
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  organization   Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  decisionLogs   DecisionLog[]
+
+  @@index([organizationId])
+  @@index([isActive])
+  @@map("cognitive_policies")
+}
+
+model DecisionLog {
+  id              String           @id @default(cuid())
+  organizationId  String
+  policyId        String?
+  scenarioId      String? // Link to a simulation if applicable
+  timestamp       DateTime         @default(now())
+  triggerEvent    String // e.g., "CongestionDetected", "SLA_Breach_Predicted"
+  category        ActionCategory
+  description     String
+  aiReasoning     String // Explanation of why this decision was made
+  confidenceScore Float
+  status          DecisionStatus
+  actionTaken     Json? // Details of the server action executed
+  outcomeMetric   Json? // The literal result (time saved, cost incurred)
+  userOverrideId  String? // If a human stopped it
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  policy          CognitivePolicy? @relation(fields: [policyId], references: [id])
+
+  @@index([organizationId])
+  @@index([timestamp])
+  @@index([category])
+  @@map("decision_logs")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// COGNITIVE ORCHESTRATION & MULTI-ECHELON TRANSFER MODULE
+// ─────────────────────────────────────────────────────────────────────────────
+
+model TransferRequest {
+  id                   String  @id @default(cuid())
+  transferNumber       String  @unique
+  sourceOrganizationId String
+  targetOrganizationId String
+  sourceWarehouseId    String?
+  targetWarehouseId    String?
+
+  status TransferRequestStatus @default(DRAFT)
+  type   TransferType          @default(INTERNAL) // INTERNAL, INTER_ORG, RECALL, RECTIFICATION
+
+  requestedById String
+  approvedById  String?
+  shippedById   String?
+  receivedById  String?
+
+  requestedAt DateTime  @default(now())
+  approvedAt  DateTime?
+  shippedAt   DateTime?
+  receivedAt  DateTime?
+
+  shippingMethod String?
+  trackingNumber String?
+
+  // Financial clearing for Inter-Org
+  invoiceId      String? // Generated Inter-Company Invoice
+  clearingStatus ClearingStatus @default(PENDING) // PENDING, INVOICED, SETTLED
+
+  items TransferRequestItem[]
+
+  sourceOrganization Organization @relation("TransferSourceOrg", fields: [sourceOrganizationId], references: [id])
+  targetOrganization Organization @relation("TransferTargetOrg", fields: [targetOrganizationId], references: [id])
+  sourceWarehouse    Warehouse?   @relation("TransferSourceWh", fields: [sourceWarehouseId], references: [id])
+  targetWarehouse    Warehouse?   @relation("TransferTargetWh", fields: [targetWarehouseId], references: [id])
+
+  requestedBy User @relation("TransferRequestor", fields: [requestedById], references: [id])
+
+  @@index([sourceOrganizationId])
+  @@index([targetOrganizationId])
+  @@index([status])
+  @@map("transfer_requests")
+}
+
+model TransferRequestItem {
+  id                String @id @default(cuid())
+  transferRequestId String
+  sku               String
+  productName       String
+  quantityRequested Int
+  quantityShipped   Int    @default(0)
+  quantityReceived  Int    @default(0)
+
+  unitCost Decimal? @db.Decimal(10, 2) // For valuation
+
+  status TransferItemStatus @default(PENDING)
+
+  transferRequest TransferRequest @relation(fields: [transferRequestId], references: [id], onDelete: Cascade)
+
+  @@index([transferRequestId])
+  @@index([sku])
+  @@map("transfer_request_items")
+}
+
+enum TransferRequestStatus {
+  DRAFT
+  REQUESTED
+  APPROVED
+  IN_TRANSIT
+  PARTIALLY_RECEIVED
+  RECEIVED
+  COMPLETED
+  CANCELLED
+}
+
+enum TransferType {
+  INTERNAL // Branch to Branch (Same Org)
+  INTER_ORG // Cross-Entity
+  RECALL // DC Recall from Branch
+  RECTIFICATION // Virtual correction
+}
+
+enum ClearingStatus {
+  PENDING
+  INVOICED
+  SETTLED
+  NOT_APPLICABLE
+}
+
+enum TransferItemStatus {
+  PENDING
+  ALLOCATED
+  SHIPPED
+  RECEIVED
+  SHORT
+  DAMAGED
+}
+
+model Printer {
+  id             String  @id @default(cuid())
+  organizationId String
+  name           String
+  type           String  @default("LASER") // ZEBRA, LASER, PDF_DOWNLOAD
+  ipAddress      String?
+  port           Int?    @default(9100) // Standard HP JetDirect port
+  location       String?
+  description    String?
+  isActive       Boolean @default(true)
+  metadata       Json?
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  users        User[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([organizationId])
+  @@map("printers")
+}
+
+model Refund {
+  id              String       @id @default(cuid())
+  organizationId  String
+  salesOrderId    String?
+  rmaId           String?
+  amount          Decimal      @db.Decimal(10, 2)
+  reason          RefundReason
+  reasonDetails   String?
+  status          RefundStatus @default(PENDING)
+  processedAt     DateTime?
+  processedById   String?
+  transactionId   String?
+  currency        String       @default("USD")
+  method          String? // Credit Card, Store Credit, Check
+  metadata        Json?
+  
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  salesOrder      SalesOrder?  @relation(fields: [salesOrderId], references: [id])
+  rma             RMA?         @relation(fields: [rmaId], references: [id])
+  processedBy     User?        @relation("RefundProcessor", fields: [processedById], references: [id])
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([organizationId])
+  @@index([salesOrderId])
+  @@index([rmaId])
+  @@index([status])
+}
+
+enum RefundReason {
+  ITEM_NOT_ARRIVED
+  DAMAGED_ITEM
+  JOB_CANCELLED
+  CUSTOMER_REQUEST
+  OTHER
+}
+
+enum RefundStatus {
+  PENDING
+  PROCESSED
+  FAILED
+  REJECTED
 }

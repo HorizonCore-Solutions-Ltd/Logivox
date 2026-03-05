@@ -4,13 +4,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-import { 
-  Plus, 
-  Trash, 
-  Save, 
-  ArrowLeft, 
+import {
+  Plus,
+  Trash,
+  Save,
+  ArrowLeft,
   Loader2,
-  GripVertical
+  GripVertical,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -74,7 +74,7 @@ export default function NewTemplatePage() {
 
   const updateCheckpoint = (id: string, updates: Partial<Checkpoint>) => {
     setCheckpoints(
-      checkpoints.map((cp) => (cp.id === id ? { ...cp, ...updates } : cp))
+      checkpoints.map((cp) => (cp.id === id ? { ...cp, ...updates } : cp)),
     );
   };
 
@@ -104,12 +104,14 @@ export default function NewTemplatePage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !code || checkpoints.length === 0) {
-      toast.error("Please fill in all required fields and add at least one checkpoint");
+      toast.error(
+        "Please fill in all required fields and add at least one checkpoint",
+      );
       return;
     }
-    
+
     // Validate checkpoints have labels
-    if (checkpoints.some(cp => !cp.label.trim())) {
+    if (checkpoints.some((cp) => !cp.label.trim())) {
       toast.error("All checkpoints must have a label");
       return;
     }
@@ -133,7 +135,9 @@ export default function NewTemplatePage() {
           </Button>
         </Link>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Create QC Template</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Create QC Template
+          </h1>
           <p className="text-muted-foreground">
             Define a standard set of checks for inspections.
           </p>
@@ -144,7 +148,9 @@ export default function NewTemplatePage() {
         <Card>
           <CardHeader>
             <CardTitle>Template Details</CardTitle>
-            <CardDescription>Basic information about this inspection template.</CardDescription>
+            <CardDescription>
+              Basic information about this inspection template.
+            </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-6 md:grid-cols-2">
             <div className="space-y-2">
@@ -157,7 +163,7 @@ export default function NewTemplatePage() {
                 required
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="code">Template Code *</Label>
               <Input
@@ -186,15 +192,19 @@ export default function NewTemplatePage() {
 
             <div className="space-y-2">
               <Label htmlFor="sampling">Sampling Type</Label>
-               <Select value={samplingType} onValueChange={setSamplingType}>
+              <Select value={samplingType} onValueChange={setSamplingType}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select sampling type" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="FULL">100% Inspection</SelectItem>
                   <SelectItem value="AQL_LEVEL_I">Level I (Reduced)</SelectItem>
-                  <SelectItem value="AQL_LEVEL_II">Level II (Normal)</SelectItem>
-                  <SelectItem value="AQL_LEVEL_III">Level III (Tightened)</SelectItem>
+                  <SelectItem value="AQL_LEVEL_II">
+                    Level II (Normal)
+                  </SelectItem>
+                  <SelectItem value="AQL_LEVEL_III">
+                    Level III (Tightened)
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -215,9 +225,16 @@ export default function NewTemplatePage() {
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle>Checkpoints</CardTitle>
-              <CardDescription>Add the criteria to be checked during inspection.</CardDescription>
+              <CardDescription>
+                Add the criteria to be checked during inspection.
+              </CardDescription>
             </div>
-            <Button type="button" onClick={addCheckpoint} variant="outline" size="sm">
+            <Button
+              type="button"
+              onClick={addCheckpoint}
+              variant="outline"
+              size="sm"
+            >
               <Plus className="mr-2 h-4 w-4" />
               Add Checkpoint
             </Button>
@@ -229,36 +246,51 @@ export default function NewTemplatePage() {
               </div>
             ) : (
               checkpoints.map((cp, index) => (
-                <div key={cp.id} className="flex gap-4 items-start p-4 border rounded-lg bg-card hover:bg-accent/5 transition-colors group relative">
+                <div
+                  key={cp.id}
+                  className="flex gap-4 items-start p-4 border rounded-lg bg-card hover:bg-accent/5 transition-colors group relative"
+                >
                   <div className="mt-3 text-muted-foreground cursor-move">
                     <GripVertical className="h-4 w-4" />
                   </div>
-                  
+
                   <div className="flex-1 space-y-4">
                     <div className="grid gap-4 md:grid-cols-[2fr,1fr]">
                       <div className="space-y-2">
                         <Label>Check Label</Label>
-                        <Input 
-                          value={cp.label} 
-                          onChange={(e) => updateCheckpoint(cp.id, { label: e.target.value })}
-                          placeholder="e.g. Check for scratches" 
+                        <Input
+                          value={cp.label}
+                          onChange={(e) =>
+                            updateCheckpoint(cp.id, { label: e.target.value })
+                          }
+                          placeholder="e.g. Check for scratches"
                         />
                       </div>
                       <div className="space-y-2">
                         <Label>Result Type</Label>
-                        <Select 
-                          value={cp.type} 
-                          onValueChange={(val: any) => updateCheckpoint(cp.id, { type: val })}
+                        <Select
+                          value={cp.type}
+                          onValueChange={(val: any) =>
+                            updateCheckpoint(cp.id, { type: val })
+                          }
                         >
                           <SelectTrigger>
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="BOOLEAN">Pass / Fail</SelectItem>
-                            <SelectItem value="NUMERIC">Numeric Measurement</SelectItem>
-                            <SelectItem value="TEXT">Text Observation</SelectItem>
-                            <SelectItem value="OPTION">Multiple Choice (TODO)</SelectItem>
-                            <SelectItem value="PHOTO">Photo Required</SelectItem>
+                            <SelectItem value="NUMERIC">
+                              Numeric Measurement
+                            </SelectItem>
+                            <SelectItem value="TEXT">
+                              Text Observation
+                            </SelectItem>
+                            <SelectItem value="OPTION">
+                              Multiple Choice (TODO)
+                            </SelectItem>
+                            <SelectItem value="PHOTO">
+                              Photo Required
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -267,7 +299,7 @@ export default function NewTemplatePage() {
 
                   <Button
                     type="button"
-                    variant="ghost" 
+                    variant="ghost"
                     size="icon"
                     className="text-muted-foreground hover:text-destructive mt-8"
                     onClick={() => removeCheckpoint(cp.id)}
@@ -279,11 +311,18 @@ export default function NewTemplatePage() {
             )}
           </CardContent>
           <CardFooter className="justify-end border-t pt-6 bg-muted/20">
-            <Button type="button" variant="outline" onClick={() => router.push('/quality/templates')} className="mr-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.push("/quality/templates")}
+              className="mr-4"
+            >
               Cancel
             </Button>
             <Button type="submit" disabled={createMutation.isPending}>
-              {createMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {createMutation.isPending && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
               <Save className="mr-2 h-4 w-4" />
               Save Template
             </Button>

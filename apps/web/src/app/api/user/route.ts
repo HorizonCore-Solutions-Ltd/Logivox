@@ -10,6 +10,7 @@ const updateProfileSchema = z.object({
   email: z.string().email().optional(),
   currentPassword: z.string().optional(),
   newPassword: z.string().min(8).optional(),
+  defaultPrinterId: z.string().optional().nullable(),
 });
 
 /** GET /api/user – return current user profile */
@@ -27,6 +28,8 @@ export async function GET() {
       role: true,
       isActive: true,
       createdAt: true,
+      defaultPrinterId: true,
+      defaultPrinter: { select: { id: true, name: true, type: true } },
       organizationMembers: {
         where: { isActive: true },
         select: { organization: { select: { id: true, name: true } } },
@@ -48,7 +51,16 @@ export async function PATCH(request: NextRequest) {
   const body = await request.json();
   const data = updateProfileSchema.parse(body);
 
-  const updates: { name?: string; email?: string; passwordHash?: string } = {};
+  const updates: {
+    name?: string;
+    email?: string;
+    passwordHash?: string;
+    defaultPrinterId?: string | null;
+  } = {};
+
+  if (typeof data.defaultPrinterId !== "undefined") {
+    updates.defaultPrinterId = data.defaultPrinterId;
+  }
 
   if (data.name) updates.name = data.name;
   if (data.email) {
@@ -89,7 +101,14 @@ export async function PATCH(request: NextRequest) {
   const updated = await prisma.user.update({
     where: { id: session.user.id },
     data: updates,
-    select: { id: true, name: true, email: true, role: true },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      defaultPrinterId: true,
+      defaultPrinter: { select: { id: true, name: true } },
+    },
   });
   return NextResponse.json({ user: updated });
 }

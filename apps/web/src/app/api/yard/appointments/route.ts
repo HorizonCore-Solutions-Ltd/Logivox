@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 export async function GET(req: Request) {
   const session = await getServerSession(authOptions);
@@ -19,25 +19,25 @@ export async function GET(req: Request) {
       // organizationId: // Wait, schema had organizationId?
       // Yes, DockAppointment has organizationId.
     };
-    
+
     // If user has organizationId
     // Need to verify if session.user has organizationId. usually added in callbacks.
     // If not, maybe query first org.
-    
+
     // For MVP, I'll filter by status if provided.
     if (status) {
       whereClause.status = status;
     }
-    
+
     if (date) {
       const startOfDay = new Date(date);
-      startOfDay.setHours(0,0,0,0);
+      startOfDay.setHours(0, 0, 0, 0);
       const endOfDay = new Date(date);
-      endOfDay.setHours(23,59,59,999);
+      endOfDay.setHours(23, 59, 59, 999);
       whereClause.scheduledDate = {
         gte: startOfDay,
-        lte: endOfDay
-      }
+        lte: endOfDay,
+      };
     }
 
     const appointments = await prisma.dockAppointment.findMany({
@@ -46,17 +46,17 @@ export async function GET(req: Request) {
         yardLocation: true,
         gateEntries: true,
         yardMoves: {
-           include: { toLocation: true, fromLocation: true }
-        }
+          include: { toLocation: true, fromLocation: true },
+        },
       },
       orderBy: {
-        scheduledStart: 'asc'
-      }
+        scheduledStart: "asc",
+      },
     });
 
     return NextResponse.json(appointments);
   } catch (error) {
-    console.error('[YARD_APPOINTMENTS_GET]', error);
+    console.error("[YARD_APPOINTMENTS_GET]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
@@ -69,10 +69,10 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json();
-    const { 
-      scheduledStart, 
-      scheduledEnd, 
-      appointmentType, 
+    const {
+      scheduledStart,
+      scheduledEnd,
+      appointmentType,
       carrierName,
       trailerNumber,
       // ... other fields
@@ -92,17 +92,20 @@ export async function POST(req: Request) {
         scheduledDate: new Date(scheduledStart),
         scheduledStart: new Date(scheduledStart),
         scheduledEnd: new Date(scheduledEnd),
-        duration: (new Date(scheduledEnd).getTime() - new Date(scheduledStart).getTime()) / 60000,
+        duration:
+          (new Date(scheduledEnd).getTime() -
+            new Date(scheduledStart).getTime()) /
+          60000,
         appointmentType: appointmentType || "INBOUND",
         carrierName,
         trailerNumber,
-        status: "SCHEDULED"
-      }
+        status: "SCHEDULED",
+      },
     });
 
     return NextResponse.json(appointment);
   } catch (error) {
-    console.error('[YARD_APPOINTMENTS_POST]', error);
+    console.error("[YARD_APPOINTMENTS_POST]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

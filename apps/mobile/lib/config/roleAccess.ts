@@ -57,7 +57,9 @@ export type TabName =
   | "labor"
   | "slotting"
   | "delivery"
-  | "assembly";
+  | "assembly"
+  | "cognitive"
+  | "transfers";
 
 export interface RoleConfig {
   label: string; // Human-readable role name
@@ -313,6 +315,8 @@ const ROLE_CONFIG: Record<AppRole, RoleConfig> = {
       "slotting",
       "assembly",
       "delivery",
+      "cognitive",
+      "transfers",
     ],
   },
 
@@ -435,6 +439,8 @@ const ROLE_CONFIG: Record<AppRole, RoleConfig> = {
       "delivery.view",
       "reporting",
       "laborPerformance",
+      "cognitive",
+      "transfers",
     ],
   },
 

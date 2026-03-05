@@ -23,6 +23,18 @@ const faqs = [
     q: "How fast is time-to-value?",
     a: "Day 1 trial access; week-one ROI checks with burn-rate alerts and SLO dashboards to prove reliability and savings.",
   },
+  {
+    q: "Do I need special hardware (Vocollect, etc)?",
+    a: "No. LogiVox is device-agnostic. It runs on affordable Android/iOS smartphones ($300) or enterprise Zebra TC5x devices. Use standard Bluetooth headsets (Jabra, BlueParrott, AirPods).",
+  },
+  {
+    q: "What is 'Hybrid Choice' voice?",
+    a: "It gives you the best of both worlds. New hires use 'Rookie Mode' (Screen showing images + Voice) for training, while experts use 'Speed Mode' (Screen off/pocketed) for maximum throughput.",
+  },
+  {
+    q: "How does the 'OLED Black' mode save battery?",
+    a: "In Pro Mode, we turn off 99% of the screen pixels (OLED Black), waking only for exceptions. This extends standard consumer device battery life to cover full 10-hour shifts.",
+  },
 ];
 
 export function FAQSection() {

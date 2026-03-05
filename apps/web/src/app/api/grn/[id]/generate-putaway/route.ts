@@ -102,22 +102,22 @@ export async function POST(
         if (item.binLocation) {
           // Check if binLocation is an ID first (standard for Brain)
           const locById = await tx.location.findUnique({
-             where: { id: item.binLocation }
+            where: { id: item.binLocation },
           });
-          
+
           if (locById) {
-              targetLocId = locById.id;
+            targetLocId = locById.id;
           } else {
-             // Fallback for legacy (Name/Code)
-             const specificLoc = await tx.location.findFirst({
-                where: {
+            // Fallback for legacy (Name/Code)
+            const specificLoc = await tx.location.findFirst({
+              where: {
                 organizationId,
                 warehouseId: grn.warehouseId,
                 OR: [
-                    { locationCode: item.binLocation },
-                    { name: item.binLocation },
+                  { locationCode: item.binLocation },
+                  { name: item.binLocation },
                 ],
-                },
+              },
             });
             if (specificLoc) targetLocId = specificLoc.id;
           }

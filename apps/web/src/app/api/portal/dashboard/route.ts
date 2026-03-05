@@ -17,9 +17,16 @@ export async function GET(request: NextRequest) {
 
     const user = session.user as any;
 
-    // Only allow CUSTOMER role
-    if (user.role !== "CUSTOMER") {
+    // Only allow CUSTOMER, SUPPLIER, CARRIER
+    if (!["CUSTOMER", "SUPPLIER", "CARRIER"].includes(user.role)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    // Return role info to help frontend decide what to show
+    const baseResponse = { role: user.role };
+
+    if (user.role !== "CUSTOMER") {
+        return NextResponse.json(baseResponse);
     }
 
     // Get customer record
@@ -98,6 +105,7 @@ export async function GET(request: NextRequest) {
     }));
 
     return NextResponse.json({
+      role: user.role,
       totalOrders,
       pendingOrders,
       shippedOrders,

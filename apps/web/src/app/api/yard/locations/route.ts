@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 export async function GET(req: Request) {
   const session = await getServerSession(authOptions);
@@ -14,19 +14,19 @@ export async function GET(req: Request) {
       include: {
         appointments: {
           where: {
-            status: { in: ['SCHEDULED', 'CHECKED_IN', 'IN_PROGRESS'] }
+            status: { in: ["SCHEDULED", "CHECKED_IN", "IN_PROGRESS"] },
           },
-          take: 1
-        }
+          take: 1,
+        },
       },
       orderBy: {
-        locationCode: 'asc'
-      }
+        locationCode: "asc",
+      },
     });
 
     return NextResponse.json(locations);
   } catch (error) {
-    console.error('[YARD_LOCATIONS_GET]', error);
+    console.error("[YARD_LOCATIONS_GET]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

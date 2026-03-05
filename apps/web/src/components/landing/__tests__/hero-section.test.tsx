@@ -6,61 +6,54 @@ describe("HeroSection", () => {
     render(<HeroSection />);
 
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      /Run Your Warehouse.*With Your Voice/i,
+      /Enterprise Voice-Native.*Warehouse Management/i,
     );
   });
 
   it("renders CTA buttons", () => {
     render(<HeroSection />);
 
-    const startTrialButton = screen.getByRole("link", {
-      name: /start your free 30-day trial/i,
-    });
     const demoButton = screen.getByRole("link", {
-      name: /schedule a personalized demo/i,
+      name: /request enterprise demo/i,
     });
-
-    expect(startTrialButton).toBeInTheDocument();
-    expect(startTrialButton).toHaveAttribute("href", "/sign-up");
+    const contactButton = screen.getByRole("link", {
+      name: /contact sales team/i,
+    });
 
     expect(demoButton).toBeInTheDocument();
-    expect(demoButton).toHaveAttribute("href", "/demo");
+    expect(demoButton).toHaveAttribute("href", "/contact");
+
+    expect(contactButton).toBeInTheDocument();
+    expect(contactButton).toHaveAttribute("href", "/contact");
   });
 
   it("displays feature highlights", () => {
     render(<HeroSection />);
 
     expect(
-      screen.getByText(/95% Reduction in Picking Errors/i),
+      screen.getByText(/Production-ready WMS with 489 API endpoints/i),
     ).toBeInTheDocument();
-    expect(
-      screen.getByText(/3x Faster Order Fulfillment/i),
-    ).toBeInTheDocument();
-    expect(screen.getByText(/936% ROI in First Year/i)).toBeInTheDocument();
-    expect(screen.getByText(/Predictive Ops/)).toBeInTheDocument();
   });
 
   it("shows enterprise statistics", () => {
     render(<HeroSection />);
 
-    expect(screen.getByText("100%"));
-    expect(screen.getByText(/Automation/i)).toBeInTheDocument();
-    expect(screen.getByText(/44\+/)).toBeInTheDocument();
+    expect(screen.getByText("489"));
+    // "API Endpoints" appears multiple times (subtext + stat card), so we check if any exist
+    const apiEndpointsElements = screen.getAllByText(/API Endpoints/i);
+    expect(apiEndpointsElements.length).toBeGreaterThan(0);
+
+    expect(screen.getByText("42"));
+    expect(screen.getAllByText(/Dashboards/i)[0]).toBeInTheDocument();
+    
     expect(screen.getByText(/99.99%/)).toBeInTheDocument();
-    expect(screen.getByText(/IT Headaches/i)).toBeInTheDocument();
   });
 
   it("displays trust indicators", () => {
     render(<HeroSection />);
 
     expect(
-      screen.getByText(/Trusted by Fortune 500 companies/i),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(/SOC 2 & ISO 27001 Certified/i),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(/847 active warehouses today/i),
+      screen.getByText(/Built for Fortune 500 companies/i),
     ).toBeInTheDocument();
   });
 });

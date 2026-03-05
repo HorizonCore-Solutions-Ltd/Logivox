@@ -72,9 +72,9 @@ export async function POST(
         // Use the binLocation from the GRN item (set by Brain or User)
         const lotNumber =
           item.batchNumber || `LOT-${grn.grnNumber}-${item.id.slice(-4)}`;
-        
+
         // Check if we already have this lot in this location to merge
-        // Note: For strict traceability, we might want new Lots every time, 
+        // Note: For strict traceability, we might want new Lots every time,
         // but for efficiency, we merge if batch/loc matches.
         let existingLot = await tx.lot.findFirst({
           where: {
@@ -104,7 +104,7 @@ export async function POST(
               currentQuantity: item.acceptedQuantity,
               receivedDate: new Date(),
               // Use the location decided during receipt
-              locationId: item.binLocation, 
+              locationId: item.binLocation,
               grnId: grn.id,
               status: "AVAILABLE", // Default to available unless QC
               qcStatus: (item.qcStatus as any) || "PENDING",

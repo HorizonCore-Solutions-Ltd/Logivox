@@ -4,30 +4,62 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
-interface LoadPlan {
+interface LoadPlanPerformance {
   id: string;
   shipmentId: string;
-  truckType: string;
-  utilization: {
-    cubePercent: number;
-    weightPercent: number;
-    itemsPlaced: number;
-    itemsTotal: number;
-  };
-  weightDistribution: {
-    front: number;
-    middle: number;
-    rear: number;
-  };
   score: number;
+  cubeUtilization: number;
+  issue?: string;
+}
+
+interface LoadSummary {
+  totalPlans: number;
+  avgCubeUtilization: number;
+  avgWeightUtilization: number;
+  avgScore: number;
+  topPerformers: LoadPlanPerformance[];
+  needsOptimization: LoadPlanPerformance[];
+}
+
+interface TruckSpec {
+  name: string;
+  length: number;
+  width: number;
+  height: number;
+  maxWeight: number;
+  maxCube: number;
 }
 
 export default function LoadPlanning() {
-  const [summary, setSummary] = useState<any>(null);
-  const [selectedPlan, setSelectedPlan] = useState<LoadPlan | null>(null);
-  const [truckSpecs, setTruckSpecs] = useState<any>(null);
+  const [summary, setSummary] = useState<LoadSummary | null>(null);
+  const [truckSpecs, setTruckSpecs] = useState<Record<string, TruckSpec> | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Cut Order State
+  const [cutDialogOpen, setCutDialogOpen] = useState(false);
+  const [cutOrderId, setCutOrderId] = useState("");
+  const [cutReason, setCutReason] = useState<"TRAILER_FULL" | "NO_STOCK" | "OTHER">("TRAILER_FULL");
+  const [cutDetails, setCutDetails] = useState("");
+  const [isCutting, setIsCutting] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -48,6 +80,7 @@ export default function LoadPlanning() {
       setTruckSpecs(specsData.truckSpecs);
     } catch (error) {
       console.error("Failed to fetch data:", error);
+      toast.error("Failed to load planning data");
     } finally {
       setLoading(false);
     }
@@ -63,6 +96,40 @@ export default function LoadPlanning() {
     if (score >= 90) return "bg-green-100 text-green-800";
     if (score >= 75) return "bg-yellow-100 text-yellow-800";
     return "bg-red-100 text-red-800";
+  };
+
+  const handleCutOrder = async () => {
+    if (!cutOrderId) return;
+    setIsCutting(true);
+    try {
+      const res = await fetch("/api/dock/load-planning/cut", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          salesOrderId: cutOrderId,
+          reason: cutReason,
+          reasonDetails: cutDetails,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to cut order");
+
+      toast.success(
+        `Order cut successfully. Status: ${data.newStatus}. ${data.verificationCallback || ''}`,
+      );
+      setCutDialogOpen(false);
+      // Refresh data
+      fetchData();
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        toast.error(err.message);
+      } else {
+        toast.error("An unknown error occurred");
+      }
+    } finally {
+      setIsCutting(false);
+    }
   };
 
   if (loading) {
@@ -178,7 +245,7 @@ export default function LoadPlanning() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {summary?.topPerformers?.map((plan: any, index: number) => (
+                  {summary?.topPerformers?.map((plan: LoadPlanPerformance, index: number) => (
                     <div
                       key={plan.id}
                       className="border rounded p-3 hover:bg-gray-50"
@@ -222,10 +289,10 @@ export default function LoadPlanning() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {summary?.needsOptimization?.map((plan: any) => (
+                  {summary?.needsOptimization?.map((plan: LoadPlanPerformance) => (
                     <div
                       key={plan.id}
-                      className="border rounded p-3 bg-yellow-50"
+                      className="border rounded p-3 hover:bg-gray-50 bg-red-50 border-red-200"
                     >
                       <div className="flex justify-between items-start mb-2">
                         <div>
@@ -249,6 +316,17 @@ export default function LoadPlanning() {
                       <div className="mt-2">
                         <Button size="sm" variant="outline" className="w-full">
                           ⚡ Optimize Load
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="w-full mt-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+                          onClick={() => {
+                            setCutOrderId("so_" + Math.random().toString(36).substr(2, 9));
+                            setCutDialogOpen(true);
+                          }}
+                        >
+                          ✂️ Cut / Backorder
                         </Button>
                       </div>
                     </div>
@@ -346,7 +424,7 @@ export default function LoadPlanning() {
         <TabsContent value="trucks" className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             {truckSpecs &&
-              Object.entries(truckSpecs).map(([key, spec]: [string, any]) => (
+              Object.entries(truckSpecs).map(([key, spec]: [string, TruckSpec]) => (
                 <Card key={key}>
                   <CardHeader>
                     <CardTitle>{spec.name}</CardTitle>
@@ -653,6 +731,86 @@ export default function LoadPlanning() {
           </Card>
         </TabsContent>
       </Tabs>
+      
+      {/* Cut Order Dialog - Moved outside of Tabs for better structure */}
+      <Dialog open={cutDialogOpen} onOpenChange={setCutDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cut Order from Load Plan</DialogTitle>
+            <DialogDescription>
+              Remove an order from the current shipment. This action will update status and trigger necessary checks.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="order-id" className="text-right">
+                Order ID
+              </Label>
+              <Input
+                id="order-id"
+                value={cutOrderId}
+                onChange={(e) => setCutOrderId(e.target.value)}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="reason" className="text-right">
+                Reason
+              </Label>
+              <Select
+                value={cutReason}
+                onValueChange={(v: "TRAILER_FULL" | "NO_STOCK" | "OTHER") => setCutReason(v)}
+              >
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Select reason" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="TRAILER_FULL">
+                    Trailer Full (Capacity)
+                  </SelectItem>
+                  <SelectItem value="NO_STOCK">
+                    Out of Stock (Inventory)
+                  </SelectItem>
+                  <SelectItem value="OTHER">Other Issue</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {cutReason === "NO_STOCK" && (
+              <div className="col-span-4 bg-blue-50 p-3 rounded text-sm text-blue-700 border border-blue-200">
+                ℹ️ Internal inventory check will be performed automatically.
+              </div>
+            )}
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="details" className="text-right">
+                Details
+              </Label>
+              <Input
+                id="details"
+                value={cutDetails}
+                onChange={(e) => setCutDetails(e.target.value)}
+                className="col-span-3"
+                placeholder="Optional notes..."
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setCutDialogOpen(false)}
+              disabled={isCutting}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleCutOrder}
+              disabled={isCutting}
+            >
+              {isCutting ? "Processing..." : "Confirm Cut"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

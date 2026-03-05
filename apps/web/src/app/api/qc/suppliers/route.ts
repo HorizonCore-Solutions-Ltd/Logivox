@@ -18,41 +18,45 @@ export async function GET(request: NextRequest) {
         code: true,
         // Calculate dynamic risk score or fetch stored one
         qualityScore: true, // Assuming this field exists or we compute it
-        riskLevel: true,    // Assuming this field exists
+        riskLevel: true, // Assuming this field exists
         _count: {
           select: {
-             purchaseOrders: true,
-             inspections: true
-          }
+            purchaseOrders: true,
+            inspections: true,
+          },
         },
         inspections: {
-           take: 50,
-           orderBy: { createdAt: 'desc' },
-           select: {
-             status: true,
-             result: true, // PASS/FAIL
-             createdAt: true
-           }
-        }
+          take: 50,
+          orderBy: { createdAt: "desc" },
+          select: {
+            status: true,
+            result: true, // PASS/FAIL
+            createdAt: true,
+          },
+        },
       },
-      take: 100
+      take: 100,
     });
-    
+
     // Transform data for UI
-    const transformed = suppliers.map(s => {
-       const totalInspections = s.inspections.length;
-       const failed = s.inspections.filter(i => i.result === 'FAIL').length;
-       const defectRate = totalInspections > 0 ? (failed / totalInspections * 100).toFixed(1) : "0.0";
-       
-       return {
-         id: s.id,
-         name: s.name,
-         code: s.code,
-         risk: s.riskLevel || (Number(defectRate) > 5 ? "HIGH" : "LOW"),
-         score: s.qualityScore || (100 - (Number(defectRate) * 5)),
-         defectRate: `${defectRate}%`,
-         lastAudit: s.inspections[0]?.createdAt.toISOString().split('T')[0] || "N/A"
-       }
+    const transformed = suppliers.map((s) => {
+      const totalInspections = s.inspections.length;
+      const failed = s.inspections.filter((i) => i.result === "FAIL").length;
+      const defectRate =
+        totalInspections > 0
+          ? ((failed / totalInspections) * 100).toFixed(1)
+          : "0.0";
+
+      return {
+        id: s.id,
+        name: s.name,
+        code: s.code,
+        risk: s.riskLevel || (Number(defectRate) > 5 ? "HIGH" : "LOW"),
+        score: s.qualityScore || 100 - Number(defectRate) * 5,
+        defectRate: `${defectRate}%`,
+        lastAudit:
+          s.inspections[0]?.createdAt.toISOString().split("T")[0] || "N/A",
+      };
     });
 
     return NextResponse.json(transformed);

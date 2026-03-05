@@ -58,6 +58,7 @@ import {
   MapPin,
   HelpCircle,
   FileInput,
+  Waves,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { OrganizationSwitcher } from "@/components/organizations/organization-switcher";
@@ -181,28 +182,32 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
     },
     {
       name: "Operations",
-      href: "/dashboard/returns",
-      icon: ShieldCheck,
+      href: "/operations",
+      icon: Activity,
       subItems: [
         {
-          name: "Operations Hub",
-          href: "/dashboard/operations",
-          icon: Activity,
+          name: "Ops Cockpit",
+          href: "/operations",
+          icon: LayoutDashboard,
         },
         {
-          name: "Cross Docking",
-          href: "/dashboard/cross-dock",
+          name: "Planning Board",
+          href: "/operations/planning",
+          icon: Waves,
+        },
+        {
+          name: "Task Orchestration",
+          href: "/operations/tasks",
           icon: GitMerge,
         },
-        { name: "Returns & RMAs", href: "/returns", icon: RotateCcw },
         {
-          name: "RMA Detail View",
-          href: "/dashboard/rmas",
-          icon: RotateCcw,
+          name: "Marshalling",
+          href: "/operations/marshalling",
+          icon: Truck,
         },
         {
           name: "QC Inspections",
-          href: "/dashboard/qc-inspections",
+          href: "/quality/inspections",
           icon: ClipboardCheck,
         },
         {
@@ -214,6 +219,16 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
           name: "Exceptions",
           href: "/dashboard/exceptions",
           icon: AlertCircle,
+        },
+        {
+          name: "Returns & RMAs",
+          href: "/returns",
+          icon: RotateCcw,
+        },
+        {
+          name: "Cross Docking",
+          href: "/dashboard/cross-dock",
+          icon: Package,
         },
       ],
     },
@@ -260,9 +275,10 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
     },
     {
       name: "Billing",
-      href: "/billing/invoices",
+      href: "/billing",
       icon: DollarSign,
       subItems: [
+        { name: "Command Center", href: "/billing", icon: LayoutDashboard },
         { name: "Invoices", href: "/billing/invoices", icon: Receipt },
         {
           name: "Accessorial Charges",

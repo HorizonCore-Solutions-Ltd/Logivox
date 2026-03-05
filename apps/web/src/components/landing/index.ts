@@ -7,3 +7,4 @@ export { CTASection } from "./cta-section";
 export { ModernOfferingsSection } from "./modern-offerings-section";
 export { FAQSection } from "./faq-section";
 export { NextGenSection } from "./replenishment-features";
+export { HybridChoiceSection } from "./hybrid-choice-section";

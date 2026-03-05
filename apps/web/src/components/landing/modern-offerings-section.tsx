@@ -13,6 +13,8 @@ import {
   Activity,
   Truck,
   GitMerge,
+  Leaf,
+  Users,
 } from "lucide-react";
 
 const offerings = [
@@ -23,6 +25,30 @@ const offerings = [
     icon: Brain,
     href: "/solutions/inventory",
     pill: "New",
+  },
+  {
+    title: "Enterprise Labor Management",
+    description:
+      "Real-time workforce tracking vs engineered standards. Gamification, predictive staffing, and biometric auth for secure, high-performance operations.",
+    icon: Users,
+    href: "/solutions/labor-management",
+    pill: "Core",
+  },
+  {
+    title: "Sustainability & ESG Suite",
+    description:
+      "Automated carbon accounting, energy intensity monitoring, and waste stream analytics. Track your path to Net Zero with auditable reporting.",
+    icon: Leaf,
+    href: "/solutions/sustainability",
+    pill: "Green",
+  },
+  {
+    title: "Task Interleaving Engine",
+    description:
+      "Eliminate deadheading by intelligently combining put-away and picking tasks. AI dispatch routes workers on dual-cycle paths to maximize throughput.",
+    icon: GitMerge,
+    href: "/solutions/task-interleaving",
+    pill: "Efficiency",
   },
   {
     title: "Predictive Ops & Anomaly Defense",
@@ -39,38 +65,6 @@ const offerings = [
     icon: Zap,
     href: "/features",
     pill: "Live",
-  },
-  {
-    title: "Copilot Over Your SOPs",
-    description:
-      "Tenant-aware RAG that surfaces your SOPs inline with citations, so teams execute perfectly the first time.",
-    icon: Brain,
-    href: "/features",
-    pill: "AI",
-  },
-  {
-    title: "Zero-Trust, Reliable Webhooks",
-    description:
-      "Per-warehouse scopes, signed webhooks, retries + dead letters, and SIEM-friendly audit streaming.",
-    icon: Shield,
-    href: "/features",
-    pill: "Security",
-  },
-  {
-    title: "Marshalling & Yard Add-On",
-    description:
-      "Yard slots, dock scheduling, and load marshalling — with 1-tap mobile quick actions for marshallers. Activated per-tenant; invisible to users who don't have the licence.",
-    icon: GitMerge,
-    href: "/solutions/yard-management",
-    pill: "Add-On",
-  },
-  {
-    title: "Last Mile Delivery Add-On",
-    description:
-      "Driver dispatch, route management, and proof-of-delivery — surfaced as quick actions directly on delivery list cards. Separately licensed for fleets.",
-    icon: Truck,
-    href: "/features",
-    pill: "Add-On",
   },
 ];
 

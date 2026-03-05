@@ -137,6 +137,17 @@ const TAB_DEFS: TabDef[] = [
     icon: "person-outline",
     activeIcon: "person",
   },
+  // Hidden screens (accessed via More)
+  {
+    name: "cognitive",
+    title: "Cognitive",
+    icon: "brain-outline",
+  },
+  {
+    name: "transfers",
+    title: "Transfers",
+    icon: "git-network-outline",
+  },
 ];
 
 export default function TabLayout() {

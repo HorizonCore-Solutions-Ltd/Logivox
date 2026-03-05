@@ -80,7 +80,7 @@ const customJestConfig = {
   testTimeout: 10000,
 
   // Ignore patterns
-  testPathIgnorePatterns: ["/node_modules/", "/.next/", "/dist/", "/coverage/"],
+  testPathIgnorePatterns: ["/node_modules/", "/.next/", "/dist/", "/coverage/", "/docs/"],
 
   // Watch plugins
   watchPlugins: [

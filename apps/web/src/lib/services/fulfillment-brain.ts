@@ -5,7 +5,10 @@ import { type TaskType, TaskStatus, TaskPriority } from "@prisma/client";
 import { taskInterleavingService } from "./task-interleaving";
 
 // Define Governance Modes based on config
-export type GovernanceMode = "ADMIN_CONTROLLED" | "ADMIN_ASSISTED" | "AUTONOMOUS";
+export type GovernanceMode =
+  | "ADMIN_CONTROLLED"
+  | "ADMIN_ASSISTED"
+  | "AUTONOMOUS";
 
 interface WorkflowContext {
   organizationId: string;
@@ -29,7 +32,6 @@ interface TaskCreationData {
 }
 
 export class FulfillmentBrain {
-  
   /**
    * Determine the Governance Mode for a specific workflow based on Organization settings.
    */
@@ -46,19 +48,19 @@ export class FulfillmentBrain {
       case "REPLENISHMENT":
         isAutoEnabled = config.enableAutoReorders; // Mapping closely to reorder logic
         break;
-      case "INVENTORY": 
+      case "INVENTORY":
         isAutoEnabled = config.enableAutoAdjustments;
         break;
       case "OUTBOUND":
         // Check if order value exceeds auto-approval threshold
         if (context.value && context.value > Number(config.maxOrderValue)) {
-            return "ADMIN_ASSISTED"; // High value requires human eye
+          return "ADMIN_ASSISTED"; // High value requires human eye
         }
         // Assume outbound is generally assisted unless fully autonomous flag (future)
-        return "ADMIN_ASSISTED"; 
+        return "ADMIN_ASSISTED";
       case "RETURNS":
-         // Returns logic usually defaults to Assisted unless specific config
-         return "ADMIN_ASSISTED";
+        // Returns logic usually defaults to Assisted unless specific config
+        return "ADMIN_ASSISTED";
       default:
         return "ADMIN_CONTROLLED";
     }
@@ -77,12 +79,11 @@ export class FulfillmentBrain {
    * - Assisted: Create as PENDING (Open for pool).
    * - Autonomous: Create as PENDING and attempt Auto-Assign.
    */
-  async orchestrateTask(
-    context: WorkflowContext,
-    taskData: TaskCreationData
-  ) {
+  async orchestrateTask(context: WorkflowContext, taskData: TaskCreationData) {
     const mode = await this.getGovernanceMode(context);
-    console.log(`[FulfillmentBrain] Orchestrating ${taskData.type} in ${mode} mode.`);
+    console.log(
+      `[FulfillmentBrain] Orchestrating ${taskData.type} in ${mode} mode.`,
+    );
 
     let status: TaskStatus = "PENDING";
     let assigneeId = taskData.assigneeId;
@@ -98,43 +99,44 @@ export class FulfillmentBrain {
         status = "PENDING";
         // Attempt immediate interleaved assignment if location is known
         if (taskData.locationId && !assigneeId) {
-            const bestWorker = await taskInterleavingService.findBestWorkerForTask(
-                context.organizationId,
-                taskData.locationId,
-                taskData.type
+          const bestWorker =
+            await taskInterleavingService.findBestWorkerForTask(
+              context.organizationId,
+              taskData.locationId,
+              taskData.type,
             );
-            if (bestWorker) {
-                assigneeId = bestWorker.id;
-                status = "ASSIGNED"; // Auto-assign!
-            }
+          if (bestWorker) {
+            assigneeId = bestWorker.id;
+            status = "ASSIGNED"; // Auto-assign!
+          }
         }
         break;
     }
 
     // Create the PickingTask in database
     const task = await prisma.pickingTask.create({
-        data: {
-            organizationId: taskData.organizationId,
-            warehouseId: taskData.warehouseId,
-            taskNumber: `TASK-${Date.now()}`, // Simple generator
-            taskType: taskData.type,
-            title: taskData.title,
-            description: taskData.description,
-            priority: taskData.priority || "NORMAL",
-            status: status,
-            assignedToId: assigneeId,
-            fromLocationId: taskData.locationId,
-            toLocationId: taskData.toLocationId,
-            inventoryItemId: taskData.inventoryItemId,
-            quantity: taskData.quantity,
-            // metadata could be stored in a JSON field if schema supported it, currently skipped
-        }
+      data: {
+        organizationId: taskData.organizationId,
+        warehouseId: taskData.warehouseId,
+        taskNumber: `TASK-${Date.now()}`, // Simple generator
+        taskType: taskData.type,
+        title: taskData.title,
+        description: taskData.description,
+        priority: taskData.priority || "NORMAL",
+        status: status,
+        assignedToId: assigneeId,
+        fromLocationId: taskData.locationId,
+        toLocationId: taskData.toLocationId,
+        inventoryItemId: taskData.inventoryItemId,
+        quantity: taskData.quantity,
+        // metadata could be stored in a JSON field if schema supported it, currently skipped
+      },
     });
-    
+
     return {
-        task,
-        mode,
-        autoAssigned: !!assigneeId
+      task,
+      mode,
+      autoAssigned: !!assigneeId,
     };
   }
 }

@@ -11,19 +11,22 @@ export async function GET(req: NextRequest) {
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    
+
     // Safety check for Organization ID
     let organizationId = (session.user as any).organizationId;
     if (!organizationId) {
-        const user = await prisma.user.findUnique({
-            where: { id: session.user.id },
-            include: { organizationMemberships: true }
-        });
-        organizationId = user?.organizationMemberships[0]?.organizationId;
+      const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        include: { organizationMemberships: true },
+      });
+      organizationId = user?.organizationMemberships[0]?.organizationId;
     }
-    
+
     if (!organizationId) {
-        return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const { searchParams } = new URL(req.url);
@@ -56,7 +59,7 @@ export async function GET(req: NextRequest) {
         supplier: po.supplier.name,
         poNumber: po.poNumber,
         status: po.status,
-        priority: 1, 
+        priority: 1,
         appointmentTime: po.expectedDeliveryDate || null,
         itemCount: po.items.length,
         dockNumber: null,
@@ -75,31 +78,31 @@ export async function GET(req: NextRequest) {
     }
 
     if (action === "quick_stats") {
-       const today = new Date();
-       today.setHours(0, 0, 0, 0);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
-       const completedToday = await prisma.goodsReceiptNote.count({
-           where: {
-               organizationId,
-               createdAt: { gte: today }
-           }
-       });
-       
-       const activePos = await prisma.purchaseOrder.count({
-           where: {
-               organizationId,
-               status: { in: ["SENT", "CONFIRMED"] }
-           }
-       });
+      const completedToday = await prisma.goodsReceiptNote.count({
+        where: {
+          organizationId,
+          createdAt: { gte: today },
+        },
+      });
 
-       return NextResponse.json({
-           stats: {
-               todayCompleted: completedToday,
-               myActive: activePos, 
-               myTodayUnits: 0, // dynamic calc omitted for speed
-               userName: session.user.name
-           }
-       });
+      const activePos = await prisma.purchaseOrder.count({
+        where: {
+          organizationId,
+          status: { in: ["SENT", "CONFIRMED"] },
+        },
+      });
+
+      return NextResponse.json({
+        stats: {
+          todayCompleted: completedToday,
+          myActive: activePos,
+          myTodayUnits: 0, // dynamic calc omitted for speed
+          userName: session.user.name,
+        },
+      });
     }
 
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
@@ -114,52 +117,55 @@ export async function GET(req: NextRequest) {
 
 // Handler for quick actions from mobile
 export async function POST(req: NextRequest) {
-    try {
-        const session = await getServerSession(authOptions);
-        if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        
-        const body = await req.json();
-        const { action, barcode } = body;
-        
-        // Find Org ID again
-        let organizationId = (session.user as any).organizationId;
-        if (!organizationId) {
-             const user = await prisma.user.findUnique({ where: { id: session.user.id }, include: { organizationMemberships: true } });
-             organizationId = user?.organizationMemberships[0]?.organizationId;
-        }
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-        if (action === "scan_barcode") {
-            // Find PO by number 
-            const po = await prisma.purchaseOrder.findFirst({
-                where: {
-                    organizationId,
-                    poNumber: { contains: barcode, mode: 'insensitive' },
-                    status: { in: ["SENT", "CONFIRMED", "PARTIALLY_RECEIVED"] }
-                }
-            });
+    const body = await req.json();
+    const { action, barcode } = body;
 
-            if (po) {
-                return NextResponse.json({
-                    success: true,
-                    result: {
-                        shipmentNumber: po.poNumber,
-                        id: po.id
-                    }
-                });
-            } else {
-                 return NextResponse.json({
-                    success: false,
-                    message: "No matching Shipment found"
-                });
-            }
-        }
-        
-        // Note: Actual receiving is done via /api/grn
-
-        return NextResponse.json({ error: "Invalid action" }, { status: 400 });
-
-    } catch (e) {
-        console.error(e);
-        return NextResponse.json({ error: "Error" }, { status: 500 });
+    // Find Org ID again
+    let organizationId = (session.user as any).organizationId;
+    if (!organizationId) {
+      const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        include: { organizationMemberships: true },
+      });
+      organizationId = user?.organizationMemberships[0]?.organizationId;
     }
+
+    if (action === "scan_barcode") {
+      // Find PO by number
+      const po = await prisma.purchaseOrder.findFirst({
+        where: {
+          organizationId,
+          poNumber: { contains: barcode, mode: "insensitive" },
+          status: { in: ["SENT", "CONFIRMED", "PARTIALLY_RECEIVED"] },
+        },
+      });
+
+      if (po) {
+        return NextResponse.json({
+          success: true,
+          result: {
+            shipmentNumber: po.poNumber,
+            id: po.id,
+          },
+        });
+      } else {
+        return NextResponse.json({
+          success: false,
+          message: "No matching Shipment found",
+        });
+      }
+    }
+
+    // Note: Actual receiving is done via /api/grn
+
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json({ error: "Error" }, { status: 500 });
+  }
 }

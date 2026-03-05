@@ -311,8 +311,9 @@ export async function PATCH(req: NextRequest) {
       { error: "Wave ID or Order ID is required" },
       { status: 400 },
     );
-    }, req);
- */
+  }, req);
+}
+
 async function autoBatchOrders(warehouseId: string) {
   try {
     // Get unassigned orders

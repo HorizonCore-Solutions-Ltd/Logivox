@@ -12,7 +12,7 @@ export class TaskInterleavingService {
   async findBestWorkerForTask(
     organizationId: string,
     locationId: string,
-    taskType: string
+    taskType: string,
   ) {
     // 1. Get location details to find the zone
     const location = await prisma.location.findUnique({

@@ -202,22 +202,23 @@ export async function POST(request: NextRequest) {
         let qcStatus =
           item.receivedQuantity === item.acceptedQuantity
             ? "PENDING"
-            : "PENDING"; 
+            : "PENDING";
         let notes = item.notes;
         let unitCost = item.unitCost;
         let poItemId = item.purchaseOrderItemId;
 
         // Resolve details from PO if missing
-        const poItem = purchaseOrder.items.find((pi) =>
-          (item.purchaseOrderItemId && pi.id === item.purchaseOrderItemId) ||
-          (pi.inventoryItemId === item.inventoryItemId)
+        const poItem = purchaseOrder.items.find(
+          (pi) =>
+            (item.purchaseOrderItemId && pi.id === item.purchaseOrderItemId) ||
+            pi.inventoryItemId === item.inventoryItemId,
         );
 
         if (poItem) {
-            if (unitCost === undefined) unitCost = Number(poItem.unitPrice);
-            if (!poItemId) poItemId = poItem.id;
+          if (unitCost === undefined) unitCost = Number(poItem.unitPrice);
+          if (!poItemId) poItemId = poItem.id;
         }
-        
+
         // Default cost to 0 if still missing
         if (unitCost === undefined) unitCost = 0;
 

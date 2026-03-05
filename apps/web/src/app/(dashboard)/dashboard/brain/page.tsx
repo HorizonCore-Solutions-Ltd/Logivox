@@ -63,7 +63,11 @@ export default function FulfillmentBrainPage() {
         description: `Running in ${determineMode(updated)} mode.`,
       });
     } catch (err) {
-      toast({ variant: "destructive", title: "Update Failed", description: String(err) });
+      toast({
+        variant: "destructive",
+        title: "Update Failed",
+        description: String(err),
+      });
     }
   };
 
@@ -81,74 +85,96 @@ export default function FulfillmentBrainPage() {
     <div className="container mx-auto p-6 space-y-8">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Fulfillment Brain Control Tower</h1>
-          <p className="text-gray-500">Configure the autonomy level of your warehouse.</p>
+          <h1 className="text-3xl font-bold">
+            Fulfillment Brain Control Tower
+          </h1>
+          <p className="text-gray-500">
+            Configure the autonomy level of your warehouse.
+          </p>
         </div>
-        <div className={`px-4 py-2 rounded-full font-bold ${
-          currentMode === "AUTONOMOUS" ? "bg-purple-100 text-purple-700" :
-          currentMode === "ADMIN_ASSISTED" ? "bg-blue-100 text-blue-700" :
-          "bg-gray-100 text-gray-700"
-        }`}>
+        <div
+          className={`px-4 py-2 rounded-full font-bold ${
+            currentMode === "AUTONOMOUS"
+              ? "bg-purple-100 text-purple-700"
+              : currentMode === "ADMIN_ASSISTED"
+                ? "bg-blue-100 text-blue-700"
+                : "bg-gray-100 text-gray-700"
+          }`}
+        >
           {MODE_LABELS[currentMode]}
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className={currentMode === "ADMIN_CONTROLLED" ? "border-2 border-blue-500" : ""}>
+        <Card
+          className={
+            currentMode === "ADMIN_CONTROLLED" ? "border-2 border-blue-500" : ""
+          }
+        >
           <CardHeader>
             <CardTitle>Admin Controlled</CardTitle>
             <CardDescription>Everything requires approval.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button 
-                variant={currentMode === "ADMIN_CONTROLLED" ? "default" : "outline"}
-                className="w-full"
-                onClick={() => {
-                    updateConfig("requireVerification", true);
-                    updateConfig("enableAutoReorders", false);
-                    updateConfig("enableAutoTransfers", false);
-                }}
+            <Button
+              variant={
+                currentMode === "ADMIN_CONTROLLED" ? "default" : "outline"
+              }
+              className="w-full"
+              onClick={() => {
+                updateConfig("requireVerification", true);
+                updateConfig("enableAutoReorders", false);
+                updateConfig("enableAutoTransfers", false);
+              }}
             >
-                Set Active
+              Set Active
             </Button>
           </CardContent>
         </Card>
 
-        <Card className={currentMode === "ADMIN_ASSISTED" ? "border-2 border-blue-500" : ""}>
+        <Card
+          className={
+            currentMode === "ADMIN_ASSISTED" ? "border-2 border-blue-500" : ""
+          }
+        >
           <CardHeader>
             <CardTitle>Admin Assisted</CardTitle>
             <CardDescription>Auto-release, manual exceptions.</CardDescription>
           </CardHeader>
           <CardContent>
-             <Button 
-                variant={currentMode === "ADMIN_ASSISTED" ? "default" : "outline"}
-                className="w-full"
-                onClick={() => {
-                    updateConfig("requireVerification", false); // Don't require check
-                    updateConfig("enableAutoReorders", false); // But don't auto-reorder yet
-                }}
+            <Button
+              variant={currentMode === "ADMIN_ASSISTED" ? "default" : "outline"}
+              className="w-full"
+              onClick={() => {
+                updateConfig("requireVerification", false); // Don't require check
+                updateConfig("enableAutoReorders", false); // But don't auto-reorder yet
+              }}
             >
-                Set Active
+              Set Active
             </Button>
           </CardContent>
         </Card>
 
-        <Card className={currentMode === "AUTONOMOUS" ? "border-2 border-purple-500" : ""}>
+        <Card
+          className={
+            currentMode === "AUTONOMOUS" ? "border-2 border-purple-500" : ""
+          }
+        >
           <CardHeader>
             <CardTitle>Autonomous</CardTitle>
             <CardDescription>Zero-touch operations.</CardDescription>
           </CardHeader>
           <CardContent>
-             <Button 
-                variant={currentMode === "AUTONOMOUS" ? "default" : "outline"}
-                className="w-full"
-                onClick={() => {
-                    updateConfig("requireVerification", false);
-                    updateConfig("enableAutoReorders", true);
-                    updateConfig("enableAutoTransfers", true);
-                }}
+            <Button
+              variant={currentMode === "AUTONOMOUS" ? "default" : "outline"}
+              className="w-full"
+              onClick={() => {
+                updateConfig("requireVerification", false);
+                updateConfig("enableAutoReorders", true);
+                updateConfig("enableAutoTransfers", true);
+              }}
             >
-                Set Active
+              Set Active
             </Button>
           </CardContent>
         </Card>
@@ -156,42 +182,53 @@ export default function FulfillmentBrainPage() {
 
       <Card>
         <CardHeader>
-            <CardTitle>Micro-Configuration</CardTitle>
+          <CardTitle>Micro-Configuration</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h3 className="font-medium">Auto-Replenish Forward Pick</h3>
-                    <p className="text-sm text-gray-500">Automatically generate tasks to move reserve stock when min/max hits.</p>
-                </div>
-                <Switch 
-                    checked={config?.enableAutoReorders}
-                    onCheckedChange={(c) => updateConfig("enableAutoReorders", c)}
-                />
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-medium">Auto-Replenish Forward Pick</h3>
+              <p className="text-sm text-gray-500">
+                Automatically generate tasks to move reserve stock when min/max
+                hits.
+              </p>
             </div>
-            <div className="flex items-center justify-between">
-                <div>
-                    <h3 className="font-medium">Task Interleaving</h3>
-                    <p className="text-sm text-gray-500">Allow drivers to receive interleaved tasks based on location.</p>
-                </div>
-                <Switch 
-                    checked={config?.enableAutoTransfers}
-                    onCheckedChange={(c) => updateConfig("enableAutoTransfers", c)}
-                />
+            <Switch
+              checked={config?.enableAutoReorders}
+              onCheckedChange={(c) => updateConfig("enableAutoReorders", c)}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-medium">Task Interleaving</h3>
+              <p className="text-sm text-gray-500">
+                Allow drivers to receive interleaved tasks based on location.
+              </p>
             </div>
-             <div className="flex items-center justify-between">
-                <div>
-                    <h3 className="font-medium">Inventory Trust Score Threshold</h3>
-                    <p className="text-sm text-gray-500">Minimum reliability score required to bypass audit ({config?.minTrustScore}%).</p>
-                </div>
-                <input 
-                    type="range" 
-                    min="0" max="100" 
-                    value={config?.minTrustScore} 
-                    onChange={(e) => updateConfig("minTrustScore", Number(e.target.value))}
-                    className="w-48"
-                />
+            <Switch
+              checked={config?.enableAutoTransfers}
+              onCheckedChange={(c) => updateConfig("enableAutoTransfers", c)}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-medium">Inventory Trust Score Threshold</h3>
+              <p className="text-sm text-gray-500">
+                Minimum reliability score required to bypass audit (
+                {config?.minTrustScore}%).
+              </p>
             </div>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={config?.minTrustScore}
+              onChange={(e) =>
+                updateConfig("minTrustScore", Number(e.target.value))
+              }
+              className="w-48"
+            />
+          </div>
         </CardContent>
       </Card>
     </div>

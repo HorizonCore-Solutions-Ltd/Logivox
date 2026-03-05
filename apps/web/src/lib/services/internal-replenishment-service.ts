@@ -13,7 +13,10 @@ export class InternalReplenishmentService {
    * 3. If below Min, find Reserve Stock.
    * 4. Orchestrate a Replenishment Task.
    */
-  async generateReplenishmentTasks(organizationId: string, warehouseId: string) {
+  async generateReplenishmentTasks(
+    organizationId: string,
+    warehouseId: string,
+  ) {
     console.log(`[InternalReplenishment] Running for warehouse ${warehouseId}`);
 
     // 1. Get Rules
@@ -49,7 +52,9 @@ export class InternalReplenishmentService {
       if (currentQty < rule.minQty) {
         // Needs Replenishment
         const neededQty = rule.maxQty - currentQty;
-        console.log(`[Replen] Item ${rule.inventoryItemId}: Current ${currentQty} < Min ${rule.minQty}. Need ${neededQty}.`);
+        console.log(
+          `[Replen] Item ${rule.inventoryItemId}: Current ${currentQty} < Min ${rule.minQty}. Need ${neededQty}.`,
+        );
 
         // 3. Find Reserve Stock (Non-pickable locations with stock)
         const reserveLots = await prisma.lot.findMany({
@@ -62,7 +67,7 @@ export class InternalReplenishmentService {
             },
           },
           orderBy: {
-            receivedDate: 'asc', // FIFO
+            receivedDate: "asc", // FIFO
           },
           include: {
             location: true,
@@ -71,7 +76,9 @@ export class InternalReplenishmentService {
         });
 
         if (reserveLots.length === 0) {
-          console.warn(`[Replen] No reserve stock found for item ${rule.inventoryItemId}`);
+          console.warn(
+            `[Replen] No reserve stock found for item ${rule.inventoryItemId}`,
+          );
           continue;
         }
 
@@ -82,11 +89,14 @@ export class InternalReplenishmentService {
           if (remainingNeed <= 0) break;
 
           const moveQty = Math.min(lot.availableQuantity, remainingNeed);
-          
+
           if (!lot.locationId) continue;
 
           // Find a destination (Empty pick bin or existing bin with same item)
-          const destLocation = await this.findBestDestination(warehouseId, rule.inventoryItemId);
+          const destLocation = await this.findBestDestination(
+            warehouseId,
+            rule.inventoryItemId,
+          );
 
           // Call the Brain
           const result = await fulfillmentBrain.orchestrateTask(
@@ -106,7 +116,7 @@ export class InternalReplenishmentService {
               title: "Internal Replenishment",
               description: `Move ${moveQty} units from Reserve to Forward Pick to meet Min/Max rule.`,
               // Assignee left blank for standard logic
-            }
+            },
           );
 
           tasksCreated.push(result);
@@ -128,32 +138,35 @@ export class InternalReplenishmentService {
    * 1. Existing bin with same item (to consolidate).
    * 2. Empty bin in the picking zone.
    */
-  private async findBestDestination(warehouseId: string, inventoryItemId: string) {
+  private async findBestDestination(
+    warehouseId: string,
+    inventoryItemId: string,
+  ) {
     // 1. Try to find a pickable location that already has this item
     const existingLoc = await prisma.lot.findFirst({
-        where: {
-            inventoryId: inventoryItemId,
-            location: {
-                warehouseId,
-                isPickable: true,
-            }
+      where: {
+        inventoryId: inventoryItemId,
+        location: {
+          warehouseId,
+          isPickable: true,
         },
-        include: { location: true }
+      },
+      include: { location: true },
     });
-    
+
     if (existingLoc?.location) return existingLoc.location;
 
     // 2. Find closest empty pickable bin
     // Simplification: Just find any empty pickable bin
     // In real app: Check capacity/volume
     const emptyBin = await prisma.location.findFirst({
-        where: {
-            warehouseId,
-            isPickable: true,
-            lots: {
-                none: {} // No lots
-            }
-        }
+      where: {
+        warehouseId,
+        isPickable: true,
+        lots: {
+          none: {}, // No lots
+        },
+      },
     });
 
     return emptyBin || undefined;

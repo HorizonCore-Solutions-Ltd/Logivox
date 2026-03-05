@@ -51,49 +51,68 @@ export async function POST(request: NextRequest) {
 
     // Basic validation
     if (!body.inventoryId || !body.quantity) {
-       return NextResponse.json({ error: "Missing required fields: inventoryId, quantity" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing required fields: inventoryId, quantity" },
+        { status: 400 },
+      );
     }
-    
+
     // Find or use provided template
     let templateId = body.templateId;
     let templateCheckpoints: any[] = [];
-    
+
     if (templateId) {
-       const tmpl = await prisma.inspectionTemplate.findUnique({
-         where: { id: templateId }
-       });
-       if (tmpl && tmpl.checkpoints && Array.isArray(tmpl.checkpoints)) {
-          templateCheckpoints = tmpl.checkpoints;
-       }
+      const tmpl = await prisma.inspectionTemplate.findUnique({
+        where: { id: templateId },
+      });
+      if (tmpl && tmpl.checkpoints && Array.isArray(tmpl.checkpoints)) {
+        templateCheckpoints = tmpl.checkpoints;
+      }
     } else {
-       const defaultTemplate = await prisma.inspectionTemplate.findFirst({
-         where: { organizationId, isActive: true }
-       });
-       if (defaultTemplate) {
-          templateId = defaultTemplate.id;
-          if (defaultTemplate.checkpoints && Array.isArray(defaultTemplate.checkpoints)) {
-             templateCheckpoints = defaultTemplate.checkpoints;
-          }
-       }
-       else return NextResponse.json({ error: "No active inspection template found. Please create one first." }, { status: 400 });
+      const defaultTemplate = await prisma.inspectionTemplate.findFirst({
+        where: { organizationId, isActive: true },
+      });
+      if (defaultTemplate) {
+        templateId = defaultTemplate.id;
+        if (
+          defaultTemplate.checkpoints &&
+          Array.isArray(defaultTemplate.checkpoints)
+        ) {
+          templateCheckpoints = defaultTemplate.checkpoints;
+        }
+      } else
+        return NextResponse.json(
+          {
+            error:
+              "No active inspection template found. Please create one first.",
+          },
+          { status: 400 },
+        );
     }
 
     // Generate logic for inspection number
-    const dateStr = new Date().toISOString().replace(/[-:T.]/g, "").slice(0, 14);
-    const randomSuffix = Math.floor(Math.random() * 1000).toString().padStart(3, "0");
+    const dateStr = new Date()
+      .toISOString()
+      .replace(/[-:T.]/g, "")
+      .slice(0, 14);
+    const randomSuffix = Math.floor(Math.random() * 1000)
+      .toString()
+      .padStart(3, "0");
     const inspectionNumber = `INS-${dateStr}-${randomSuffix}`;
 
     // Prepare checkpoints creation data
     // Assuming JSON structure matches what QCCheckpoint needs or is adaptable
     // We map common fields.
-    const checkpointsData = templateCheckpoints.map((cp: any, index: number) => ({
+    const checkpointsData = templateCheckpoints.map(
+      (cp: any, index: number) => ({
         name: cp.name || `Checkpoint ${index + 1}`,
         type: cp.type || "PASS_FAIL", // Default to simple check
         sequence: index,
         description: cp.description || "",
         isRequired: cp.required !== false,
-        status: "PENDING"
-    }));
+        status: "PENDING",
+      }),
+    );
 
     const inspection = await prisma.qCInspection.create({
       data: {
@@ -102,7 +121,10 @@ export async function POST(request: NextRequest) {
         category: (body.category as any) || "INCOMING",
         status: "PENDING",
         inventoryId: body.inventoryId,
-        quantity: typeof body.quantity === 'string' ? parseInt(body.quantity) : body.quantity,
+        quantity:
+          typeof body.quantity === "string"
+            ? parseInt(body.quantity)
+            : body.quantity,
         templateId,
         inspectedById: userId,
         // Optional fields
@@ -113,12 +135,12 @@ export async function POST(request: NextRequest) {
         lotId: body.lotId || undefined,
         // Create checkpoints
         checkpoints: {
-            create: checkpointsData
-        }
+          create: checkpointsData,
+        },
       },
       include: {
-        checkpoints: true // Return them so frontend can see
-      }
+        checkpoints: true, // Return them so frontend can see
+      },
     });
 
     return NextResponse.json({ inspection }, { status: 201 });

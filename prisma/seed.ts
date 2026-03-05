@@ -1820,7 +1820,9 @@ async function main() {
 
   // ─── QC Templates ──────────────────────────────────────────────────────────
   await prisma.inspectionTemplate.upsert({
-    where: { organizationId_code: { organizationId: org.id, code: "TMP-INCOMING-STD" } },
+    where: {
+      organizationId_code: { organizationId: org.id, code: "TMP-INCOMING-STD" },
+    },
     update: {},
     create: {
       organizationId: org.id,
@@ -1831,12 +1833,32 @@ async function main() {
       samplingType: "STATISTICAL",
       isActive: true,
       checkpoints: [
-          { name: "Visual Check - Packaging", type: "PASS_FAIL", description: "Is packaging intact?", required: true },
-          { name: "Label Verification", type: "PASS_FAIL", description: "Does label match PO?", required: true },
-          { name: "Unit Count Verification", type: "MEASUREMENT", description: "Count items in sample box", required: true },
-          { name: "Damage Check", type: "PASS_FAIL", description: "Any visible damage?", required: true }
-      ]
-    }
+        {
+          name: "Visual Check - Packaging",
+          type: "PASS_FAIL",
+          description: "Is packaging intact?",
+          required: true,
+        },
+        {
+          name: "Label Verification",
+          type: "PASS_FAIL",
+          description: "Does label match PO?",
+          required: true,
+        },
+        {
+          name: "Unit Count Verification",
+          type: "MEASUREMENT",
+          description: "Count items in sample box",
+          required: true,
+        },
+        {
+          name: "Damage Check",
+          type: "PASS_FAIL",
+          description: "Any visible damage?",
+          required: true,
+        },
+      ],
+    },
   });
   console.log("✅ QC Template seeded");
 
@@ -1852,6 +1874,62 @@ async function main() {
       userId: admin.id,
     },
   });
+
+  // ─── Operations Master Data (BayDoors & Zones) ────────────────────────────
+  console.log("Creating Operations Data...");
+  
+  // Seed Bay Doors
+  const bayDoors = [
+    { num: "BD-01", type: "INBOUND", status: "AVAILABLE" },
+    { num: "BD-02", type: "INBOUND", status: "OCCUPIED" },
+    { num: "BD-03", type: "OUTBOUND", status: "AVAILABLE" },
+    { num: "BD-04", type: "OUTBOUND", status: "MAINTENANCE" },
+    { num: "BD-05", type: "CROSS_DOCK", status: "AVAILABLE" },
+  ];
+
+  for (const door of bayDoors) {
+    await prisma.bayDoor.upsert({
+      where: { organizationId_doorNumber: { organizationId: org.id, doorNumber: door.num } },
+      update: { status: door.status },
+      create: {
+        organizationId: org.id,
+        warehouseId: wh.id,
+        doorNumber: door.num,
+        doorType: door.type,
+        status: door.status,
+        isActive: true
+      }
+    });
+  }
+  console.log("✅ Bay Doors (5)");
+
+  // Seed Zones / Locations
+  const opsZones = [
+    { code: "ZONE-A", name: "Picking Zone A", type: "ZONE" },
+    { code: "ZONE-B", name: "Picking Zone B", type: "ZONE" },
+    { code: "STAGING-IN", name: "Inbound Staging", type: "STAGING" },
+    { code: "STAGING-OUT", name: "Outbound Staging", type: "STAGING" },
+    { code: "PACK-01", name: "Packing Station 1", type: "SHIPPING" },
+  ];
+
+  for (const z of opsZones) {
+    // We use barcode as unique handle
+    const loc = await prisma.location.findFirst({ where: { barcode: z.code, organizationId: org.id } });
+    if (!loc) {
+        await prisma.location.create({
+            data: {
+                organizationId: org.id,
+                warehouseId: wh.id,
+                locationCode: z.code,
+                name: z.name,
+                type: z.type as any, // assuming valid enum
+                barcode: z.code,
+                isActive: true
+            }
+        });
+    }
+  }
+  console.log("✅ Operation Zones");
 
   console.log("\n🎉 Seed complete!\n");
   console.log("━".repeat(55));
