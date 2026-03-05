@@ -1,3 +1,6 @@
+> [!NOTE]
+> Historical snapshot: This document captures status at the time it was written and may not reflect current codebase metrics. See `docs/status-reports/QUICK_STATUS.md` for the live baseline.
+
 # 🎉 100% PRODUCTION READY - COMPLETION SUMMARY
 
 ## LogiVox WMS - Full Feature Implementation Complete

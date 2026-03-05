@@ -1,8 +1,8 @@
-# Flowstock Mobile App - Implementation Plan
+# LogiVox Mobile App - Implementation Plan
 
 ## React Native iOS/Android Application
 
-**Status:** Ready for Implementation  
+**Status:** Implemented and Evolving  
 **Timeline:** Phase 1 (2-3 weeks) | Phase 2 (4-6 weeks) | Phase 3 (6-8 weeks)  
 **Created:** February 28, 2026  
 **Target Platforms:** iOS 14+, Android 8.0+
@@ -58,7 +58,7 @@ Frontend:
 - React Hook Form (forms with offline queue)
 
 Backend Integration:
-- Existing 489 REST APIs (no changes needed)
+- Existing REST API surface in `apps/web/src/app/api` (no major backend redesign needed)
 - NextAuth.js session token authentication
 - Pusher WebSocket (real-time updates)
 - OpenAI Whisper API (voice commands)
@@ -82,7 +82,7 @@ Offline Strategy:
 
 **Zero Backend Changes Required:**
 
-- Mobile app consumes existing `/api/*` endpoints (489 APIs)
+- Mobile app consumes existing `/api/*` endpoints from the current API surface
 - Authentication via existing NextAuth.js token system
 - Real-time updates via existing Pusher WebSocket
 - Voice transcription via existing OpenAI Whisper integration
@@ -217,7 +217,7 @@ apps/
 
 ```bash
 # Initialize project
-cd /workspaces/Flowstock/apps
+cd /workspaces/LogiVox/apps
 npx create-expo-app mobile --template expo-template-blank-typescript
 cd mobile
 
@@ -606,7 +606,7 @@ export function useAuth() {
     }
 
     const result = await LocalAuthentication.authenticateAsync({
-      promptMessage: "Login to Flowstock",
+      promptMessage: "Login to LogiVox",
       fallbackLabel: "Use password",
     });
 
@@ -869,7 +869,7 @@ export async function generateInvoicePDF(invoice: Invoice) {
             <p>Date: ${new Date(invoice.created_at).toLocaleDateString()}</p>
           </div>
           <div>
-            <h2>Flowstock WMS</h2>
+            <h2>LogiVox WMS</h2>
             <p>123 Warehouse Blvd</p>
             <p>City, State 12345</p>
           </div>
@@ -1104,7 +1104,7 @@ npm install --save-dev detox
     "production": {
       "distribution": "store",
       "env": {
-        "API_URL": "https://api.flowstock.com"
+        "API_URL": "https://api.logivox.com"
       }
     }
   },
@@ -1157,7 +1157,7 @@ eas update --branch production --message "Fixed invoice PDF generation"
 
 ```bash
 # apps/mobile/.env.production
-API_URL=https://api.flowstock.com
+API_URL=https://api.logivox.com
 PUSHER_KEY=your_pusher_key
 PUSHER_CLUSTER=us2
 OPENAI_API_KEY=your_openai_key
@@ -1240,7 +1240,7 @@ EXPO_PROJECT_ID=your_expo_project_id
 1. **Initialize Expo project:**
 
    ```bash
-   cd /workspaces/Flowstock/apps
+   cd /workspaces/LogiVox/apps
    npx create-expo-app mobile --template expo-template-blank-typescript
    ```
 
@@ -1277,7 +1277,7 @@ EXPO_PROJECT_ID=your_expo_project_id
 
 > **"The First Voice-Native Mobile WMS"**
 >
-> While Manhattan, Blue Yonder, and SAP force your team to desktop computers or clunky browsers, Flowstock puts enterprise-grade WMS in your pocket.
+> While Manhattan, Blue Yonder, and SAP force your team to desktop computers or clunky browsers, LogiVox puts enterprise-grade WMS in your pocket.
 >
 > ✅ **Invoice customers from the dock** - not the desk  
 > ✅ **Voice-directed operations** - hands-free picking, receiving, putaway  
@@ -1313,7 +1313,7 @@ EXPO_PROJECT_ID=your_expo_project_id
 
 ## Conclusion
 
-This mobile app transforms Flowstock from "modern WMS" to **"mobile-first logistics platform"** - a category of one in the enterprise WMS space.
+This mobile app transforms LogiVox from "modern WMS" to **"mobile-first logistics platform"** - a category of one in the enterprise WMS space.
 
 **The invoicing-anywhere feature alone justifies the investment** - faster cash flow for 3PLs and warehouses is measured in real dollars.
 
@@ -1326,4 +1326,4 @@ This mobile app transforms Flowstock from "modern WMS" to **"mobile-first logist
 **Prepared by:** GitHub Copilot  
 **Date:** February 28, 2026  
 **Version:** 1.0  
-**Status:** READY FOR IMPLEMENTATION
+**Status:** IMPLEMENTED AND EVOLVING

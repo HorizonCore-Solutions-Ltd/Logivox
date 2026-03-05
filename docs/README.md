@@ -2,6 +2,12 @@
 
 Welcome to the Logivox documentation. All documentation has been organized into categorized folders for easy navigation.
 
+## Documentation Freshness
+
+- Operational source-of-truth for current implementation status: `docs/status-reports/`
+- Latest drift review: `docs/status-reports/DOCUMENTATION_DRIFT_AUDIT_2026-03-05.md`
+- Some legacy and completion-summary documents are historical snapshots and may contain older counts.
+
 ## 📂 Documentation Structure
 
 ### Business & Investment
@@ -202,8 +208,8 @@ Welcome to the Logivox documentation. All documentation has been organized into 
 2. **Enterprise QC/CAPA** - FDA/ISO compliant quality control built-in
 3. **Complete Documentation** - Turnkey solution ready for deployment or sale
 4. **Patent-Worthy Technology** - Two patent applications outlined ($1.5M-$2.5M value)
-5. **Modern Architecture** - Cloud-native, microservices-based design
+5. **Modern Architecture** - Cloud-native unified Next.js platform (monorepo)
 
 ---
 
-Last Updated: January 7, 2026
+Last Updated: March 5, 2026

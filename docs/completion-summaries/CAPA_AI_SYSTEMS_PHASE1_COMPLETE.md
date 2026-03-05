@@ -1,3 +1,6 @@
+> [!NOTE]
+> Historical snapshot: This document captures status at the time it was written and may not reflect current codebase metrics. See `docs/status-reports/QUICK_STATUS.md` for the live baseline.
+
 # CAPA Module - AI-Powered Systems Phase 1 Complete
 
 **Date:** January 7, 2026  

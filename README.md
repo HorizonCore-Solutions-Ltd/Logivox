@@ -14,7 +14,7 @@ To deliver the world's most adaptable and intelligent warehouse management platf
 
 ## ✅ Production Ready - Complete Platform
 
-**LogiVox v1.0 is 100% complete and enterprise-ready.** A unified Next.js warehouse management system with comprehensive end-to-end capabilities built-in.
+**LogiVox v1.0 is enterprise-ready and actively evolving.** A unified Next.js warehouse management system with comprehensive end-to-end capabilities built-in.
 
 ### What You Get
 
@@ -58,7 +58,7 @@ To deliver the world's most adaptable and intelligent warehouse management platf
 
 - ✅ **Multi-Tenant SaaS** - Organization isolation with tenant scoping
 - ✅ **Customer/Supplier Portals** - Public tracking, proof-of-delivery, uploads
-- ✅ **Advanced Analytics** - Real-time dashboards with 42 specialized views
+- ✅ **Advanced Analytics** - Real-time dashboards and workflow views across operations
 - ✅ **Omnichannel Fulfillment** - Unified inventory across Retail, E-commerce, Wholesale
 
 ### 🌟 Strategic Advantage: Hybrid Choice Operations
@@ -75,9 +75,9 @@ LogiVox is the only platform that adapts to the user's proficiency level on stan
 
 | Metric                              | Value                                                       |
 | ----------------------------------- | ----------------------------------------------------------- |
-| **API Endpoints**                   | 489 fully implemented                                       |
-| **Database Tables**                 | 201 with 16 migrations                                      |
-| **Dashboard Pages**                 | 42 specialized views across 11 categories                   |
+| **API Route Handlers**              | 435 in `apps/web/src/app/api` (as of 2026-03-05)           |
+| **Prisma Models**                  | 243 in `prisma/schema.prisma` with 16 migrations            |
+| **Dashboard Pages**                 | 243 `page.tsx` routes under `apps/web/src/app/(dashboard)` |
 | **Production Code**                 | 80,000+ lines of TypeScript                                 |
 | **Feature Completeness**            | 100% (zero placeholders)                                    |
 | **Automation Workflows**            | 10+ autonomous execution types                              |
@@ -96,6 +96,44 @@ LogiVox is the only platform that adapts to the user's proficiency level on stan
 
 ---
 
+## Recent Engineering Enhancements (Mar 1-5, 2026)
+
+The following production-grade improvements were completed in the last few days and are now in `main`.
+
+- ✅ **Quality + CAPA expansion**: Detailed Quality Control and CAPA modules implemented across APIs and dashboard flows.
+- ✅ **Returns backend completion**: Intake, inspection, and disposition flows implemented end-to-end; cross-dock logic enhanced.
+- ✅ **API completion hardening**: Missing routes were implemented, placeholder/stub behavior removed, and route parity improved.
+- ✅ **Auth + tenant scope fixes**: Authorization and organization scoping were hardened across many API routes.
+- ✅ **Real-data wiring**: Newly added pages were connected to live APIs (mock data removed).
+- ✅ **Replenishment intelligence updates**: Autonomous Replenishment 2.0 enhancements with AI/IoT/robotics-oriented logic.
+- ✅ **Web + mobile parity uplift**: Additional pages and workflow parity updates between PWA and mobile app.
+- ✅ **Data/bootstrap reliability**: Seed process made idempotent, with missing schema models added for safer environment setup.
+
+### Pre-Test Validation (Recommended Right Now)
+
+Run this sequence before functional testing to catch integration and regression issues early:
+
+```bash
+# 1) Install dependencies
+npm install
+
+# 2) Static quality gates
+npm run lint
+npm run type-check
+
+# 3) Core automated tests
+npm run test
+npm run test:integration
+
+# 4) End-to-end and production validation
+npm run test:e2e
+npm run deploy:validate
+```
+
+If you want one combined sweep: `npm run test:all`
+
+---
+
 ## 🏗️ Technical Architecture
 
 ### Unified Platform Foundation
@@ -105,8 +143,8 @@ LogiVox is a **single, unified Next.js enterprise application** (not multiple mi
 **Technology Stack:**
 
 - **Frontend**: Next.js 14 with React Server Components, TypeScript, Tailwind CSS, shadcn/ui
-- **Backend**: Next.js API Routes (489 endpoints), Prisma ORM, Zod validation
-- **Database**: PostgreSQL 16 with 201 tables, optimized indexes, multi-tenant isolation
+- **Backend**: Next.js API Routes (435 route handlers), Prisma ORM, Zod validation
+- **Database**: PostgreSQL 16 with 243 Prisma models in `prisma/schema.prisma`
 - **Real-Time**: Pusher WebSocket integration with 20+ event types
 - **AI/ML**: OpenAI (GPT-4, Whisper, TTS), custom forecasting models
 - **Authentication**: NextAuth.js with multi-tenant support, SSO/SAML ready
@@ -122,7 +160,7 @@ LogiVox/
 │   │   ├── app/                 # Next.js App Router
 │   │   │   ├── (dashboard)/     # Protected dashboard routes
 │   │   │   ├── (auth)/          # Authentication pages
-│   │   │   ├── api/             # 489 API endpoints
+│   │   │   ├── api/             # 435 route handlers (as of 2026-03-05)
 │   │   │   └── (public)/        # Public pages
 │   │   ├── components/          # React components
 │   │   ├── lib/                 # Services, utilities, Prisma client
@@ -141,9 +179,9 @@ LogiVox/
 
 **🎯 Complete & Production-Ready**
 
-- 489 API endpoints fully implemented (zero stubs)
-- 42 specialized dashboards covering all operations
-- 201 database tables with complete data model
+- 435 API route handlers in `apps/web/src/app/api` (as of 2026-03-05)
+- 243 dashboard page routes under `apps/web/src/app/(dashboard)`
+- 243 Prisma models with complete relational data model
 - Real integrations—not mock APIs
 - Ready to deploy and generate ROI immediately
 
@@ -521,7 +559,7 @@ LogiVox includes a comprehensive **React Native mobile application** for iOS and
 
 **Integration with Backend:**
 
-- ✅ **Zero Backend Changes** - Uses existing 489 API endpoints
+- ✅ **Zero Backend Changes** - Uses existing API surface in `apps/web/src/app/api`
 - ✅ **Authentication** - Leverages existing NextAuth.js token system
 - ✅ **Real-Time Sync** - Integrates with existing Pusher WebSocket
 - ✅ **Voice Transcription** - Uses existing OpenAI Whisper integration
@@ -566,7 +604,7 @@ LogiVox includes a comprehensive **React Native mobile application** for iOS and
 **What's Included:**
 
 - ✅ Unlimited users and warehouses
-- ✅ All 489 API endpoints and 42 dashboards
+- ✅ Full API and dashboard coverage included in enterprise scope
 - ✅ AI, IoT, and next-gen features
 - ✅ Priority support with dedicated success manager
 - ✅ Custom integrations and development
@@ -598,7 +636,7 @@ LogiVox includes a comprehensive **React Native mobile application** for iOS and
 - ✅ **Phase 2**: Core Operations (inventory, receiving, picking, packing, returns, dock scheduling)
 - ✅ **Phase 3**: Quality & Compliance (CAPA, QC, computer vision, document management)
 - ✅ **Phase 4**: Next-Gen Features (labor management, task interleaving, yard management, IoT, AI forecasting)
-- ✅ **Phase 5**: Enterprise Polish (42 dashboards, voice operations, PWA, dark mode, integrations)
+- ✅ **Phase 5**: Enterprise Polish (broad dashboard coverage, voice operations, PWA, dark mode, integrations)
 
 ### Strategic Roadmap: H1 2026 – H2 2027
 
@@ -665,8 +703,8 @@ LogiVox includes a comprehensive **React Native mobile application** for iOS and
 
 ### Technical Reference
 
-- **[API Documentation](./docs/api/)** - Complete 489 endpoint reference
-- **[Database Schema](./prisma/schema.prisma)** - 201 table definitions
+- **[API Documentation](./docs/technical/API_DOCUMENTATION.md)** - Current API reference
+- **[Database Schema](./prisma/schema.prisma)** - Current Prisma models and relations
 - **[Architecture Docs](./docs/architecture/)** - System design and patterns
 
 ### Feature Guides
@@ -821,20 +859,27 @@ npx prisma migrate reset
 ### Testing
 
 ```bash
-# Run all tests
-npm test
+# Run all workspace tests
+npm run test
 
 # Run in watch mode
-npm test -- --watch
-
-# Run specific test file
-npm test -- auth.test.ts
+npm run test:watch
 
 # Run integration tests
 npm run test:integration
 
+# Run end-to-end tests
+npm run test:e2e
+
+# Run security-focused tests
+npm run test:security
+npm run test:security:e2e
+
 # Generate coverage report
 npm run test:coverage
+
+# Run full combined suite
+npm run test:all
 ```
 
 ---

@@ -2,6 +2,10 @@
 
 Build completion summaries and milestone achievements.
 
+> [!NOTE]
+> Historical snapshot collection: files in this folder reflect point-in-time session/build outcomes and may contain outdated counts.
+> For current implementation baseline, use `docs/status-reports/QUICK_STATUS.md` and `docs/status-reports/DOCUMENTATION_DRIFT_AUDIT_2026-03-05.md`.
+
 ## Summaries
 
 - [100% Completion Summary](./100_PERCENT_COMPLETION_SUMMARY.md)

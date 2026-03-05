@@ -1,3 +1,6 @@
+> [!NOTE]
+> Historical snapshot: This document captures status at the time it was written and may not reflect current codebase metrics. See `docs/status-reports/QUICK_STATUS.md` for the live baseline.
+
 # 🎉 SESSION COMPLETION SUMMARY - January 8, 2026
 
 ## 🚀 PHASE 1 OPTIMIZATION SYSTEMS - COMPLETE!
