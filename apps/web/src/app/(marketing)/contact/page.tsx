@@ -77,8 +77,6 @@ export default function ContactPage() {
       setIsSubmitting(false);
     }
   };
-    setIsSubmitting(false);
-  };
 
   const handleChange = (
     e: React.ChangeEvent<
