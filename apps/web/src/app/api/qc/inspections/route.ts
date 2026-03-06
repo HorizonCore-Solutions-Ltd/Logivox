@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
     // Generate logic for inspection number
     const dateStr = new Date()
       .toISOString()
-      .replace(/[-:T.]/g, "")
+      .replace(/[^0-9]/g, "")
       .slice(0, 14);
     const randomSuffix = Math.floor(Math.random() * 1000)
       .toString()

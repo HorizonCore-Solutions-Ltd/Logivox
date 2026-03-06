@@ -72,30 +72,6 @@ export function Navigation() {
       href: "/solutions/warehouse-management",
     },
     {
-      title: "Labor Management",
-      description: "Workforce optimization and productivity tracking",
-      icon: Users,
-      href: "/solutions/labor-management",
-    },
-    {
-      title: "Sustainability Suite",
-      description: "Carbon tracking and green logistics optimization",
-      icon: Leaf,
-      href: "/solutions/sustainability",
-    },
-    {
-      title: "Task Interleaving",
-      description: "Smart task combining to reduce deadhead travel",
-      icon: GitMerge,
-      href: "/solutions/task-interleaving",
-    },
-    {
-      title: "Labor Management",
-      description: "Workforce optimization and productivity tracking",
-      icon: Users,
-      href: "/solutions/labor-management",
-    },
-    {
       title: "Sustainability Suite",
       description: "Carbon tracking and green logistics optimization",
       icon: Leaf,
