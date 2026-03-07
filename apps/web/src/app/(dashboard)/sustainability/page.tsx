@@ -41,21 +41,19 @@ export default function SustainabilityPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">12.4t</div>
-            <p className="text-xs text-muted-foreground">
-              -5% from last month
-            </p>
+            <p className="text-xs text-muted-foreground">-5% from last month</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Energy Efficiency</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Energy Efficiency
+            </CardTitle>
             <Zap className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">98.2 kWh</div>
-            <p className="text-xs text-muted-foreground">
-              Per unit processed
-            </p>
+            <p className="text-xs text-muted-foreground">Per unit processed</p>
           </CardContent>
         </Card>
         <Card>
@@ -67,16 +65,12 @@ export default function SustainabilityPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">85%</div>
-            <p className="text-xs text-muted-foreground">
-              +2% goal target
-            </p>
+            <p className="text-xs text-muted-foreground">+2% goal target</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Cost Savings
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Cost Savings</CardTitle>
             <TrendingDown className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -104,9 +98,7 @@ export default function SustainabilityPage() {
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
                     <p className="text-sm font-medium">Transportation</p>
-                    <p className="text-xs text-muted-foreground">
-                      Scope 3
-                    </p>
+                    <p className="text-xs text-muted-foreground">Scope 3</p>
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-medium">45%</p>
@@ -118,9 +110,7 @@ export default function SustainabilityPage() {
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
                     <p className="text-sm font-medium">Facilities</p>
-                    <p className="text-xs text-muted-foreground">
-                      Scope 1 & 2
-                    </p>
+                    <p className="text-xs text-muted-foreground">Scope 1 & 2</p>
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-medium">30%</p>
@@ -129,12 +119,10 @@ export default function SustainabilityPage() {
                     </div>
                   </div>
                 </div>
-                 <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between">
                   <div className="space-y-1">
                     <p className="text-sm font-medium">Packaging</p>
-                    <p className="text-xs text-muted-foreground">
-                      Scope 3
-                    </p>
+                    <p className="text-xs text-muted-foreground">Scope 3</p>
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-medium">25%</p>
@@ -156,22 +144,34 @@ export default function SustainabilityPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-               <div className="flex items-start gap-4 rounded-md border p-4">
+              <div className="flex items-start gap-4 rounded-md border p-4">
                 <div className="space-y-1">
-                  <p className="text-sm font-medium">Solar Array Installation</p>
+                  <p className="text-sm font-medium">
+                    Solar Array Installation
+                  </p>
                   <p className="text-sm text-muted-foreground">
                     Phase 1 complete. Generating 15% of facility power.
                   </p>
-                  <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50">Active</Badge>
+                  <Badge
+                    variant="outline"
+                    className="text-green-600 border-green-200 bg-green-50"
+                  >
+                    Active
+                  </Badge>
                 </div>
               </div>
-                <div className="flex items-start gap-4 rounded-md border p-4">
+              <div className="flex items-start gap-4 rounded-md border p-4">
                 <div className="space-y-1">
                   <p className="text-sm font-medium">EV Fleet Transition</p>
                   <p className="text-sm text-muted-foreground">
                     Deployment of 5 electric forklifts scheduled for Q3.
                   </p>
-                   <Badge variant="outline" className="text-blue-600 border-blue-200 bg-blue-50">Planning</Badge>
+                  <Badge
+                    variant="outline"
+                    className="text-blue-600 border-blue-200 bg-blue-50"
+                  >
+                    Planning
+                  </Badge>
                 </div>
               </div>
             </div>

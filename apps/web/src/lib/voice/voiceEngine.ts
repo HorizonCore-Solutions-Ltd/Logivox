@@ -377,35 +377,41 @@ async function resolveIntentLogic(
         break;
       case "EXPLAIN_ITEM":
         if (params.sku || params.item) {
-           return await fetchExplainItem(String(params.sku || params.item));
+          return await fetchExplainItem(String(params.sku || params.item));
         }
         break;
       case "SHORT_PICK":
-         if (!session?.userId) return "No active user session.";
-         // Find active task to get expected quantity
-         const task = await prisma.pickingTask.findFirst({
-             where: { assignedToId: session.userId, status: "IN_PROGRESS" }
-         });
-         
-         if (!task) return "You have no active picking task.";
-         const expected = task.quantity || 0;
-         const qty = typeof params.quantity === "number" ? params.quantity : 0;
-         return await processShortPick(sessionId || "unknown", orgId, qty, expected);
+        if (!session?.userId) return "No active user session.";
+        // Find active task to get expected quantity
+        const task = await prisma.pickingTask.findFirst({
+          where: { assignedToId: session.userId, status: "IN_PROGRESS" },
+        });
+
+        if (!task) return "You have no active picking task.";
+        const expected = task.quantity || 0;
+        const qty = typeof params.quantity === "number" ? params.quantity : 0;
+        return await processShortPick(
+          sessionId || "unknown",
+          orgId,
+          qty,
+          expected,
+        );
 
       case "PICK":
-         if (!session?.userId) return "No active user session.";
-         const pickQty = typeof params.quantity === "number" ? params.quantity : 1;
-         const pickSku = params.sku ? String(params.sku) : undefined;
-         return await handlePickRequest(session.userId, pickQty, pickSku);
+        if (!session?.userId) return "No active user session.";
+        const pickQty =
+          typeof params.quantity === "number" ? params.quantity : 1;
+        const pickSku = params.sku ? String(params.sku) : undefined;
+        return await handlePickRequest(session.userId, pickQty, pickSku);
 
       case "CONFIRM":
-         if (!session?.userId) return "No active user session.";
-         return await handleTaskConfirmation(session.userId);
+        if (!session?.userId) return "No active user session.";
+        return await handleTaskConfirmation(session.userId);
 
       case "SCAN":
-         if (!session?.userId) return "No active user session.";
-         if (!params.barcode) return "No barcode scanned.";
-         return await handleScan(session.userId, String(params.barcode));
+        if (!session?.userId) return "No active user session.";
+        if (!params.barcode) return "No barcode scanned.";
+        return await handleScan(session.userId, String(params.barcode));
 
       default:
         // No special logic -> use default static response
@@ -611,50 +617,61 @@ export async function processVoiceCommand(input: {
   let finalResponseText = "";
 
   // 1. Resolve Dynamic Logic if fast path matches a smart intent (e.g. valid regex for SHORT_PICK)
-  const dynamicResponse = await resolveIntentLogic(intent, params, input.sessionId);
+  const dynamicResponse = await resolveIntentLogic(
+    intent,
+    params,
+    input.sessionId,
+  );
 
   if (dynamicResponse) {
-      finalResponseText = dynamicResponse;
-      isConversational = true;
+    finalResponseText = dynamicResponse;
+    isConversational = true;
   } else {
-      finalResponseText = getLegacyResponseText(intent, params);
+    finalResponseText = getLegacyResponseText(intent, params);
   }
 
   // 2. SMART PATH (LLM) - Only if regex failed (UNKNOWN)
   if (intent === "UNKNOWN") {
     const smartResult = await processSmartIntent(transcribedText);
     if (smartResult && smartResult.intent !== "UNKNOWN") {
-        // Update intent/params with smart result
-        intent = smartResult.intent;
-        params = smartResult.params;
-        confidence = smartResult.confidence;
-        isConversational = true;
+      // Update intent/params with smart result
+      intent = smartResult.intent;
+      params = smartResult.params;
+      confidence = smartResult.confidence;
+      isConversational = true;
 
-        // Try logic again with smart params
-        const smartLogicResponse = await resolveIntentLogic(intent, params, input.sessionId);
+      // Try logic again with smart params
+      const smartLogicResponse = await resolveIntentLogic(
+        intent,
+        params,
+        input.sessionId,
+      );
 
-        // If logic provides a response, use it. Otherwise, use legacy response text for the new intent
-        finalResponseText = smartLogicResponse || getLegacyResponseText(intent, params);
+      // If logic provides a response, use it. Otherwise, use legacy response text for the new intent
+      finalResponseText =
+        smartLogicResponse || getLegacyResponseText(intent, params);
     }
   }
 
   // 3. PERSIST INTERACTION LOG (WIRED DB)
   try {
-     const dbSession = input.sessionId ? activeSessions.get(input.sessionId) : null;
-     await prisma.voiceSession.create({
-         data: {
-             userId: input.userId,
-             organizationId: dbSession?.organizationId, 
-             transcript: transcribedText,
-             intent: intent,
-             entities: params as any,
-             response: finalResponseText,
-             status: "PROCESSED",
-             language: "en"
-         }
-     });
-  } catch(e) {
-      console.error("Failed to log voice interaction to DB:", e);
+    const dbSession = input.sessionId
+      ? activeSessions.get(input.sessionId)
+      : null;
+    await prisma.voiceSession.create({
+      data: {
+        userId: input.userId,
+        organizationId: dbSession?.organizationId,
+        transcript: transcribedText,
+        intent: intent,
+        entities: params as any,
+        response: finalResponseText,
+        status: "PROCESSED",
+        language: "en",
+      },
+    });
+  } catch (e) {
+    console.error("Failed to log voice interaction to DB:", e);
   }
 
   return {
@@ -682,8 +699,10 @@ export async function startVoiceSession(
 
   // Fetch contextual details for the user (Organization/Role)
   const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { organizationMemberships: { select: { organizationId: true }, take: 1 } }
+    where: { id: userId },
+    select: {
+      organizationMemberships: { select: { organizationId: true }, take: 1 },
+    },
   });
   const orgId = user?.organizationMemberships[0]?.organizationId;
 
@@ -697,7 +716,7 @@ export async function startVoiceSession(
     status: "ACTIVE",
     startedAt: new Date(),
     commandCount: 0,
-    mode: "VISUAL_ASSIST" // Default to Rookie mode initially
+    mode: "VISUAL_ASSIST", // Default to Rookie mode initially
   };
   activeSessions.set(id, voiceSession);
   return voiceSession;

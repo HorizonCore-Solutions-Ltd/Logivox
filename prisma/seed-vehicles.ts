@@ -7,8 +7,8 @@ async function main() {
 
   const org = await prisma.organization.findFirst();
   if (!org) {
-      console.error("No organization found. Run main seed first.");
-      return;
+    console.error("No organization found. Run main seed first.");
+    return;
   }
 
   const vehicles = [
@@ -38,7 +38,7 @@ async function main() {
       height: 6,
       maxWeight: 1500,
       maxVolume: 10,
-    }
+    },
   ];
 
   for (const v of vehicles) {
@@ -46,14 +46,14 @@ async function main() {
       where: {
         organizationId_name: {
           organizationId: org.id,
-          name: v.name
-        }
+          name: v.name,
+        },
       },
       update: {},
       create: {
         organizationId: org.id,
-        ...v
-      }
+        ...v,
+      },
     });
   }
 

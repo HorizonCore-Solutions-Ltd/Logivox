@@ -9,13 +9,16 @@
 <div style="font-family: Arial, sans-serif; color: #2d3748; line-height: 1.5;">
 
 ## 1. The Startup Operator (Growth)
-*Our entry-level tier designed for scaling D2C e-commerce operations managing 1-3 facilities.*
+
+_Our entry-level tier designed for scaling D2C e-commerce operations managing 1-3 facilities._
+
 <div style="background-color: #f7fafc; padding: 15px; border-left: 4px solid #4299e1; margin-bottom: 20px;">
   <strong style="font-size: 1.2em; color: #2b6cb0;">$1,500 / month</strong> <br/>
   <em>+ $5,000 One-Time Implementation Fee</em>
 </div>
 
 **Includes:**
+
 - Single Omni-Channel Account / Tenant Structure
 - Standard Inventory, Wave Orchestration, & Order Processing
 - Carrier Rate Shopping Integrations (FedEx, UPS, USPS)
@@ -24,13 +27,16 @@
 ---
 
 ## 2. Professional 3PL (Multi-Tenant)
-*Built for fast-growing 3PL providers that need client segmentation, personalized billing, and advanced dashboards.*
+
+_Built for fast-growing 3PL providers that need client segmentation, personalized billing, and advanced dashboards._
+
 <div style="background-color: #f7fafc; padding: 15px; border-left: 4px solid #48bb78; margin-bottom: 20px;">
   <strong style="font-size: 1.2em; color: #276749;">$4,500 / month</strong> <br/>
   <em>+ $15,000 One-Time Implementation Fee</em>
 </div>
 
 **Includes:**
+
 - Unlimited Client/Tenant Profiles with Client Portal Access
 - Automated Billing & Storage Invoice Generation
 - Advanced Putaway Logic & Dynamic Bin Slotting
@@ -39,13 +45,16 @@
 ---
 
 ## 3. Enterprise Command
-*For complex regional networks utilizing advanced robotics, automated sorting, and multi-node fulfillment.*
+
+_For complex regional networks utilizing advanced robotics, automated sorting, and multi-node fulfillment._
+
 <div style="background-color: #f7fafc; padding: 15px; border-left: 4px solid #805ad5; margin-bottom: 20px;">
   <strong style="font-size: 1.2em; color: #22543d;">Custom Pricing</strong> <br/>
   <em>Based on Facility Volume & Hardware Connected</em>
 </div>
 
 **Includes:**
+
 - Everything in Professional + Advanced Yard Management
 - **IoT & Robotics Engine**: Native Locus, 6 River Systems, and Conveyor direct integration
 - Dedicated Environment & Edge Routing Options

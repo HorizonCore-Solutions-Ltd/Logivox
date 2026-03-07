@@ -75,9 +75,9 @@ LogiVox is the only platform that adapts to the user's proficiency level on stan
 
 | Metric                              | Value                                                       |
 | ----------------------------------- | ----------------------------------------------------------- |
-| **API Route Handlers**              | 435 in `apps/web/src/app/api` (as of 2026-03-05)           |
-| **Prisma Models**                  | 243 in `prisma/schema.prisma` with 16 migrations            |
-| **Dashboard Pages**                 | 243 `page.tsx` routes under `apps/web/src/app/(dashboard)` |
+| **API Route Handlers**              | 435 in `apps/web/src/app/api` (as of 2026-03-05)            |
+| **Prisma Models**                   | 243 in `prisma/schema.prisma` with 16 migrations            |
+| **Dashboard Pages**                 | 243 `page.tsx` routes under `apps/web/src/app/(dashboard)`  |
 | **Production Code**                 | 80,000+ lines of TypeScript                                 |
 | **Feature Completeness**            | 100% (zero placeholders)                                    |
 | **Automation Workflows**            | 10+ autonomous execution types                              |

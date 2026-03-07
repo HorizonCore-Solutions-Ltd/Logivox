@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
   if (!loadSheetId && !loadSheetNumber) {
     return NextResponse.json(
       { error: "Missing loadSheetId or loadSheetNumber" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -79,17 +79,17 @@ export async function GET(request: NextRequest) {
         customer: true,
         vehicleType: true,
         containers: {
-            include: {
-                containerItems: {
-                    take: 5 // Get some sample items for summary
-                }
-            }
+          include: {
+            containerItems: {
+              take: 5, // Get some sample items for summary
+            },
+          },
         },
         events: {
           orderBy: { createdAt: "asc" },
           include: {
-             // If User relation existed on LoadSheetEvent, include user name
-             // Our schema has userId, userName strings on Event, so we use those
+            // If User relation existed on LoadSheetEvent, include user name
+            // Our schema has userId, userName strings on Event, so we use those
           },
         },
       },
@@ -98,14 +98,20 @@ export async function GET(request: NextRequest) {
     if (!loadSheet) {
       return NextResponse.json(
         { error: "Load Sheet not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     // 1. Determine Chain of Custody from Events
-    const startEvent = loadSheet.events.find((e) => e.eventType === "LOADING_STARTED" || e.eventType === "CREATED");
-    const completeEvent = loadSheet.events.find((e) => e.eventType === "LOADING_COMPLETED" || e.eventType === "DEPARTED");
-    const approveEvent = loadSheet.events.find((e) => e.eventType === "APPROVED");
+    const startEvent = loadSheet.events.find(
+      (e) => e.eventType === "LOADING_STARTED" || e.eventType === "CREATED",
+    );
+    const completeEvent = loadSheet.events.find(
+      (e) => e.eventType === "LOADING_COMPLETED" || e.eventType === "DEPARTED",
+    );
+    const approveEvent = loadSheet.events.find(
+      (e) => e.eventType === "APPROVED",
+    );
 
     // 2. Fetch Quality incidents linked to this LoadSheet
     const qualityAlerts = await prisma.alert.findMany({
@@ -117,20 +123,22 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    const isSafe = qualityAlerts.filter(a => a.severity === 'HIGH').length === 0;
+    const isSafe =
+      qualityAlerts.filter((a) => a.severity === "HIGH").length === 0;
 
     // 3. Build Manifest with Container Positions (if in metadata)
     const manifest = loadSheet.containers.map((c) => {
       // Safely cast metadata
       const meta = (c.metadata as Record<string, any>) || {};
-      
+
       return {
         id: c.containerNumber || c.id,
         type: c.containerType,
         position: meta.position || "Unassigned", // e.g., "Left-1", "Nose", "Tail-Right"
         weight: c.weight,
-        contents: c.containerItems.map(i => `${i.quantity}x ${i.sku}`).join(', ') + 
-                  (c.containerItems.length > 0 ? '...' : ''),
+        contents:
+          c.containerItems.map((i) => `${i.quantity}x ${i.sku}`).join(", ") +
+          (c.containerItems.length > 0 ? "..." : ""),
         customFields: meta.customFields || {}, // Flexible fields
       };
     });
@@ -155,15 +163,26 @@ export async function GET(request: NextRequest) {
         },
       },
       custody: {
-        startedBy: startEvent?.userName || loadSheet.metadata?.startedBy || "System",
-        startedAt: loadSheet.startedLoadingAt?.toISOString() || startEvent?.createdAt.toISOString() || null,
+        startedBy:
+          startEvent?.userName || loadSheet.metadata?.startedBy || "System",
+        startedAt:
+          loadSheet.startedLoadingAt?.toISOString() ||
+          startEvent?.createdAt.toISOString() ||
+          null,
         completedBy: completeEvent?.userName || "Pending",
         completedAt: loadSheet.finishedLoadingAt?.toISOString() || null,
         approvedBy: loadSheet.approvedBy || approveEvent?.userName || null,
-        approvedAt: loadSheet.approvedAt?.toISOString() || approveEvent?.createdAt.toISOString() || null,
+        approvedAt:
+          loadSheet.approvedAt?.toISOString() ||
+          approveEvent?.createdAt.toISOString() ||
+          null,
       },
       quality: {
-        status: isSafe ? "SAFE" : qualityAlerts.length > 0 ? "ATTENTION_REQUIRED" : "SAFE",
+        status: isSafe
+          ? "SAFE"
+          : qualityAlerts.length > 0
+            ? "ATTENTION_REQUIRED"
+            : "SAFE",
         activeAlerts: qualityAlerts.length,
         incidents: qualityAlerts.map((a) => ({
           type: a.title,
@@ -180,7 +199,7 @@ export async function GET(request: NextRequest) {
     console.error("Handover API Error:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

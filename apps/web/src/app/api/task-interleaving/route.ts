@@ -31,11 +31,14 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-    // Force re-optimize queue
-    return NextResponse.json({ message: "Queue optimized", tasksReordered: 45 }, { status: 200 });
+  // Force re-optimize queue
+  return NextResponse.json(
+    { message: "Queue optimized", tasksReordered: 45 },
+    { status: 200 },
+  );
 }
 
 export async function PUT(req: Request) {
-    // Update interleaving settings
-    return NextResponse.json({ message: "Settings updated" });
+  // Update interleaving settings
+  return NextResponse.json({ message: "Settings updated" });
 }

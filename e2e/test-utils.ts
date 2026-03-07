@@ -11,9 +11,9 @@ import { Page } from "@playwright/test";
 export async function login(
   page: Page,
   email: string = "admin@logivox.ai",
-  password: string = "password",
+  password: string = "Admin@Logivox1!",
 ) {
-  await page.goto("/login");
+  await page.goto("/sign-in");
   await page.fill('input[name="email"]', email);
   await page.fill('input[name="password"]', password);
   await page.click('button[type="submit"]');
@@ -28,7 +28,7 @@ export async function login(
 export async function logout(page: Page) {
   await page.click('[data-testid="user-menu"]');
   await page.click('[data-testid="logout-button"]');
-  await page.waitForURL("/login");
+  await page.waitForURL("/sign-in");
 }
 
 /**

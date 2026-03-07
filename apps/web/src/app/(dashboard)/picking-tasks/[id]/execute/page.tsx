@@ -69,7 +69,9 @@ export default function VoicePickingExecutePage({
   const [isListening, setIsListening] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [messages, setMessages] = useState<VoiceMessage[]>([]);
-  const [mode, setMode] = useState<"VISUAL_ASSIST" | "EYES_FREE">("VISUAL_ASSIST");
+  const [mode, setMode] = useState<"VISUAL_ASSIST" | "EYES_FREE">(
+    "VISUAL_ASSIST",
+  );
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
@@ -88,8 +90,13 @@ export default function VoicePickingExecutePage({
 
       // Initial Voice Greeting
       if (data) {
-        speak(`Task loaded. Pick ${data.quantity || 1} of ${data.inventoryItem?.sku || "item"}. Location: ${data.fromLocation?.name || "unassigned"}.`);
-        addMessage("system", `Pick ${data.quantity || 1} of ${data.inventoryItem?.sku}. Location: ${data.fromLocation?.name}.`);
+        speak(
+          `Task loaded. Pick ${data.quantity || 1} of ${data.inventoryItem?.sku || "item"}. Location: ${data.fromLocation?.name || "unassigned"}.`,
+        );
+        addMessage(
+          "system",
+          `Pick ${data.quantity || 1} of ${data.inventoryItem?.sku}. Location: ${data.fromLocation?.name}.`,
+        );
       }
     } catch (error) {
       console.error(error);
@@ -103,7 +110,11 @@ export default function VoicePickingExecutePage({
     }
   };
 
-  const addMessage = (role: "user" | "system", content: string, intent?: string) => {
+  const addMessage = (
+    role: "user" | "system",
+    content: string,
+    intent?: string,
+  ) => {
     setMessages((prev) => [
       ...prev,
       {
@@ -121,7 +132,9 @@ export default function VoicePickingExecutePage({
       const utterance = new SpeechSynthesisUtterance(text);
       // Construct a more natural voice if available
       const voices = window.speechSynthesis.getVoices();
-      const preferredVoice = voices.find(v => v.name.includes("Google") || v.name.includes("Natural"));
+      const preferredVoice = voices.find(
+        (v) => v.name.includes("Google") || v.name.includes("Natural"),
+      );
       if (preferredVoice) utterance.voice = preferredVoice;
       utterance.rate = 1.1; // Slightly faster for efficiency
       window.speechSynthesis.speak(utterance);
@@ -170,7 +183,7 @@ export default function VoicePickingExecutePage({
       const formData = new FormData();
       formData.append("file", audioBlob); // Voice Engine expects "file"
       formData.append("sessionId", params.id); // Use task ID as session context
-      
+
       // Send to our new unified Voice API
       const res = await fetch("/api/voice", {
         method: "POST",
@@ -180,10 +193,10 @@ export default function VoicePickingExecutePage({
       if (!res.ok) throw new Error("Voice processing failed");
 
       const result = await res.json();
-      
+
       // 1. Show User Transcript
       addMessage("user", result.recognizedText || "(Unintelligible)");
-      
+
       // 2. Show System Response
       if (result.responseText) {
         addMessage("system", result.responseText, result.intent);
@@ -201,7 +214,10 @@ export default function VoicePickingExecutePage({
           });
 
           if (completeRes.ok) {
-            toast({ title: "Success", description: "Task marked as completed." });
+            toast({
+              title: "Success",
+              description: "Task marked as completed.",
+            });
             speak("Task completed. Good job.");
             setTimeout(() => router.push("/picking-tasks"), 1500);
           } else {
@@ -217,11 +233,14 @@ export default function VoicePickingExecutePage({
           speak("Network error. Please try again.");
         }
       } else if (result.intent === "SHORT_PICK") {
-          speak("Short pick recorded. How many did you find?");
-          addMessage("system", "Short pick recorded. Please confirm actual quantity.");
+        speak("Short pick recorded. How many did you find?");
+        addMessage(
+          "system",
+          "Short pick recorded. Please confirm actual quantity.",
+        );
       } else if (result.intent === "CHECK_DIGIT_OVERRIDE") {
-          speak("Override authorized. Please proceed.");
-          addMessage("system", "Check digit override authorized.");
+        speak("Override authorized. Please proceed.");
+        addMessage("system", "Check digit override authorized.");
       }
     } catch (error) {
       console.error(error);
@@ -263,8 +282,9 @@ export default function VoicePickingExecutePage({
   }
 
   return (
-    <div className={`min-h-screen flex flex-col ${mode === "EYES_FREE" ? "bg-black text-white" : "bg-gray-50 text-slate-900"}`}>
-      
+    <div
+      className={`min-h-screen flex flex-col ${mode === "EYES_FREE" ? "bg-black text-white" : "bg-gray-50 text-slate-900"}`}
+    >
       {/* Header */}
       <header className="p-4 flex items-center justify-between border-b bg-white dark:bg-black">
         <Button variant="ghost" size="icon" onClick={() => router.back()}>
@@ -272,34 +292,41 @@ export default function VoicePickingExecutePage({
         </Button>
         <div className="text-center">
           <h1 className="font-bold text-lg">{task.taskNumber}</h1>
-          <Badge variant={task.priority === "URGENT" ? "destructive" : "secondary"}>
+          <Badge
+            variant={task.priority === "URGENT" ? "destructive" : "secondary"}
+          >
             {task.priority}
           </Badge>
         </div>
         <Button variant="ghost" size="icon" onClick={toggleMode}>
-          {mode === "VISUAL_ASSIST" ? <MicOff className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+          {mode === "VISUAL_ASSIST" ? (
+            <MicOff className="h-5 w-5" />
+          ) : (
+            <Volume2 className="h-5 w-5" />
+          )}
         </Button>
       </header>
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col p-4 gap-6 max-w-md mx-auto w-full">
-        
         {/* Picking Card - Dominant UI Element */}
-        <Card className={`overflow-hidden shadow-lg border-2 ${mode === "EYES_FREE" ? "border-gray-800 bg-gray-900 text-white" : "border-primary/20"}`}>
+        <Card
+          className={`overflow-hidden shadow-lg border-2 ${mode === "EYES_FREE" ? "border-gray-800 bg-gray-900 text-white" : "border-primary/20"}`}
+        >
           <div className="h-48 bg-gray-100 flex items-center justify-center relative">
             {task.inventoryItem?.imageUrl ? (
-              <img 
-                src={task.inventoryItem.imageUrl} 
-                alt={task.inventoryItem.name} 
+              <img
+                src={task.inventoryItem.imageUrl}
+                alt={task.inventoryItem.name}
                 className="h-full w-full object-cover"
               />
             ) : (
-                <div className="flex flex-col items-center text-gray-400">
-                    <span className="text-6xl font-black opacity-20">IMG</span>
-                    <span className="text-sm mt-2">No Image Available</span>
-                </div>
+              <div className="flex flex-col items-center text-gray-400">
+                <span className="text-6xl font-black opacity-20">IMG</span>
+                <span className="text-sm mt-2">No Image Available</span>
+              </div>
             )}
-            
+
             {/* Quantity Overlay */}
             <div className="absolute bottom-4 right-4 bg-primary text-primary-foreground px-6 py-2 rounded-full text-2xl font-bold shadow-xl">
               x{task.quantity || 1}
@@ -314,85 +341,110 @@ export default function VoicePickingExecutePage({
               {task.inventoryItem?.sku} - {task.inventoryItem?.name}
             </p>
           </CardHeader>
-          
+
           {mode === "VISUAL_ASSIST" && (
             <CardContent>
-               <div className="grid grid-cols-2 gap-4 mt-2">
-                 <div className="bg-blue-50 p-3 rounded-lg text-center border border-blue-100">
-                   <span className="text-xs text-blue-600 block uppercase tracking-wide">Category</span>
-                   <span className="font-semibold text-blue-900">Electronics</span>
-                 </div>
-                 <div className="bg-amber-50 p-3 rounded-lg text-center border border-amber-100">
-                    <span className="text-xs text-amber-600 block uppercase tracking-wide">Weight</span>
-                    <span className="font-semibold text-amber-900">1.2 kg</span>
-                 </div>
-               </div>
+              <div className="grid grid-cols-2 gap-4 mt-2">
+                <div className="bg-blue-50 p-3 rounded-lg text-center border border-blue-100">
+                  <span className="text-xs text-blue-600 block uppercase tracking-wide">
+                    Category
+                  </span>
+                  <span className="font-semibold text-blue-900">
+                    Electronics
+                  </span>
+                </div>
+                <div className="bg-amber-50 p-3 rounded-lg text-center border border-amber-100">
+                  <span className="text-xs text-amber-600 block uppercase tracking-wide">
+                    Weight
+                  </span>
+                  <span className="font-semibold text-amber-900">1.2 kg</span>
+                </div>
+              </div>
             </CardContent>
           )}
 
           <CardFooter className="flex gap-2 justify-center pb-6">
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               className={`rounded-full h-16 w-16 shadow-xl transition-all ${isListening ? "bg-red-500 hover:bg-red-600 scale-110 animate-pulse" : "bg-primary hover:bg-primary/90"}`}
               onMouseDown={startListening}
               onMouseUp={stopListening}
               onTouchStart={startListening}
               onTouchEnd={stopListening}
             >
-              {isListening ? <MicOff className="h-8 w-8" /> : <Mic className="h-8 w-8" />}
+              {isListening ? (
+                <MicOff className="h-8 w-8" />
+              ) : (
+                <Mic className="h-8 w-8" />
+              )}
             </Button>
           </CardFooter>
         </Card>
 
         {/* Conversation Transcript (Chat) */}
         <div className="flex-1 overflow-y-auto space-y-4 px-2 min-h-[200px]">
-           {messages.length === 0 && (
-             <div className="text-center text-muted-foreground py-8">
-               <p>Tap and hold Mic to speak.</p>
-               <p className="text-sm mt-2 italic">"Pick 5 confirmed"</p>
-             </div>
-           )}
-           {messages.map((msg) => (
-             <div 
-               key={msg.id} 
-               className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-             >
-               <div className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm shadow-sm ${
-                 msg.role === "user" 
-                   ? "bg-primary text-primary-foreground rounded-br-none" 
-                   : "bg-white border rounded-bl-none text-gray-800"
-               }`}>
-                 {msg.intent && (
-                    <span className="block text-[10px] uppercase font-bold opacity-70 mb-1">{msg.intent.replace("_", " ")}</span>
-                 )}
-                 {msg.content}
-               </div>
-             </div>
-           ))}
-           {isProcessing && (
-              <div className="flex justify-start">
-                  <div className="bg-gray-100 rounded-2xl px-4 py-2 text-xs animate-pulse text-gray-500">
-                    Thinking...
-                  </div>
+          {messages.length === 0 && (
+            <div className="text-center text-muted-foreground py-8">
+              <p>Tap and hold Mic to speak.</p>
+              <p className="text-sm mt-2 italic">"Pick 5 confirmed"</p>
+            </div>
+          )}
+          {messages.map((msg) => (
+            <div
+              key={msg.id}
+              className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+            >
+              <div
+                className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm shadow-sm ${
+                  msg.role === "user"
+                    ? "bg-primary text-primary-foreground rounded-br-none"
+                    : "bg-white border rounded-bl-none text-gray-800"
+                }`}
+              >
+                {msg.intent && (
+                  <span className="block text-[10px] uppercase font-bold opacity-70 mb-1">
+                    {msg.intent.replace("_", " ")}
+                  </span>
+                )}
+                {msg.content}
               </div>
-           )}
+            </div>
+          ))}
+          {isProcessing && (
+            <div className="flex justify-start">
+              <div className="bg-gray-100 rounded-2xl px-4 py-2 text-xs animate-pulse text-gray-500">
+                Thinking...
+              </div>
+            </div>
+          )}
         </div>
-
       </main>
 
       {/* Footer Controls */}
       <footer className="p-4 border-t bg-white dark:bg-black">
-         <div className="grid grid-cols-3 gap-4">
-             <Button variant="outline" size="sm" onClick={() => speak("Where is the break room?")}>
-                <Keyboard className="mr-2 h-4 w-4" /> Short Pick
-             </Button>
-             <Button variant="outline" size="sm" onClick={() => speak("Repeat instruction.")}>
-                <RotateCcw className="mr-2 h-4 w-4" /> Repeat
-             </Button>
-             <Button variant="default" size="sm" className="bg-green-600 hover:bg-green-700">
-                <Check className="mr-2 h-4 w-4" /> Confirm
-             </Button>
-         </div>
+        <div className="grid grid-cols-3 gap-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => speak("Where is the break room?")}
+          >
+            <Keyboard className="mr-2 h-4 w-4" /> Short Pick
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => speak("Repeat instruction.")}
+          >
+            <RotateCcw className="mr-2 h-4 w-4" /> Repeat
+          </Button>
+          <Button
+            variant="default"
+            size="sm"
+            className="bg-green-600 hover:bg-green-700"
+          >
+            <Check className="mr-2 h-4 w-4" /> Confirm
+          </Button>
+        </div>
       </footer>
     </div>
   );

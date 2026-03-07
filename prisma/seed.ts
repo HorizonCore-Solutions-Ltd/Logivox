@@ -1877,9 +1877,9 @@ async function main() {
 
   // ─── Operations Master Data (BayDoors & Zones) ────────────────────────────
   console.log("Creating Operations Data...");
-  
+
   // Seed Bay Doors
-  const bayDoors = [
+  const bayDoorsList = [
     { num: "BD-01", type: "INBOUND", status: "AVAILABLE" },
     { num: "BD-02", type: "INBOUND", status: "OCCUPIED" },
     { num: "BD-03", type: "OUTBOUND", status: "AVAILABLE" },
@@ -1887,9 +1887,14 @@ async function main() {
     { num: "BD-05", type: "CROSS_DOCK", status: "AVAILABLE" },
   ];
 
-  for (const door of bayDoors) {
+  for (const door of bayDoorsList) {
     await prisma.bayDoor.upsert({
-      where: { organizationId_doorNumber: { organizationId: org.id, doorNumber: door.num } },
+      where: {
+        organizationId_doorNumber: {
+          organizationId: org.id,
+          doorNumber: door.num,
+        },
+      },
       update: { status: door.status },
       create: {
         organizationId: org.id,
@@ -1897,8 +1902,8 @@ async function main() {
         doorNumber: door.num,
         doorType: door.type,
         status: door.status,
-        isActive: true
-      }
+        isActive: true,
+      },
     });
   }
   console.log("✅ Bay Doors (5)");
@@ -1914,19 +1919,21 @@ async function main() {
 
   for (const z of opsZones) {
     // We use barcode as unique handle
-    const loc = await prisma.location.findFirst({ where: { barcode: z.code, organizationId: org.id } });
+    const loc = await prisma.location.findFirst({
+      where: { locationCode: z.code, organizationId: org.id },
+    });
     if (!loc) {
-        await prisma.location.create({
-            data: {
-                organizationId: org.id,
-                warehouseId: wh.id,
-                locationCode: z.code,
-                name: z.name,
-                type: z.type as any, // assuming valid enum
-                barcode: z.code,
-                isActive: true
-            }
-        });
+      await prisma.location.create({
+        data: {
+          organizationId: org.id,
+          warehouseId: wh.id,
+          locationCode: z.code,
+          name: z.name,
+          type: z.type as any, // assuming valid enum
+          barcode: z.code,
+          isActive: true,
+        },
+      });
     }
   }
   console.log("✅ Operation Zones");

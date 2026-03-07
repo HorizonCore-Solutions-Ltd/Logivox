@@ -1,9 +1,11 @@
-
 import { prisma } from "@/lib/prisma";
-import type { DecisionContext, GovernorInterface, ProposedAction } from "../types";
+import type {
+  DecisionContext,
+  GovernorInterface,
+  ProposedAction,
+} from "../types";
 
 export const InventoryGovernor: GovernorInterface = {
-
   /**
    * Balances inventory across the network.
    * Checks for stockouts or excess stock and triggers transfers logic.
@@ -16,9 +18,9 @@ export const InventoryGovernor: GovernorInterface = {
     const lowStockItems = await prisma.inventoryItem.findMany({
       where: {
         organizationId: context.organizationId,
-        availableQty: { lt: 10 } // Hardcoded threshold for demo
+        availableQty: { lt: 10 }, // Hardcoded threshold for demo
       },
-      take: 5
+      take: 5,
     });
 
     const actions: ProposedAction[] = [];
@@ -30,11 +32,16 @@ export const InventoryGovernor: GovernorInterface = {
         parameters: { sku: item.sku, qty: 50, locationId: item.warehouseId },
         reasoning: `Low stock detected for ${item.sku} (Qty: ${item.availableQty}). Initiating replenishment from Hub.`,
         predictedOutcomes: [
-          { metric: "STOCKOUT_RISK", value: 0, confidence: 0.9, impact: "POSITIVE" }
+          {
+            metric: "STOCKOUT_RISK",
+            value: 0,
+            confidence: 0.9,
+            impact: "POSITIVE",
+          },
         ],
         confidence: 0.85,
         estimatedCost: 0, // Transfer cost internal
-        estimatedTimeRaw: 24 * 60 // 24 hours
+        estimatedTimeRaw: 24 * 60, // 24 hours
       });
     }
 
@@ -42,8 +49,10 @@ export const InventoryGovernor: GovernorInterface = {
   },
 
   async execute(action: ProposedAction): Promise<boolean> {
-    console.log(`[InventoryGovernor] Triggering Transfer Logic for ${action.parameters.sku}`);
+    console.log(
+      `[InventoryGovernor] Triggering Transfer Logic for ${action.parameters.sku}`,
+    );
     // Call TransferService here in real implementation
     return true;
-  }
+  },
 };

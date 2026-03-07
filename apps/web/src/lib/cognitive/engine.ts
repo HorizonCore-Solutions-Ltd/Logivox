@@ -1,4 +1,3 @@
-
 import { prisma } from "@/lib/prisma";
 import { LaborGovernor } from "./governors/labor-governor";
 import { CarrierGovernor } from "./governors/carrier-governor";
@@ -10,13 +9,14 @@ import type { DecisionContext, ProposedAction } from "./types";
 import { ActionCategory } from "@prisma/client";
 
 export const CognitiveEngine = {
-
   /**
    * Main entry point for the "Brain".
    * Ingests context, delegates to governors, logs decisions, and executes.
    */
   async runDecisionCycle(context: DecisionContext) {
-    console.log(`[CognitiveEngine] Starting cycle for event: ${context.triggerEvent}`);
+    console.log(
+      `[CognitiveEngine] Starting cycle for event: ${context.triggerEvent}`,
+    );
 
     // OPTIONAL: Run a Pre-Decision Simulation to set context
     // const simResult = await SimulationService.runSimulation("NETWORK_HEALTH", {});
@@ -33,17 +33,17 @@ export const CognitiveEngine = {
     const networkProposals = await NetworkLoadBalancer.evaluate(context);
 
     proposals.push(
-        ...laborProposals, 
-        ...carrierProposals, 
-        ...inventoryProposals, 
-        ...financeProposals,
-        ...networkProposals
+      ...laborProposals,
+      ...carrierProposals,
+      ...inventoryProposals,
+      ...financeProposals,
+      ...networkProposals,
     );
 
     // 2. Arbitration / Optimization
     // If multiple actions conflict, choose the best one based on Policy Goals
     // For now, we accept all high-confidence proposals
-    const acceptedActions = proposals.filter(p => p.confidence > 0.7);
+    const acceptedActions = proposals.filter((p) => p.confidence > 0.7);
 
     // 3. Execution & Logging
     const results = [];
@@ -60,8 +60,8 @@ export const CognitiveEngine = {
           confidenceScore: action.confidence,
           status: "EXECUTED",
           actionTaken: action.parameters,
-          outcomeMetric: { outcomes: action.predictedOutcomes }
-        }
+          outcomeMetric: { outcomes: action.predictedOutcomes },
+        },
       });
 
       // B. Execute the Action (The "Hands")
@@ -79,14 +79,14 @@ export const CognitiveEngine = {
         default:
           console.warn("Unknown action category:", action.category);
       }
-      
+
       results.push({ id: logEntry.id, success, action });
     }
 
     return {
       cycleId: `CYCLE-${Date.now()}`,
       decisionsMade: results.length,
-      details: results
+      details: results,
     };
-  }
+  },
 };

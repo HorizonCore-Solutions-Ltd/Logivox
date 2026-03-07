@@ -3,12 +3,15 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(
+  req: Request,
+  { params }: { params: { id: string } },
+) {
   const session = await getServerSession(authOptions);
-  
+
   // Basic Auth
   if (!session?.user?.email) {
-      // return new NextResponse("Unauthorized", { status: 401 });
+    // return new NextResponse("Unauthorized", { status: 401 });
   }
 
   const loadSheetId = params.id;
@@ -20,11 +23,11 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
         customer: true,
         containers: {
           include: {
-            containerItems: true
-          }
+            containerItems: true,
+          },
         },
-        vehicleType: true
-      }
+        vehicleType: true,
+      },
     });
 
     if (!loadSheet) {
@@ -33,9 +36,10 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 
     // Transform for UI/PDF if needed, but raw is fine
     return NextResponse.json(loadSheet);
-
   } catch (error: any) {
     console.error("LoadSheet Detail Error:", error);
-    return new NextResponse(JSON.stringify({ error: error.message }), { status: 500 });
+    return new NextResponse(JSON.stringify({ error: error.message }), {
+      status: 500,
+    });
   }
 }

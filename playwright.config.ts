@@ -28,6 +28,11 @@ export default defineConfig({
 
   // Shared settings for all the projects below
   use: {
+    // Docker / CI / Codespace fixes to prevent browser crashing
+    launchOptions: {
+      args: ["--disable-dev-shm-usage", "--no-sandbox"],
+    },
+    
     // Base URL to use in actions like `await page.goto('/')`
     baseURL: process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:3000",
 

@@ -1,4 +1,3 @@
-
 import { apiClient } from "./client";
 
 export interface ManualTransferPayload {
@@ -17,7 +16,10 @@ export const transferApi = {
    * This triggers the full financial and logistical flow.
    */
   createManualTransfer: async (payload: ManualTransferPayload) => {
-    const { data } = await apiClient.post("/api/logistics/transfers/manual", payload);
+    const { data } = await apiClient.post(
+      "/api/logistics/transfers/manual",
+      payload,
+    );
     return data;
   },
 
@@ -26,9 +28,12 @@ export const transferApi = {
    * Identifies stagnant stock across the network.
    */
   runGlobalRecall: async (mainDcId: string) => {
-    const { data } = await apiClient.get(`/api/logistics/transfers/cron/recall`, {
-      params: { dcId: mainDcId },
-    });
+    const { data } = await apiClient.get(
+      `/api/logistics/transfers/cron/recall`,
+      {
+        params: { dcId: mainDcId },
+      },
+    );
     return data;
   },
 };

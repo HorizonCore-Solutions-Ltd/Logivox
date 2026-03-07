@@ -1,4 +1,5 @@
 # LogiVox Platform Modules\n\nThis directory contains detailed technical and functional specifications for each module in the LogiVox platform.
+
 - [3PL_MULTI_CLIENT_MODULE_PART1](3PL_MULTI_CLIENT_MODULE_PART1.md)
 - [3PL_MULTI_CLIENT_MODULE_PART2](3PL_MULTI_CLIENT_MODULE_PART2.md)
 - [ADVANCED_INVENTORY_MANAGEMENT_MODULE_PART1](ADVANCED_INVENTORY_MANAGEMENT_MODULE_PART1.md)

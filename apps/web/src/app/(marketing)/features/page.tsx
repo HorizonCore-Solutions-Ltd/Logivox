@@ -384,6 +384,7 @@ export default function FeaturesPage() {
       description:
         "The engine analyses real-time labor rate calendars and warehouse traffic patterns, then schedules heavy replenishment tasks during off-peak windows. Peak-hour surcharges are avoided entirely without manual planning.",
       impact: "30% labor cost reduction, eliminates scheduling manual effort",
+      },
     {
       category: "Warehouse Operations",
       tier: "enterprise",
@@ -412,8 +413,6 @@ export default function FeaturesPage() {
       benefit: "Eliminate deadhead travel with dual-cycle operations",
       description: "AI-driven task assignment that combines put-away and picking tasks into single trips based on location and priority.",
       impact: "30-40% reduction in travel time, increased throughput",
-      usedBy: ["Enterprise"],
-    },
       usedBy: ["Enterprise"],
     },
   ];

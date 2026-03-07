@@ -7,8 +7,8 @@ async function main() {
 
   const org = await prisma.organization.findFirst();
   if (!org) {
-      console.error("No organization found. Run main seed first.");
-      return;
+    console.error("No organization found. Run main seed first.");
+    return;
   }
 
   const vehicles = [
@@ -38,19 +38,19 @@ async function main() {
       height: 6,
       maxWeight: 1500,
       maxVolume: 10,
-    }
+    },
   ];
 
   for (const v of vehicles) {
     // We need to implement upsert manually logic or find unique condition
     // FleetVehicleType has @@unique([organizationId, name])
-    
+
     await prisma.fleetVehicleType.upsert({
       where: {
         organizationId_name: {
           organizationId: org.id,
-          name: v.name
-        }
+          name: v.name,
+        },
       },
       update: {},
       create: {
@@ -61,8 +61,8 @@ async function main() {
         width: v.width,
         height: v.height,
         maxWeight: v.maxWeight,
-        maxVolume: v.maxVolume
-      }
+        maxVolume: v.maxVolume,
+      },
     });
   }
 

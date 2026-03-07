@@ -533,9 +533,6 @@ export default function OperationsCockpit() {
                     </div>
                 </TabsContent>
 
-                        </div>
-                    </div>
-                </TabsContent>
 
                 <TabsContent value="returns" className="h-[400px]">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-full">

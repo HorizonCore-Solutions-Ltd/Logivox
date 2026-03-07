@@ -90,35 +90,27 @@ export default function TaskInterleavingPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">34 km</div>
-            <p className="text-xs text-muted-foreground">
-              This shift
-            </p>
+            <p className="text-xs text-muted-foreground">This shift</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Tasks Batched
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Tasks Batched</CardTitle>
             <Layers className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">89%</div>
-            <p className="text-xs text-muted-foreground">
-              Optimization rate
-            </p>
+            <p className="text-xs text-muted-foreground">Optimization rate</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Throughput</CardTitle>
-             <CheckCircle className="h-4 w-4 text-green-500" />
+            <CheckCircle className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">+18%</div>
-            <p className="text-xs text-muted-foreground">
-              Efficiency gain
-            </p>
+            <p className="text-xs text-muted-foreground">Efficiency gain</p>
           </CardContent>
         </Card>
       </div>
@@ -148,39 +140,47 @@ export default function TaskInterleavingPage() {
                       <p className="text-sm font-medium leading-none">
                         {task.type.toUpperCase()} - {task.id}
                       </p>
-                       <p className="text-xs text-muted-foreground">
-                          Location: {task.location} | Assigned to: {task.worker}
-                        </p>
+                      <p className="text-xs text-muted-foreground">
+                        Location: {task.location} | Assigned to: {task.worker}
+                      </p>
                     </div>
-                     <div className="flex items-center gap-2">
-                         <Badge variant={task.status === 'in-progress' ? 'default' : 'secondary'}>
-                             {task.status}
-                         </Badge>
-                     </div>
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant={
+                          task.status === "in-progress"
+                            ? "default"
+                            : "secondary"
+                        }
+                      >
+                        {task.status}
+                      </Badge>
+                    </div>
                   </div>
                 ))}
               </div>
             )}
           </CardContent>
         </Card>
-         <Card className="col-span-3">
+        <Card className="col-span-3">
           <CardHeader>
             <CardTitle>Optimization Strategy</CardTitle>
-            <CardDescription>
-              Current algorithm settings.
-            </CardDescription>
+            <CardDescription>Current algorithm settings.</CardDescription>
           </CardHeader>
           <CardContent>
-             <div className="space-y-4">
-                 <div className="grid gap-2">
-                     <p className="text-sm font-medium">Mixing Rules</p>
-                     <p className="text-xs text-muted-foreground">Combine Putaway + Picking in same aisle.</p>
-                 </div>
-                 <div className="grid gap-2">
-                     <p className="text-sm font-medium">Max Batch Size</p>
-                     <p className="text-xs text-muted-foreground">4 tasks per operator.</p>
-                 </div>
-             </div>
+            <div className="space-y-4">
+              <div className="grid gap-2">
+                <p className="text-sm font-medium">Mixing Rules</p>
+                <p className="text-xs text-muted-foreground">
+                  Combine Putaway + Picking in same aisle.
+                </p>
+              </div>
+              <div className="grid gap-2">
+                <p className="text-sm font-medium">Max Batch Size</p>
+                <p className="text-xs text-muted-foreground">
+                  4 tasks per operator.
+                </p>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>

@@ -34,6 +34,6 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-    // Handle shift creation or updates
-    return NextResponse.json({ message: "Labor data updated" }, { status: 200 });
+  // Handle shift creation or updates
+  return NextResponse.json({ message: "Labor data updated" }, { status: 200 });
 }

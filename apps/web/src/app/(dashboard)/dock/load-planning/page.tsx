@@ -51,13 +51,18 @@ interface TruckSpec {
 
 export default function LoadPlanning() {
   const [summary, setSummary] = useState<LoadSummary | null>(null);
-  const [truckSpecs, setTruckSpecs] = useState<Record<string, TruckSpec> | null>(null);
+  const [truckSpecs, setTruckSpecs] = useState<Record<
+    string,
+    TruckSpec
+  > | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Cut Order State
   const [cutDialogOpen, setCutDialogOpen] = useState(false);
   const [cutOrderId, setCutOrderId] = useState("");
-  const [cutReason, setCutReason] = useState<"TRAILER_FULL" | "NO_STOCK" | "OTHER">("TRAILER_FULL");
+  const [cutReason, setCutReason] = useState<
+    "TRAILER_FULL" | "NO_STOCK" | "OTHER"
+  >("TRAILER_FULL");
   const [cutDetails, setCutDetails] = useState("");
   const [isCutting, setIsCutting] = useState(false);
 
@@ -116,7 +121,7 @@ export default function LoadPlanning() {
       if (!res.ok) throw new Error(data.error || "Failed to cut order");
 
       toast.success(
-        `Order cut successfully. Status: ${data.newStatus}. ${data.verificationCallback || ''}`,
+        `Order cut successfully. Status: ${data.newStatus}. ${data.verificationCallback || ""}`,
       );
       setCutDialogOpen(false);
       // Refresh data
@@ -245,37 +250,41 @@ export default function LoadPlanning() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {summary?.topPerformers?.map((plan: LoadPlanPerformance, index: number) => (
-                    <div
-                      key={plan.id}
-                      className="border rounded p-3 hover:bg-gray-50"
-                    >
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <div className="font-medium">{plan.shipmentId}</div>
-                          <div className="text-sm text-gray-600">{plan.id}</div>
-                        </div>
-                        <span
-                          className={`text-xs px-2 py-1 rounded ${getScoreColor(plan.score)}`}
-                        >
-                          Score: {plan.score}
-                        </span>
-                      </div>
-
-                      <div className="flex gap-4 text-sm">
-                        <div>
-                          <span className="text-gray-600">Cube:</span>{" "}
-                          <span className="font-medium text-green-600">
-                            {plan.cubeUtilization.toFixed(1)}%
+                  {summary?.topPerformers?.map(
+                    (plan: LoadPlanPerformance, index: number) => (
+                      <div
+                        key={plan.id}
+                        className="border rounded p-3 hover:bg-gray-50"
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <div className="font-medium">{plan.shipmentId}</div>
+                            <div className="text-sm text-gray-600">
+                              {plan.id}
+                            </div>
+                          </div>
+                          <span
+                            className={`text-xs px-2 py-1 rounded ${getScoreColor(plan.score)}`}
+                          >
+                            Score: {plan.score}
                           </span>
                         </div>
-                        <div>
-                          <span className="text-gray-600">Rank:</span>{" "}
-                          <span className="font-medium">#{index + 1}</span>
+
+                        <div className="flex gap-4 text-sm">
+                          <div>
+                            <span className="text-gray-600">Cube:</span>{" "}
+                            <span className="font-medium text-green-600">
+                              {plan.cubeUtilization.toFixed(1)}%
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-gray-600">Rank:</span>{" "}
+                            <span className="font-medium">#{index + 1}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ),
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -289,48 +298,58 @@ export default function LoadPlanning() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {summary?.needsOptimization?.map((plan: LoadPlanPerformance) => (
-                    <div
-                      key={plan.id}
-                      className="border rounded p-3 hover:bg-gray-50 bg-red-50 border-red-200"
-                    >
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <div className="font-medium">{plan.shipmentId}</div>
-                          <div className="text-sm text-gray-600">{plan.id}</div>
+                  {summary?.needsOptimization?.map(
+                    (plan: LoadPlanPerformance) => (
+                      <div
+                        key={plan.id}
+                        className="border rounded p-3 hover:bg-gray-50 bg-red-50 border-red-200"
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <div className="font-medium">{plan.shipmentId}</div>
+                            <div className="text-sm text-gray-600">
+                              {plan.id}
+                            </div>
+                          </div>
+                          <span
+                            className={`text-xs px-2 py-1 rounded ${getScoreColor(plan.score)}`}
+                          >
+                            Score: {plan.score}
+                          </span>
                         </div>
-                        <span
-                          className={`text-xs px-2 py-1 rounded ${getScoreColor(plan.score)}`}
-                        >
-                          Score: {plan.score}
-                        </span>
-                      </div>
 
-                      <div className="text-sm">
-                        <span className="text-gray-600">Issue:</span>{" "}
-                        <span className="font-medium text-orange-600">
-                          {plan.issue}
-                        </span>
-                      </div>
+                        <div className="text-sm">
+                          <span className="text-gray-600">Issue:</span>{" "}
+                          <span className="font-medium text-orange-600">
+                            {plan.issue}
+                          </span>
+                        </div>
 
-                      <div className="mt-2">
-                        <Button size="sm" variant="outline" className="w-full">
-                          ⚡ Optimize Load
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="w-full mt-1 text-red-600 hover:text-red-700 hover:bg-red-50"
-                          onClick={() => {
-                            setCutOrderId("so_" + Math.random().toString(36).substr(2, 9));
-                            setCutDialogOpen(true);
-                          }}
-                        >
-                          ✂️ Cut / Backorder
-                        </Button>
+                        <div className="mt-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="w-full"
+                          >
+                            ⚡ Optimize Load
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="w-full mt-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+                            onClick={() => {
+                              setCutOrderId(
+                                "so_" + Math.random().toString(36).substr(2, 9),
+                              );
+                              setCutDialogOpen(true);
+                            }}
+                          >
+                            ✂️ Cut / Backorder
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ),
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -424,50 +443,52 @@ export default function LoadPlanning() {
         <TabsContent value="trucks" className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             {truckSpecs &&
-              Object.entries(truckSpecs).map(([key, spec]: [string, TruckSpec]) => (
-                <Card key={key}>
-                  <CardHeader>
-                    <CardTitle>{spec.name}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      <div className="grid grid-cols-2 gap-2 text-sm">
-                        <div className="p-2 bg-blue-50 rounded">
-                          <div className="text-gray-600">Length</div>
-                          <div className="font-medium">
-                            {spec.length}" ({(spec.length / 12).toFixed(0)}ft)
+              Object.entries(truckSpecs).map(
+                ([key, spec]: [string, TruckSpec]) => (
+                  <Card key={key}>
+                    <CardHeader>
+                      <CardTitle>{spec.name}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                          <div className="p-2 bg-blue-50 rounded">
+                            <div className="text-gray-600">Length</div>
+                            <div className="font-medium">
+                              {spec.length}" ({(spec.length / 12).toFixed(0)}ft)
+                            </div>
+                          </div>
+                          <div className="p-2 bg-green-50 rounded">
+                            <div className="text-gray-600">Width</div>
+                            <div className="font-medium">
+                              {spec.width}" ({(spec.width / 12).toFixed(1)}ft)
+                            </div>
+                          </div>
+                          <div className="p-2 bg-purple-50 rounded">
+                            <div className="text-gray-600">Height</div>
+                            <div className="font-medium">
+                              {spec.height}" ({(spec.height / 12).toFixed(1)}ft)
+                            </div>
+                          </div>
+                          <div className="p-2 bg-orange-50 rounded">
+                            <div className="text-gray-600">Max Weight</div>
+                            <div className="font-medium">
+                              {spec.maxWeight.toLocaleString()} lbs
+                            </div>
                           </div>
                         </div>
-                        <div className="p-2 bg-green-50 rounded">
-                          <div className="text-gray-600">Width</div>
-                          <div className="font-medium">
-                            {spec.width}" ({(spec.width / 12).toFixed(1)}ft)
-                          </div>
-                        </div>
-                        <div className="p-2 bg-purple-50 rounded">
-                          <div className="text-gray-600">Height</div>
-                          <div className="font-medium">
-                            {spec.height}" ({(spec.height / 12).toFixed(1)}ft)
-                          </div>
-                        </div>
-                        <div className="p-2 bg-orange-50 rounded">
-                          <div className="text-gray-600">Max Weight</div>
-                          <div className="font-medium">
-                            {spec.maxWeight.toLocaleString()} lbs
-                          </div>
-                        </div>
-                      </div>
 
-                      <div className="mt-3 p-3 bg-gray-50 rounded">
-                        <div className="text-gray-600 text-sm">Max Cube</div>
-                        <div className="font-bold text-lg">
-                          {spec.maxCube.toLocaleString()} ft³
+                        <div className="mt-3 p-3 bg-gray-50 rounded">
+                          <div className="text-gray-600 text-sm">Max Cube</div>
+                          <div className="font-bold text-lg">
+                            {spec.maxCube.toLocaleString()} ft³
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ),
+              )}
           </div>
         </TabsContent>
 
@@ -731,14 +752,15 @@ export default function LoadPlanning() {
           </Card>
         </TabsContent>
       </Tabs>
-      
+
       {/* Cut Order Dialog - Moved outside of Tabs for better structure */}
       <Dialog open={cutDialogOpen} onOpenChange={setCutDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Cut Order from Load Plan</DialogTitle>
             <DialogDescription>
-              Remove an order from the current shipment. This action will update status and trigger necessary checks.
+              Remove an order from the current shipment. This action will update
+              status and trigger necessary checks.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -759,7 +781,9 @@ export default function LoadPlanning() {
               </Label>
               <Select
                 value={cutReason}
-                onValueChange={(v: "TRAILER_FULL" | "NO_STOCK" | "OTHER") => setCutReason(v)}
+                onValueChange={(v: "TRAILER_FULL" | "NO_STOCK" | "OTHER") =>
+                  setCutReason(v)
+                }
               >
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder="Select reason" />

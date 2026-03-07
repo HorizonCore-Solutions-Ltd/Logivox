@@ -5,10 +5,9 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { hasPermission } from "@/lib/rbac";
-import { logAuditEvent } from "@/lib/audit-logger";
+import { hasPermission } from "@/lib/permissions";
 import bcrypt from "bcryptjs";
 
 // GET /api/admin/users - List all users
@@ -152,18 +151,21 @@ export async function POST(request: NextRequest) {
     });
 
     // Log audit event
-    await logAuditEvent({
-      userId: session.user.id,
-      action: "user_created",
-      resource: "user",
-      resourceId: user.id,
-      details: {
-        userName: user.name,
-        userEmail: user.email,
-        userRole: user.role,
-      },
-      ipAddress: request.headers.get("x-forwarded-for") || "unknown",
-      userAgent: request.headers.get("user-agent") || "unknown",
+    await prisma.activityLog.create({
+      data: {
+        organizationId: session.user.organizationId || "system", // Fallback if missing
+        userId: session.user.id,
+        action: "user_created",
+        entityType: "user",
+        entityId: user.id,
+        metadata: {
+          userName: user.name,
+          userEmail: user.email,
+          userRole: user.role,
+        },
+        ipAddress: request.headers.get("x-forwarded-for") || "unknown",
+        userAgent: request.headers.get("user-agent") || "unknown",
+      }
     });
 
     return NextResponse.json(user, { status: 201 });

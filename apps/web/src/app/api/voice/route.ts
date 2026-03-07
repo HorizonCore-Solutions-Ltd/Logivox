@@ -51,14 +51,14 @@ export async function POST(req: NextRequest) {
     } else {
       return NextResponse.json(
         { error: "Unsupported Content-Type" },
-        { status: 415 }
+        { status: 415 },
       );
     }
 
     if (!audioBuffer && !textCommand) {
       return NextResponse.json(
         { error: "No voice or text input provided" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
     console.error("Voice API Error:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

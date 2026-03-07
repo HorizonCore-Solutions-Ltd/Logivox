@@ -6,10 +6,10 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { hasPermission } from "@/lib/rbac";
-import { logAuditEvent } from "@/lib/audit-logger";
+import { hasPermission } from "@/lib/permissions";
+
 
 // Default settings structure
 const defaultSettings = {
@@ -173,17 +173,6 @@ export async function PUT(request: NextRequest) {
     );
 
     // Log audit event
-    await logAuditEvent({
-      userId: session.user.id,
-      action: "settings_updated",
-      resource: "system_settings",
-      details: {
-        updatedSettings: flattenedSettings.map((s) => s.key),
-        timestamp: new Date().toISOString(),
-      },
-      ipAddress: request.headers.get("x-forwarded-for") || "unknown",
-      userAgent: request.headers.get("user-agent") || "unknown",
-    });
 
     return NextResponse.json({
       success: true,

@@ -9,6 +9,7 @@
 <div style="font-family: Arial, sans-serif; color: #2d3748; line-height: 1.6;">
 
 ## 🚀 The Future of High-Volume Warehousing
+
 LogiVox is a modern, AI-driven Warehouse Management System designed for 3PLs, E-Commerce fulfillment centers, and high-volume distribution networks. Unlike legacy systems that require months to deploy, LogiVox launches your operations in **60-90 days** with a fully cloud-native, API-first architecture.
 
 ### ✨ Core Product Offerings
@@ -32,25 +33,30 @@ Gain full visibility over your trailers and dock doors. Optimize scheduling, red
 LogiVox utilizes a straightforward SaaS pricing model tailored to your operational scale, avoiding the predatory licensing fees of legacy vendors.
 
 ### Tier 1: Growth Operations
+
 **Perfect for:** Growing D2C fulfillment centers and regional 3PLs branching into multiple sites.
-*   **Up to 5 Facilities**
-*   Full API Access (400+ Endpoints)
-*   Shopify / Magento / Standard ERP Integrations
-*   Standard Support (8x5)
-*   **Pricing:** Custom Volume-Based Scaling + Low One-Time Implementation Fee
+
+- **Up to 5 Facilities**
+- Full API Access (400+ Endpoints)
+- Shopify / Magento / Standard ERP Integrations
+- Standard Support (8x5)
+- **Pricing:** Custom Volume-Based Scaling + Low One-Time Implementation Fee
 
 ### Tier 2: Enterprise Command
+
 **Perfect for:** Massive regional distribution networks, complex omni-channel fulfillment, and robotics-heavy sites.
-*   **Unlimited Facilities**
-*   Advanced Hardware Integrations (Locus, AutoStore)
-*   Multi-Tenant Billing & Advanced 3PL Client Portals
-*   Dedicated Technical Account Manager & 24/7 Critical Support
-*   **Pricing:** Tiered Facility License + API Usage Blocks
+
+- **Unlimited Facilities**
+- Advanced Hardware Integrations (Locus, AutoStore)
+- Multi-Tenant Billing & Advanced 3PL Client Portals
+- Dedicated Technical Account Manager & 24/7 Critical Support
+- **Pricing:** Tiered Facility License + API Usage Blocks
 
 ---
 
 ## 📈 Partnering with LogiVox
-Transitioning your operation shouldn't mean pausing it. Our dedicated customer success engineering team utilizes proprietary data migration scripts, reducing rollout risk to near-zero. 
+
+Transitioning your operation shouldn't mean pausing it. Our dedicated customer success engineering team utilizes proprietary data migration scripts, reducing rollout risk to near-zero.
 
 **Ready to accelerate your fulfillment?**  
 Contact our sales team to arrange a sandbox demo tailored to your operation's biggest pain points.

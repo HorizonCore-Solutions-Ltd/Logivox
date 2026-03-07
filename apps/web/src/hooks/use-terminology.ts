@@ -1,6 +1,6 @@
 // apps/web/src/hooks/use-terminology.ts
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 type TerminologyState = {
   terms: {
@@ -11,7 +11,7 @@ type TerminologyState = {
     driver: string;
     loadSheet: string;
   };
-  updateTerm: (key: keyof TerminologyState['terms'], value: string) => void;
+  updateTerm: (key: keyof TerminologyState["terms"], value: string) => void;
 };
 
 // Simple global state for terminology preferences
@@ -24,13 +24,13 @@ export const useTerminology = create<TerminologyState>()(
         tipping: "Tipping",
         returns: "Returns",
         driver: "Driver",
-        loadSheet: "Load Sheet"
+        loadSheet: "Load Sheet",
       },
-      updateTerm: (key, value) => 
+      updateTerm: (key, value) =>
         set((state) => ({ terms: { ...state.terms, [key]: value } })),
     }),
     {
-      name: 'flowstock-terminology',
-    }
-  )
+      name: "flowstock-terminology",
+    },
+  ),
 );

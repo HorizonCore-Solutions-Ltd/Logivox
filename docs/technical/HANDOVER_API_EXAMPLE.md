@@ -11,6 +11,7 @@ or
 ## Sample Response
 
 This JSON response answers:
+
 - **Who loaded it?** (`custody.startedBy`, `custody.approvedBy`)
 - **Is it safe?** (`quality.status`, `quality.incidents`)
 - **Where are items loaded?** (`manifest[].position`)

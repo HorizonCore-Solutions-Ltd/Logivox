@@ -10,8 +10,8 @@ async function checkInternalInventory(orderId: string) {
   const orderItems = await prisma.salesOrderItem.findMany({
     where: { salesOrderId: orderId },
     include: {
-      inventoryItem: true
-    }
+      inventoryItem: true,
+    },
   });
 
   const shortages: string[] = [];
@@ -21,27 +21,27 @@ async function checkInternalInventory(orderId: string) {
     if (!item.inventoryItem) continue;
 
     const available = item.inventoryItem.availableQty || 0;
-    const required = item.quantity; 
+    const required = item.quantity;
 
     // Simple check: Is available stock less than required?
     if (available < required) {
       totalAvailable = false;
       shortages.push(
-        `${item.inventoryItem.name} (Req: ${required}, Avail: ${available})`
+        `${item.inventoryItem.name} (Req: ${required}, Avail: ${available})`,
       );
     }
   }
 
   return {
     hasStock: totalAvailable,
-    details: shortages.length > 0 ? shortages.join(", ") : "Stock Sufficient"
+    details: shortages.length > 0 ? shortages.join(", ") : "Stock Sufficient",
   };
 }
 
 const cutOrderSchema = z.object({
   salesOrderId: z.string(),
   reason: z.enum(["TRAILER_FULL", "NO_STOCK", "OTHER"]),
-  reasonDetails: z.string().optional()
+  reasonDetails: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -50,13 +50,13 @@ export async function POST(req: NextRequest) {
     if (!session?.user) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
-    
+
     const json = await req.json();
     const { salesOrderId, reason, reasonDetails } = cutOrderSchema.parse(json);
 
     // 1. Get Current Order
     const order = await prisma.salesOrder.findUnique({
-      where: { id: salesOrderId }
+      where: { id: salesOrderId },
     });
 
     if (!order) {
@@ -69,23 +69,24 @@ export async function POST(req: NextRequest) {
     let verificationResult = "";
 
     if (reason === "TRAILER_FULL") {
-       newStatus = "ON_HOLD"; 
-       statusNote = `Cut from Load Plan: Trailer Full. ${reasonDetails || ""}`;
+      newStatus = "ON_HOLD";
+      statusNote = `Cut from Load Plan: Trailer Full. ${reasonDetails || ""}`;
     } else if (reason === "NO_STOCK") {
-       newStatus = "BACKORDERED";
-       
-       // Perform REAL check against Internal Inventory
-       const stockCheck = await checkInternalInventory(salesOrderId);
-       
-       if (stockCheck.hasStock) {
-         // Contradiction: User said no stock, but system says we have it.
-         // We still cut the order, but flag it for review.
-         statusNote = `Cut from Load Plan: User reported NO_STOCK, but internal system shows availability. Review required.`;
-         verificationResult = "Internal Inventory: Stock Available (Discrepancy)";
-       } else {
-         statusNote = `Cut from Load Plan: Inventory Shortage confirmed. Missing: ${stockCheck.details}`;
-         verificationResult = `Internal Inventory: Shortage Confirmed (${stockCheck.details})`;
-       }
+      newStatus = "BACKORDERED";
+
+      // Perform REAL check against Internal Inventory
+      const stockCheck = await checkInternalInventory(salesOrderId);
+
+      if (stockCheck.hasStock) {
+        // Contradiction: User said no stock, but system says we have it.
+        // We still cut the order, but flag it for review.
+        statusNote = `Cut from Load Plan: User reported NO_STOCK, but internal system shows availability. Review required.`;
+        verificationResult =
+          "Internal Inventory: Stock Available (Discrepancy)";
+      } else {
+        statusNote = `Cut from Load Plan: Inventory Shortage confirmed. Missing: ${stockCheck.details}`;
+        verificationResult = `Internal Inventory: Shortage Confirmed (${stockCheck.details})`;
+      }
     } else {
       newStatus = "ON_HOLD";
       statusNote = `Cut from Load Plan: ${reasonDetails || "Other functionality"}`;
@@ -94,36 +95,42 @@ export async function POST(req: NextRequest) {
     // 3. Update Order
     // Transaction: Remove from Load Plan (if exists) -> Update Status -> Add Note history
     await prisma.$transaction(async (tx) => {
-        // Remove connection to any Load Plan
-        // Based on schema `loadPlanItems LoadPlanItem[]`
-        await tx.loadPlanItem.deleteMany({
-            where: { salesOrderId }
-        });
+      // Remove connection to any Load Plan
+      // Based on schema `loadPlanItems LoadPlanItem[]`
+      await tx.loadPlanItem.deleteMany({
+        where: { salesOrderId },
+      });
 
-        // Append to existing notes
-        const updatedNote = (order.internalNotes ? order.internalNotes + "\n" : "") + 
-                           `[${new Date().toISOString()}] ${statusNote}`;
+      // Append to existing notes
+      const updatedNote =
+        (order.internalNotes ? order.internalNotes + "\n" : "") +
+        `[${new Date().toISOString()}] ${statusNote}`;
 
-        await tx.salesOrder.update({
-            where: { id: salesOrderId },
-            data: {
-                status: newStatus,
-                internalNotes: updatedNote
-            }
-        });
+      await tx.salesOrder.update({
+        where: { id: salesOrderId },
+        data: {
+          status: newStatus,
+          internalNotes: updatedNote,
+        },
+      });
     });
 
-    return NextResponse.json({ 
-        success: true, 
-        newStatus,
-        verificationCallback: verificationResult 
+    return NextResponse.json({
+      success: true,
+      newStatus,
+      verificationCallback: verificationResult,
     });
-
   } catch (error) {
     if (error instanceof z.ZodError) {
-        return NextResponse.json({ error: (error as z.ZodError).errors }, { status: 400 });
+      return NextResponse.json(
+        { error: (error as z.ZodError).errors },
+        { status: 400 },
+      );
     }
     console.error("Cut Order Error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }

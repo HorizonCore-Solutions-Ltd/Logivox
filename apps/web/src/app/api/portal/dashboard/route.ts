@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     const baseResponse = { role: user.role };
 
     if (user.role !== "CUSTOMER") {
-        return NextResponse.json(baseResponse);
+      return NextResponse.json(baseResponse);
     }
 
     // Get customer record

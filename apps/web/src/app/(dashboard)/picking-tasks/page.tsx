@@ -361,7 +361,7 @@ export default function PickingTasksPage() {
                     {getStatusIcon(task.status)}
                     {task.status.replace("_", " ")}
                   </span>
-                  
+
                   {/* Start Voice Mode Button */}
                   <button
                     onClick={(e) => {

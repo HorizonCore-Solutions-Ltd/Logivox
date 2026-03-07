@@ -45,7 +45,7 @@ describe("HeroSection", () => {
 
     expect(screen.getByText("42"));
     expect(screen.getAllByText(/Dashboards/i)[0]).toBeInTheDocument();
-    
+
     expect(screen.getByText(/99.99%/)).toBeInTheDocument();
   });
 

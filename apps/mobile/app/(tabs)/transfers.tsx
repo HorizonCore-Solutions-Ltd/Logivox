@@ -1,5 +1,14 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, ActivityIndicator, Alert } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+  ActivityIndicator,
+  Alert,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { transferApi, ManualTransferPayload } from "../../lib/api/transfers";
@@ -9,7 +18,7 @@ export default function TransfersScreen() {
   const router = useRouter();
   const { user } = useAuthStore();
   const [loading, setLoading] = useState(false);
-  
+
   // Form State
   const [targetOrgId, setTargetOrgId] = useState("");
   const [sku, setSku] = useState("");
@@ -34,13 +43,17 @@ export default function TransfersScreen() {
         targetOrgId: targetOrgId, // In a real app, this would be a dropdown of known partners
         sku: sku,
         quantity: parseInt(quantity, 10),
-        requesterId: user.id
+        requesterId: user.id,
       };
-      
+
       const response = await transferApi.createManualTransfer(payload);
-      setResult("Transfer Created Successfully:\n" + JSON.stringify(response, null, 2));
+      setResult(
+        "Transfer Created Successfully:\n" + JSON.stringify(response, null, 2),
+      );
     } catch (error: any) {
-      setResult("Error creating transfer: " + (error.message || "Unknown error"));
+      setResult(
+        "Error creating transfer: " + (error.message || "Unknown error"),
+      );
     } finally {
       setLoading(false);
     }
@@ -53,7 +66,9 @@ export default function TransfersScreen() {
     try {
       // Assuming current org is the main DC for this context
       const response = await transferApi.runGlobalRecall(user.organizationId);
-      setResult("Recall Analysis Initiated:\n" + JSON.stringify(response, null, 2));
+      setResult(
+        "Recall Analysis Initiated:\n" + JSON.stringify(response, null, 2),
+      );
     } catch (error: any) {
       setResult("Error running recall: " + (error.message || "Unknown error"));
     } finally {
@@ -64,7 +79,10 @@ export default function TransfersScreen() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
         <Text style={styles.title}>Global Logistics & Transfers</Text>
@@ -72,46 +90,51 @@ export default function TransfersScreen() {
 
       <View style={styles.content}>
         <Text style={styles.sectionHeader}>Create Manual Transfer</Text>
-        
+
         <View style={styles.formGroup}>
-            <Text style={styles.label}>Target Organization ID</Text>
-            <TextInput 
-                style={styles.input} 
-                placeholder="e.g. org_12345"
-                value={targetOrgId}
-                onChangeText={setTargetOrgId}
-                autoCapitalize="none"
-            />
+          <Text style={styles.label}>Target Organization ID</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="e.g. org_12345"
+            value={targetOrgId}
+            onChangeText={setTargetOrgId}
+            autoCapitalize="none"
+          />
         </View>
 
         <View style={styles.formGroup}>
-            <Text style={styles.label}>SKU</Text>
-            <TextInput 
-                style={styles.input} 
-                placeholder="e.g. WIDGET-A"
-                value={sku}
-                onChangeText={setSku}
-                autoCapitalize="characters"
-            />
+          <Text style={styles.label}>SKU</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="e.g. WIDGET-A"
+            value={sku}
+            onChangeText={setSku}
+            autoCapitalize="characters"
+          />
         </View>
 
         <View style={styles.formGroup}>
-            <Text style={styles.label}>Quantity</Text>
-            <TextInput 
-                style={styles.input} 
-                placeholder="10"
-                value={quantity}
-                onChangeText={setQuantity}
-                keyboardType="numeric"
-            />
+          <Text style={styles.label}>Quantity</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="10"
+            value={quantity}
+            onChangeText={setQuantity}
+            keyboardType="numeric"
+          />
         </View>
 
-        <TouchableOpacity 
-          style={[styles.button, loading && styles.disabledButton]} 
+        <TouchableOpacity
+          style={[styles.button, loading && styles.disabledButton]}
           onPress={handleCreateTransfer}
           disabled={loading}
         >
-          <Ionicons name="paper-plane-outline" size={20} color="#FFF" style={styles.icon} />
+          <Ionicons
+            name="paper-plane-outline"
+            size={20}
+            color="#FFF"
+            style={styles.icon}
+          />
           <Text style={styles.buttonText}>Submit Transfer Request</Text>
         </TouchableOpacity>
 
@@ -119,19 +142,35 @@ export default function TransfersScreen() {
 
         <Text style={styles.sectionHeader}>Network Management</Text>
         <Text style={styles.description}>
-            Initiate a global recall to identify stagnant inventory across all connected nodes and return it to the central DC.
+          Initiate a global recall to identify stagnant inventory across all
+          connected nodes and return it to the central DC.
         </Text>
 
-        <TouchableOpacity 
-          style={[styles.button, styles.recallButton, loading && styles.disabledButton]} 
+        <TouchableOpacity
+          style={[
+            styles.button,
+            styles.recallButton,
+            loading && styles.disabledButton,
+          ]}
           onPress={handleGlobalRecall}
           disabled={loading}
         >
-          <Ionicons name="refresh-circle-outline" size={20} color="#FFF" style={styles.icon} />
+          <Ionicons
+            name="refresh-circle-outline"
+            size={20}
+            color="#FFF"
+            style={styles.icon}
+          />
           <Text style={styles.buttonText}>Trigger Global Recall</Text>
         </TouchableOpacity>
 
-        {loading && <ActivityIndicator size="large" color="#2563EB" style={{ marginTop: 20 }} />}
+        {loading && (
+          <ActivityIndicator
+            size="large"
+            color="#2563EB"
+            style={{ marginTop: 20 }}
+          />
+        )}
 
         {result && (
           <View style={styles.resultBox}>

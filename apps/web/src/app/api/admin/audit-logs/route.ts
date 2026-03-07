@@ -6,9 +6,9 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { hasPermission } from "@/lib/rbac";
+import { hasPermission } from "@/lib/permissions";
 import { resolveTenantFromRequest } from "@/lib/tenant-context";
 
 // GET /api/admin/audit-logs - Fetch audit logs for organization

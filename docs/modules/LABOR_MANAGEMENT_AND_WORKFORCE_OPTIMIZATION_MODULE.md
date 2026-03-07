@@ -17,6 +17,7 @@ This module serves as the **human performance engine** of LogiVox, ensuring the 
 This module governs everything related to labor, workforce, skills, productivity, and real‑time optimization.
 
 **Core Objectives:**
+
 - **Allocate Labor Dynamically:** instant response to wave progress and bottlenecks.
 - **Real-Time Productivity:** Live tracking of "True Productivity" (Task Time / Paid Time).
 - **Adminless Operation:** Support modes where AI manages the floor, and humans only handle escalations.
@@ -28,6 +29,7 @@ This module governs everything related to labor, workforce, skills, productivity
 ## 2. Roles and Surfaces
 
 ### Roles
+
 - **Shift Manager:** Oversees overall efficiency and cost.
 - **Labor Planner:** Forecasts headcount needs weeks in advance.
 - **Zone Lead:** Manages exceptions in a specific physical area.
@@ -36,6 +38,7 @@ This module governs everything related to labor, workforce, skills, productivity
 - **Worker:** The end-user (Picker, Driver, QC, Packer, etc.).
 
 ### Surfaces
+
 - **Labor Planning Console:** Desktop view for forecasting and shift templates.
 - **Real-Time Labor Board:** "God Mode" view of the floor (Heatmaps, Idle Workers).
 - **Worker Mobile App:** Personal dashboard for tasks, performance, and safety.
@@ -47,7 +50,9 @@ This module governs everything related to labor, workforce, skills, productivity
 ## 3. Worker Profiles & Skill Matrix
 
 ### Worker Profile
+
 The digital twin of the employee, tracking:
+
 - **Skills:** (Picking, Forklift, Reach Truck, Clamp, Hazmat, Cold Chain).
 - **Certifications:** License numbers, expiry dates, and digital copies.
 - **Experience Level:** Trainee, Proficient, Expert, Trainer.
@@ -56,7 +61,9 @@ The digital twin of the employee, tracking:
 - **Voice Readiness:** Language preference, speed settings, voice profile.
 
 ### Skill Matrix
+
 A 2D mapping driving the allocation engine:
+
 - Defines **Proficiency Levels** (1-5) for every task type.
 - Identifies **Cross-Training** candidates (e.g., "Worker is Level 5 in Picking, train in QC").
 - Auto-blocks tasks if certifications are expired.
@@ -66,6 +73,7 @@ A 2D mapping driving the allocation engine:
 ## 4. Real-Time Labor Visibility
 
 ### The Labor Board
+
 - **Heatmaps:** Visual density of workers in aisles vs. order volume.
 - **Status Indicators:**
   - 🟢 **Active:** Moving/Scanning.
@@ -74,12 +82,15 @@ A 2D mapping driving the allocation engine:
 - **Congestion Analysis:** Real-time alerts for "Traffic Jams" in high-velocity zones.
 
 ### Worker Telemetry
+
 - **Travel vs. Productive:** Split analysis of time spent walking vs. working.
 - **Fatigue Indicators:** Anomaly detection dropping picking rates toward end of shift.
 - **Error Rates:** Spikes in short-picks or mis-scans triggering "Coaching Needed" alerts.
 
 ### Voice Integration & Intent Tracking
+
 The **Voice Module** acts as the primary telemetry source for floor operations, providing granular data beyond simple task completion:
+
 - **Session Persistence:** Every voice interaction is logged in `VoiceSession` (Postgres), capturing transcripts, intents (`PICK`, `SHORT_PICK`), and response times.
 - **Exception Intelligence:**
   - **Short Picks:** Automatically recorded in `ExceptionRecord`.
@@ -92,13 +103,17 @@ The **Voice Module** acts as the primary telemetry source for floor operations, 
 ## 5. Labor Allocation & Dynamic Rebalancing
 
 ### Allocation Engine
+
 Assigns workers to zones based on a multi-variable score:
+
 - **Workload:** Volume of open tasks in the zone.
 - **SLA Pressure:** Approaching cut-off times for carriers.
 - **Skill Fit:** Matching "Expert" pickers to "Complex" orders.
 
 ### Dynamic Rebalancing (The "Adminless" Brain)
+
 Automatically moves workers without human intervention when:
+
 - **Returns Spike:** Pulls cross-trained pickers to the returns validation area.
 - **Dock Congestion:** Shifts forklift drivers from Putaway to Loading.
 - **Wave Completion:** Auto-releases pickers to the next active wave.
@@ -108,13 +123,16 @@ Automatically moves workers without human intervention when:
 ## 6. Task Assignment & Interleaving
 
 ### Intelligent Interleaving
+
 Reduces deadhead travel by chaining dissimilar tasks:
+
 1.  **Pick** items for Order A (Aisle 4).
 2.  **Replenish** slot in Aisle 5 (nearby).
 3.  **Cycle Count** slot in Aisle 6 (en route).
 4.  **Drop** at Packing Station.
 
 ### Task Assignment Logic
+
 - **Fatigue Aware:** Avoids giving "Heavy Lift" tasks continuously to the same worker.
 - **Congestion Aware:** avoiding sending 3 pickers to the same narrow aisle simultaneously.
 
@@ -123,10 +141,12 @@ Reduces deadhead travel by chaining dissimilar tasks:
 ## 7. Productivity Tracking & Gamification
 
 ### Performance Scoring
+
 - **Weighted Model:** `(Lines * A) + (Units * B) - (Errors * C)`. Customizable per client.
 - **SLA Impact:** Bonus points for clearing "At Risk" orders.
 
 ### Gamification (Optional)
+
 - **Leaderboards:** "Golden Scanner" award for top zone performer.
 - **Shift Goals:** "Team unlock: Pizza party if we clear 10k units by 2 PM."
 - **Badges:** "Speed Demon", "Accuracy Ace", "Safe Operator".
@@ -136,12 +156,15 @@ Reduces deadhead travel by chaining dissimilar tasks:
 ## 8. Forecasting & Planning
 
 ### AI Labor Forecasting
+
 Predicts headcount needs by ingesting:
+
 - **Historical Order Volume:** Last year's matching week.
 - **Inbound ASN Data:** Incoming workload.
 - **Marketing Events:** "Black Friday" multipliers.
 
 ### What-If Simulation
+
 - "What if we add 5 temp workers?"
 - "What if the sorting machine breaks?"
 - "What if order volume doubles tomorrow?"
@@ -151,6 +174,7 @@ Predicts headcount needs by ingesting:
 ## 9. Training, Certification & Compliance
 
 ### Management System
+
 - **Auto-Expiry:** Alerts supervisor 30 days before Forklift License expires.
 - **Hard Blocks:** System refuses to assign a Forklift Task if license is expired.
 - **Refresher Training:** Triggered automatically by high error rates in specific tasks.
@@ -160,14 +184,17 @@ Predicts headcount needs by ingesting:
 ## 10. Operating Modes
 
 ### 🟢 Admin-Controlled (Legacy)
+
 - Planners assign workers to zones manually.
 - Supervisors explicitly approve every move.
 
 ### 🟡 Admin-Assisted (Hybrid)
+
 - System suggests moves ("Move 3 people to Shipping").
 - Supervisor clicks "Approve" or "Reject".
 
 ### 🟣 Adminless (Autonomous)
+
 - System allocates labor and rebalances zones automatically.
 - Tasks are assigned and interleaved by AI.
 - Breaks are auto-scheduled to maintain coverage.
@@ -178,14 +205,17 @@ Predicts headcount needs by ingesting:
 ## 11. Optimization & Future Capabilities
 
 ### AI Coaching
+
 - **Micro-Feedback:** "You are dwelling 15s at the slot. Try organizing your cart differently."
 - **Safety Nudges:** "Slow down, corner approaching."
 
 ### Robotics Integration
+
 - **Hybrid Work:** Assigns the "Long Walk" to AMRs and the "Dexterous Pick" to humans.
 - **Cobot Pacing:** Adjusts robot speed to match the assigned human's fatigue level.
 
 ### Sustainability
+
 - **Energy Tracking:** Optimizes forklift routes to save battery/charging cycles.
 - **Movement:** Minimizes total human kilometers traveled per shift.
 
@@ -194,6 +224,7 @@ Predicts headcount needs by ingesting:
 ## 12. Technical Implementation Architecture
 
 ### Database Schema (Prisma)
+
 - **`WorkerProfile`**: Extends `User`. Stores physical constraints and preferences.
 - **`SkillMatrix`**: Link table `Worker` <-> `Skill` with `proficiencyLevel` (1-5).
 - **`PickingTask`**: The core unit of work assignment. Links `User`, `InventoryItem`, and `Location`.
@@ -201,12 +232,14 @@ Predicts headcount needs by ingesting:
 - **`ExceptionRecord`**: Tracks operational anomalies (short picks, damaged goods) with severity levels and resolution status (`autoResolved` vs `escalated`).
 
 ### API Structure (`/api/labor`)
+
 - `POST /allocation/rebalance`: Trigger the rebalancing engine manually.
 - `GET /forecast`: Retrieve AI-predicted labor needs.
 - `POST /sessions/analyze`: Process completed voice sessions for intent patterns and user coaching opportunities.
 - `POST /exceptions/resolve`: Supervisor action on escalated discrepancies.
 
 ### Integration Points
+
 - **Warehouse Brain:** Feeds "Congestion" data to the labor engine.
 - **Voice System:** Feeds real-time task completion timestamps and intent logs directly into the labor metrics pipeline.
 - **Inventory Service:** Validates pick quantities against `InventoryItem` records in real-time.

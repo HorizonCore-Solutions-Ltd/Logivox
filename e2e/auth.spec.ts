@@ -7,10 +7,10 @@ import { login, logout } from "./test-utils";
 
 test.describe("Authentication", () => {
   test("should login successfully with valid credentials", async ({ page }) => {
-    await page.goto("/login");
+    await page.goto("/sign-in");
 
     await page.fill('input[name="email"]', "admin@logivox.ai");
-    await page.fill('input[name="password"]', "password");
+    await page.fill('input[name="Admin@Logivox1!"]', "Admin@Logivox1!");
     await page.click('button[type="submit"]');
 
     // Should redirect to dashboard
@@ -21,10 +21,10 @@ test.describe("Authentication", () => {
   });
 
   test("should show error with invalid credentials", async ({ page }) => {
-    await page.goto("/login");
+    await page.goto("/sign-in");
 
     await page.fill('input[name="email"]', "invalid@example.com");
-    await page.fill('input[name="password"]', "wrongpassword");
+    await page.fill('input[name="Admin@Logivox1!"]', "wrongpassword");
     await page.click('button[type="submit"]');
 
     // Should show error message
@@ -33,7 +33,7 @@ test.describe("Authentication", () => {
     );
 
     // Should stay on login page
-    await expect(page).toHaveURL("/login");
+    await expect(page).toHaveURL("/sign-in");
   });
 
   test("should logout successfully", async ({ page }) => {
@@ -44,21 +44,21 @@ test.describe("Authentication", () => {
     await page.click('[data-testid="logout-button"]');
 
     // Should redirect to login
-    await expect(page).toHaveURL("/login");
+    await expect(page).toHaveURL("/sign-in");
   });
 
   test("should redirect to login when not authenticated", async ({ page }) => {
     await page.goto("/dashboard");
 
     // Should redirect to login
-    await expect(page).toHaveURL("/login");
+    await expect(page).toHaveURL("/sign-in");
   });
 
   test("should remember me work correctly", async ({ page, context }) => {
-    await page.goto("/login");
+    await page.goto("/sign-in");
 
     await page.fill('input[name="email"]', "admin@logivox.ai");
-    await page.fill('input[name="password"]', "password");
+    await page.fill('input[name="Admin@Logivox1!"]', "Admin@Logivox1!");
     await page.check('input[name="rememberMe"]');
     await page.click('button[type="submit"]');
 

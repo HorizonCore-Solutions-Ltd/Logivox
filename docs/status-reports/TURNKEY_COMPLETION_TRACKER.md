@@ -164,15 +164,15 @@ For each domain/feature, track completion across 6 dimensions:
 
 ### Analytics & Dashboards
 
-| Dimension        | Status         | Notes                                                |
-| ---------------- | -------------- | ---------------------------------------------------- |
-| DB & ORM         | ✅ DONE        | Analytics models, aggregation queries optimized      |
+| Dimension        | Status         | Notes                                                        |
+| ---------------- | -------------- | ------------------------------------------------------------ |
+| DB & ORM         | ✅ DONE        | Analytics models, aggregation queries optimized              |
 | Backend APIs     | ✅ DONE        | Broad dashboard and reporting API coverage, export (CSV/PDF) |
-| Frontend UI      | ✅ DONE        | Extensive dashboard coverage with charts, KPIs, and filters |
-| AuthZ & Roles    | ✅ DONE        | Warehouse managers see their data, admins see all    |
-| Errors & Logging | ✅ DONE        | Dashboard load failures handled, slow queries logged |
-| Tests            | ✅ DONE        | KPI calculation tested, export functionality tested  |
-| **OVERALL**      | **✅ TURNKEY** | Fully production-ready                               |
+| Frontend UI      | ✅ DONE        | Extensive dashboard coverage with charts, KPIs, and filters  |
+| AuthZ & Roles    | ✅ DONE        | Warehouse managers see their data, admins see all            |
+| Errors & Logging | ✅ DONE        | Dashboard load failures handled, slow queries logged         |
+| Tests            | ✅ DONE        | KPI calculation tested, export functionality tested          |
+| **OVERALL**      | **✅ TURNKEY** | Fully production-ready                                       |
 
 ### Integrations (ERP, Carriers, IoT)
 
@@ -192,63 +192,63 @@ For each domain/feature, track completion across 6 dimensions:
 
 ### Autonomous Workflows
 
-| Dimension        | Status             | Notes                                         |
-| ---------------- | ------------------ | --------------------------------------------- |
-| DB & ORM         | ✅ DONE            | Automation entities present and integrated      |
-| Backend APIs     | ✅ DONE            | Autonomous workflow and orchestration routes live |
-| Frontend UI      | ✅ DONE            | Automation configuration and visibility UIs available |
-| AuthZ & Roles    | ✅ DONE            | Operational role constraints enforced            |
-| Errors & Logging | ✅ DONE            | Workflow execution and failure telemetry logged |
-| Tests            | ✅ DONE            | Critical automation paths covered               |
-| **OVERALL**      | **✅ TURNKEY**     | Delivered and in active use                     |
+| Dimension        | Status         | Notes                                                 |
+| ---------------- | -------------- | ----------------------------------------------------- |
+| DB & ORM         | ✅ DONE        | Automation entities present and integrated            |
+| Backend APIs     | ✅ DONE        | Autonomous workflow and orchestration routes live     |
+| Frontend UI      | ✅ DONE        | Automation configuration and visibility UIs available |
+| AuthZ & Roles    | ✅ DONE        | Operational role constraints enforced                 |
+| Errors & Logging | ✅ DONE        | Workflow execution and failure telemetry logged       |
+| Tests            | ✅ DONE        | Critical automation paths covered                     |
+| **OVERALL**      | **✅ TURNKEY** | Delivered and in active use                           |
 
 ### Customer Self-Service Portal
 
-| Dimension        | Status             | Notes                                            |
-| ---------------- | ------------------ | ------------------------------------------------ |
-| DB & ORM         | ✅ DONE            | Existing models leveraged with tenant isolation  |
-| Backend APIs     | ✅ DONE            | Customer visibility, returns, and tracking APIs live |
-| Frontend UI      | ✅ DONE            | Portal pages and self-service workflows shipped  |
-| AuthZ & Roles    | ✅ DONE            | Customer-only data access controls enforced      |
-| Errors & Logging | ✅ DONE            | Customer actions and exceptions logged           |
-| Tests            | ✅ DONE            | Portal critical paths covered                    |
-| **OVERALL**      | **✅ TURNKEY**     | Delivered and in active use                      |
+| Dimension        | Status         | Notes                                                |
+| ---------------- | -------------- | ---------------------------------------------------- |
+| DB & ORM         | ✅ DONE        | Existing models leveraged with tenant isolation      |
+| Backend APIs     | ✅ DONE        | Customer visibility, returns, and tracking APIs live |
+| Frontend UI      | ✅ DONE        | Portal pages and self-service workflows shipped      |
+| AuthZ & Roles    | ✅ DONE        | Customer-only data access controls enforced          |
+| Errors & Logging | ✅ DONE        | Customer actions and exceptions logged               |
+| Tests            | ✅ DONE        | Portal critical paths covered                        |
+| **OVERALL**      | **✅ TURNKEY** | Delivered and in active use                          |
 
 ### Compliance Automation
 
-| Dimension        | Status             | Notes                                           |
-| ---------------- | ------------------ | ----------------------------------------------- |
-| DB & ORM         | ✅ DONE            | Compliance entities and evidence models active  |
-| Backend APIs     | ✅ DONE            | Compliance automation and reporting APIs live   |
-| Frontend UI      | ✅ DONE            | Compliance dashboards and report views available |
-| AuthZ & Roles    | ✅ DONE            | Compliance role gating enforced                 |
-| Errors & Logging | ✅ DONE            | Violation and audit logging active              |
-| Tests            | ✅ DONE            | Compliance reporting paths covered              |
-| **OVERALL**      | **✅ TURNKEY**     | Delivered and in active use                     |
+| Dimension        | Status         | Notes                                            |
+| ---------------- | -------------- | ------------------------------------------------ |
+| DB & ORM         | ✅ DONE        | Compliance entities and evidence models active   |
+| Backend APIs     | ✅ DONE        | Compliance automation and reporting APIs live    |
+| Frontend UI      | ✅ DONE        | Compliance dashboards and report views available |
+| AuthZ & Roles    | ✅ DONE        | Compliance role gating enforced                  |
+| Errors & Logging | ✅ DONE        | Violation and audit logging active               |
+| Tests            | ✅ DONE        | Compliance reporting paths covered               |
+| **OVERALL**      | **✅ TURNKEY** | Delivered and in active use                      |
 
 ### Supplier Scorecards
 
-| Dimension        | Status             | Notes                                           |
-| ---------------- | ------------------ | ----------------------------------------------- |
-| DB & ORM         | ✅ DONE            | Supplier scoring and history entities active     |
-| Backend APIs     | ✅ DONE            | Scorecard and supplier-read APIs live            |
-| Frontend UI      | ✅ DONE            | Scorecard dashboards and trends available        |
-| AuthZ & Roles    | ✅ DONE            | Supplier scoped access controls enforced         |
-| Errors & Logging | ✅ DONE            | Score calculation logging active                 |
-| Tests            | ✅ DONE            | Scoring and visibility paths covered             |
-| **OVERALL**      | **✅ TURNKEY**     | Delivered and in active use                      |
+| Dimension        | Status         | Notes                                        |
+| ---------------- | -------------- | -------------------------------------------- |
+| DB & ORM         | ✅ DONE        | Supplier scoring and history entities active |
+| Backend APIs     | ✅ DONE        | Scorecard and supplier-read APIs live        |
+| Frontend UI      | ✅ DONE        | Scorecard dashboards and trends available    |
+| AuthZ & Roles    | ✅ DONE        | Supplier scoped access controls enforced     |
+| Errors & Logging | ✅ DONE        | Score calculation logging active             |
+| Tests            | ✅ DONE        | Scoring and visibility paths covered         |
+| **OVERALL**      | **✅ TURNKEY** | Delivered and in active use                  |
 
 ### Sustainability Tracking
 
-| Dimension        | Status             | Notes                                    |
-| ---------------- | ------------------ | ---------------------------------------- |
-| DB & ORM         | ✅ DONE            | Carbon and ESG entities active                    |
-| Backend APIs     | ✅ DONE            | Sustainability calculation and reporting APIs live |
-| Frontend UI      | ✅ DONE            | Carbon and ESG dashboards available               |
-| AuthZ & Roles    | ✅ DONE            | Dashboard visibility controlled by role           |
-| Errors & Logging | ✅ DONE            | Calculation and ingestion errors logged           |
-| Tests            | ✅ DONE            | Core sustainability paths covered                 |
-| **OVERALL**      | **✅ TURNKEY**     | Delivered and in active use                       |
+| Dimension        | Status         | Notes                                              |
+| ---------------- | -------------- | -------------------------------------------------- |
+| DB & ORM         | ✅ DONE        | Carbon and ESG entities active                     |
+| Backend APIs     | ✅ DONE        | Sustainability calculation and reporting APIs live |
+| Frontend UI      | ✅ DONE        | Carbon and ESG dashboards available                |
+| AuthZ & Roles    | ✅ DONE        | Dashboard visibility controlled by role            |
+| Errors & Logging | ✅ DONE        | Calculation and ingestion errors logged            |
+| Tests            | ✅ DONE        | Core sustainability paths covered                  |
+| **OVERALL**      | **✅ TURNKEY** | Delivered and in active use                        |
 
 ---
 

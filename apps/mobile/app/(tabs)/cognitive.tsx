@@ -1,8 +1,19 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { cognitiveApi, DecisionPayload, SimulationPayload } from "../../lib/api/cognitive";
+import {
+  cognitiveApi,
+  DecisionPayload,
+  SimulationPayload,
+} from "../../lib/api/cognitive";
 import { useAuthStore } from "../../lib/store/auth.store";
 
 export default function CognitiveScreen() {
@@ -22,7 +33,9 @@ export default function CognitiveScreen() {
         metadata: { triggeredBy: user.id },
       };
       const response = await cognitiveApi.triggerDecisionCycle(payload);
-      setResult("Decision Cycle Completed:\n" + JSON.stringify(response, null, 2));
+      setResult(
+        "Decision Cycle Completed:\n" + JSON.stringify(response, null, 2),
+      );
     } catch (error: any) {
       setResult("Error: " + (error.message || "Unknown error"));
     } finally {
@@ -52,7 +65,10 @@ export default function CognitiveScreen() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
         <Text style={styles.title}>Cognitive Engine Control</Text>
@@ -61,15 +77,21 @@ export default function CognitiveScreen() {
       <View style={styles.content}>
         <Text style={styles.subtitle}>Autonomous Decision Making</Text>
         <Text style={styles.description}>
-          Manually trigger the cognitive loop to evaluate current stock levels, labor constraints, and financial thresholds.
+          Manually trigger the cognitive loop to evaluate current stock levels,
+          labor constraints, and financial thresholds.
         </Text>
-        
-        <TouchableOpacity 
-          style={[styles.button, loading && styles.disabledButton]} 
+
+        <TouchableOpacity
+          style={[styles.button, loading && styles.disabledButton]}
           onPress={handleDecisionCycle}
           disabled={loading}
         >
-          <Ionicons name="brain-outline" size={20} color="#FFF" style={styles.icon} />
+          <Ionicons
+            name="brain-outline"
+            size={20}
+            color="#FFF"
+            style={styles.icon}
+          />
           <Text style={styles.buttonText}>Trigger Decision Cycle</Text>
         </TouchableOpacity>
 
@@ -77,19 +99,35 @@ export default function CognitiveScreen() {
 
         <Text style={styles.subtitle}>Digital Twin Simulation</Text>
         <Text style={styles.description}>
-          Run a predictive simulation to stress-test the current supply chain configuration against hypothetical scenarios.
+          Run a predictive simulation to stress-test the current supply chain
+          configuration against hypothetical scenarios.
         </Text>
 
-        <TouchableOpacity 
-          style={[styles.button, styles.simButton, loading && styles.disabledButton]} 
+        <TouchableOpacity
+          style={[
+            styles.button,
+            styles.simButton,
+            loading && styles.disabledButton,
+          ]}
           onPress={handleRunSimulation}
           disabled={loading}
         >
-          <Ionicons name="hardware-chip-outline" size={20} color="#FFF" style={styles.icon} />
+          <Ionicons
+            name="hardware-chip-outline"
+            size={20}
+            color="#FFF"
+            style={styles.icon}
+          />
           <Text style={styles.buttonText}>Run Simulation (Labor Stress)</Text>
         </TouchableOpacity>
 
-        {loading && <ActivityIndicator size="large" color="#2563EB" style={{ marginTop: 20 }} />}
+        {loading && (
+          <ActivityIndicator
+            size="large"
+            color="#2563EB"
+            style={{ marginTop: 20 }}
+          />
+        )}
 
         {result && (
           <View style={styles.resultBox}>

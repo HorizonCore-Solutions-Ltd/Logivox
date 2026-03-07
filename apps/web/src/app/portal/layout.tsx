@@ -46,13 +46,13 @@ export default async function PortalLayout({
                   LogiVox Portal
                 </span>
               </Link>
-              
+
               <nav className="hidden md:flex space-x-4">
                 <Link
-                   href="/portal"
-                   className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+                  href="/portal"
+                  className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
                 >
-                   Dashboard
+                  Dashboard
                 </Link>
 
                 {role === "CUSTOMER" && (
@@ -85,21 +85,21 @@ export default async function PortalLayout({
                 )}
 
                 {role === "SUPPLIER" && (
-                    <Link
-                      href="/portal/supplier"
-                      className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
-                    >
-                      Process ASNs
-                    </Link>
+                  <Link
+                    href="/portal/supplier"
+                    className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    Process ASNs
+                  </Link>
                 )}
 
                 {role === "CARRIER" && (
-                    <Link
-                      href="/portal/carrier"
-                      className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
-                    >
-                      Book Appointments
-                    </Link>
+                  <Link
+                    href="/portal/carrier"
+                    className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    Book Appointments
+                  </Link>
                 )}
 
                 <Link

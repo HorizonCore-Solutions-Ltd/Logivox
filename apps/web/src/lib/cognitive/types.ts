@@ -1,4 +1,3 @@
-
 import { type ActionCategory, type CognitiveGoalType } from "@prisma/client";
 
 export interface DecisionContext {

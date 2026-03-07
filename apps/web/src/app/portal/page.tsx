@@ -20,7 +20,7 @@ import {
   CheckCircle2,
   XCircle,
   FileText,
-  Calendar
+  Calendar,
 } from "lucide-react";
 
 interface DashboardData {
@@ -69,86 +69,107 @@ export default function PortalDashboardPage() {
     );
   }
 
-  if (!data) return <div className="p-8 text-center text-red-600">Failed to load portal data.</div>;
+  if (!data)
+    return (
+      <div className="p-8 text-center text-red-600">
+        Failed to load portal data.
+      </div>
+    );
 
   // SUPPLIER VIEW
   if (data.role === "SUPPLIER") {
-      return (
-          <div className="space-y-8">
-              <div className="flex justify-between items-start">
-                  <div>
-                      <h1 className="text-3xl font-bold text-gray-900">Supplier Dashboard</h1>
-                      <p className="mt-2 text-gray-600">Welcome back. Manage your shipments and ASNs.</p>
-                  </div>
-                  <Link href="/portal/supplier">
-                      <Button size="lg" className="shadow-lg">
-                          <Plus className="h-5 w-5 mr-2" />
-                          Create ASN
-                      </Button>
-                  </Link>
-              </div>
-
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                      <Link href="/portal/supplier">
-                          <CardHeader className="flex flex-row items-center justify-between pb-2">
-                              <CardTitle className="text-sm font-medium text-gray-600">Active Shipments</CardTitle>
-                              <TruckIcon className="h-4 w-4 text-blue-500" />
-                          </CardHeader>
-                          <CardContent>
-                              <div className="text-2xl font-bold">Process ASN</div>
-                              <p className="text-xs text-gray-500 mt-1">Submit shipping notices</p>
-                          </CardContent>
-                      </Link>
-                  </Card>
-                   <Card className="hover:shadow-md transition-shadow">
-                      <CardHeader className="flex flex-row items-center justify-between pb-2">
-                          <CardTitle className="text-sm font-medium text-gray-600">Purchase Orders</CardTitle>
-                          <FileText className="h-4 w-4 text-green-500" />
-                      </CardHeader>
-                      <CardContent>
-                          <div className="text-2xl font-bold">View POs</div>
-                          <p className="text-xs text-gray-500 mt-1">Check open orders</p>
-                      </CardContent>
-                  </Card>
-              </div>
+    return (
+      <div className="space-y-8">
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Supplier Dashboard
+            </h1>
+            <p className="mt-2 text-gray-600">
+              Welcome back. Manage your shipments and ASNs.
+            </p>
           </div>
-      );
+          <Link href="/portal/supplier">
+            <Button size="lg" className="shadow-lg">
+              <Plus className="h-5 w-5 mr-2" />
+              Create ASN
+            </Button>
+          </Link>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer">
+            <Link href="/portal/supplier">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium text-gray-600">
+                  Active Shipments
+                </CardTitle>
+                <TruckIcon className="h-4 w-4 text-blue-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">Process ASN</div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Submit shipping notices
+                </p>
+              </CardContent>
+            </Link>
+          </Card>
+          <Card className="hover:shadow-md transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">
+                Purchase Orders
+              </CardTitle>
+              <FileText className="h-4 w-4 text-green-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">View POs</div>
+              <p className="text-xs text-gray-500 mt-1">Check open orders</p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
   }
 
   // CARRIER VIEW
   if (data.role === "CARRIER") {
-      return (
-          <div className="space-y-8">
-              <div className="flex justify-between items-start">
-                  <div>
-                      <h1 className="text-3xl font-bold text-gray-900">Carrier Dashboard</h1>
-                      <p className="mt-2 text-gray-600">Manage dock appointments and deliveries.</p>
-                  </div>
-                  <Link href="/portal/carrier">
-                      <Button size="lg" className="shadow-lg">
-                          <Calendar className="h-5 w-5 mr-2" />
-                          Book Appointment
-                      </Button>
-                  </Link>
-              </div>
-
-               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                      <Link href="/portal/carrier">
-                          <CardHeader className="flex flex-row items-center justify-between pb-2">
-                              <CardTitle className="text-sm font-medium text-gray-600">Schedule</CardTitle>
-                              <Clock className="h-4 w-4 text-blue-500" />
-                          </CardHeader>
-                          <CardContent>
-                              <div className="text-2xl font-bold">Book Slot</div>
-                              <p className="text-xs text-gray-500 mt-1">Reserve dock time</p>
-                          </CardContent>
-                      </Link>
-                  </Card>
-              </div>
+    return (
+      <div className="space-y-8">
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Carrier Dashboard
+            </h1>
+            <p className="mt-2 text-gray-600">
+              Manage dock appointments and deliveries.
+            </p>
           </div>
-      );
+          <Link href="/portal/carrier">
+            <Button size="lg" className="shadow-lg">
+              <Calendar className="h-5 w-5 mr-2" />
+              Book Appointment
+            </Button>
+          </Link>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer">
+            <Link href="/portal/carrier">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium text-gray-600">
+                  Schedule
+                </CardTitle>
+                <Clock className="h-4 w-4 text-blue-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">Book Slot</div>
+                <p className="text-xs text-gray-500 mt-1">Reserve dock time</p>
+              </CardContent>
+            </Link>
+          </Card>
+        </div>
+      </div>
+    );
   }
 
   // CUSTOMER VIEW (Existing Logic)

@@ -1,4 +1,3 @@
-
 import { apiClient } from "./client";
 
 export interface DecisionPayload {
@@ -20,7 +19,10 @@ export const cognitiveApi = {
    * Use for testing or forcing an evaluation.
    */
   triggerDecisionCycle: async (payload: DecisionPayload) => {
-    const { data } = await apiClient.post("/api/cognitive/decision-cycle", payload);
+    const { data } = await apiClient.post(
+      "/api/cognitive/decision-cycle",
+      payload,
+    );
     return data;
   },
 

@@ -5,13 +5,14 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 // Dynamically derive tenant-scoped models from the Prisma schema
-const TENANT_SCOPED_MODELS = new Set(
-  Prisma.dmmf.datamodel.models
-    .filter((model) =>
-      model.fields.some((field) => field.name === "organizationId"),
-    )
-    .map((model) => model.name),
-);
+// Currently disabled because Prisma.dmmf is not available at runtime in some environments
+// const TENANT_SCOPED_MODELS = new Set(
+//   Prisma.dmmf.datamodel.models
+//     .filter((model) =>
+//       model.fields.some((field) => field.name === "organizationId"),
+//     )
+//     .map((model) => model.name),
+// );
 
 // Helpers to verify organization scoping on queries
 function containsOrganizationId(input: unknown): boolean {

@@ -1,0 +1,134 @@
+🚀 Starting global setup...
+📦 Seeding test database...
+👤 Creating test users...
+✅ App is running at: http://localhost:3000
+✅ Global setup complete
+
+Running 7 tests using 1 worker
+
+  ✘  1 [chromium] › e2e/inventory.spec.ts:13:7 › Inventory Management › should create new inventory item (20.4s)
+  ✘  2 [firefox] › e2e/inventory.spec.ts:13:7 › Inventory Management › should create new inventory item (3ms)
+  ✘  3 [webkit] › e2e/inventory.spec.ts:13:7 › Inventory Management › should create new inventory item (3ms)
+  ✘  4 [Mobile Chrome] › e2e/inventory.spec.ts:13:7 › Inventory Management › should create new inventory item (16.9s)
+  ✘  5 [Mobile Safari] › e2e/inventory.spec.ts:13:7 › Inventory Management › should create new inventory item (4ms)
+  ✘  6 [Microsoft Edge] › e2e/inventory.spec.ts:13:7 › Inventory Management › should create new inventory item (3ms)
+  ✘  7 [Google Chrome] › e2e/inventory.spec.ts:13:7 › Inventory Management › should create new inventory item (3ms)
+🧹 Starting global teardown...
+🗑️  Cleaning up test data...
+✅ Global teardown complete
+
+
+  1) [chromium] › e2e/inventory.spec.ts:13:7 › Inventory Management › should create new inventory item 
+
+    TimeoutError: page.fill: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('input[name="email"]')[22m
+
+
+       at test-utils.ts:17
+
+      15 | ) {
+      16 |   await page.goto("/sign-in");
+    > 17 |   await page.fill('input[name="email"]', email);
+         |              ^
+      18 |   await page.fill('input[name="password"]', password);
+      19 |   await page.click('button[type="submit"]');
+      20 |
+        at login (/workspaces/Logivox/e2e/test-utils.ts:17:14)
+        at /workspaces/Logivox/e2e/inventory.spec.ts:10:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/inventory-Inventory-Manage-55c82-d-create-new-inventory-item-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/inventory-Inventory-Manage-55c82-d-create-new-inventory-item-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/inventory-Inventory-Manage-55c82-d-create-new-inventory-item-chromium/error-context.md
+
+  2) [firefox] › e2e/inventory.spec.ts:13:7 › Inventory Management › should create new inventory item 
+
+    Error: browserType.launch: Executable doesn't exist at /home/codespace/.cache/ms-playwright/firefox-1495/firefox/firefox
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+
+  3) [webkit] › e2e/inventory.spec.ts:13:7 › Inventory Management › should create new inventory item 
+
+    Error: browserType.launch: Executable doesn't exist at /home/codespace/.cache/ms-playwright/webkit-2215/pw_run.sh
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+
+  4) [Mobile Chrome] › e2e/inventory.spec.ts:13:7 › Inventory Management › should create new inventory item 
+
+    TimeoutError: page.fill: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('input[name="email"]')[22m
+
+
+       at test-utils.ts:17
+
+      15 | ) {
+      16 |   await page.goto("/sign-in");
+    > 17 |   await page.fill('input[name="email"]', email);
+         |              ^
+      18 |   await page.fill('input[name="password"]', password);
+      19 |   await page.click('button[type="submit"]');
+      20 |
+        at login (/workspaces/Logivox/e2e/test-utils.ts:17:14)
+        at /workspaces/Logivox/e2e/inventory.spec.ts:10:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/inventory-Inventory-Manage-55c82-d-create-new-inventory-item-Mobile-Chrome/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/inventory-Inventory-Manage-55c82-d-create-new-inventory-item-Mobile-Chrome/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/inventory-Inventory-Manage-55c82-d-create-new-inventory-item-Mobile-Chrome/error-context.md
+
+  5) [Mobile Safari] › e2e/inventory.spec.ts:13:7 › Inventory Management › should create new inventory item 
+
+    Error: browserType.launch: Executable doesn't exist at /home/codespace/.cache/ms-playwright/webkit-2215/pw_run.sh
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+
+  6) [Microsoft Edge] › e2e/inventory.spec.ts:13:7 › Inventory Management › should create new inventory item 
+
+    Error: browserType.launch: Chromium distribution 'msedge' is not found at /opt/microsoft/msedge/msedge
+    Run "npx playwright install msedge"
+
+  7) [Google Chrome] › e2e/inventory.spec.ts:13:7 › Inventory Management › should create new inventory item 
+
+    Error: browserType.launch: Chromium distribution 'chrome' is not found at /opt/google/chrome/chrome
+    Run "npx playwright install chrome"
+
+  7 failed
+    [chromium] › e2e/inventory.spec.ts:13:7 › Inventory Management › should create new inventory item 
+    [firefox] › e2e/inventory.spec.ts:13:7 › Inventory Management › should create new inventory item 
+    [webkit] › e2e/inventory.spec.ts:13:7 › Inventory Management › should create new inventory item 
+    [Mobile Chrome] › e2e/inventory.spec.ts:13:7 › Inventory Management › should create new inventory item 
+    [Mobile Safari] › e2e/inventory.spec.ts:13:7 › Inventory Management › should create new inventory item 
+    [Microsoft Edge] › e2e/inventory.spec.ts:13:7 › Inventory Management › should create new inventory item 
+    [Google Chrome] › e2e/inventory.spec.ts:13:7 › Inventory Management › should create new inventory item 
+
+[36m  Serving HTML report at http://localhost:9323. Press Ctrl+C to quit.[39m

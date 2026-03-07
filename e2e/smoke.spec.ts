@@ -24,7 +24,7 @@ test.describe("Smoke Tests - Critical Paths", () => {
   });
 
   test("Login page is accessible", async ({ page }) => {
-    await page.goto("/login");
+    await page.goto("/sign-in");
 
     // Verify login form elements
     await expect(
@@ -44,7 +44,7 @@ test.describe("Smoke Tests - Critical Paths", () => {
     // Should redirect to login or show unauthorized
     const url = page.url();
     expect(
-      url.includes("/login") ||
+      url.includes("/sign-in") ||
         url.includes("/auth") ||
         url.includes("/api/auth"),
     ).toBe(true);
@@ -206,7 +206,7 @@ test.describe("Security Smoke Tests", () => {
   });
 
   test("XSS protection in forms", async ({ page }) => {
-    await page.goto("/login");
+    await page.goto("/sign-in");
 
     // Try to inject script
     const xssPayload = '<script>alert("XSS")</script>';
@@ -295,7 +295,7 @@ test.describe("Accessibility Smoke Tests", () => {
   });
 
   test("Form inputs have labels", async ({ page }) => {
-    await page.goto("/login");
+    await page.goto("/sign-in");
 
     const inputs = await page
       .locator(

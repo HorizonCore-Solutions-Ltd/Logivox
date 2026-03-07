@@ -35,23 +35,29 @@ export default function BlogHybridWarehouseVoicePage() {
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="container max-w-4xl py-12 space-y-10 mx-auto px-4">
-        
         {/* Header */}
         <div className="space-y-4">
-          <p className="text-sm font-semibold text-blue-600 uppercase tracking-wide">Industry Insights</p>
+          <p className="text-sm font-semibold text-blue-600 uppercase tracking-wide">
+            Industry Insights
+          </p>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 leading-tight">
             The Hybrid Warehouse Revolution: Adaptive UI vs. Screenless Dogma
           </h1>
           <p className="text-xl text-slate-600 max-w-2xl">
-            Why forcing new hires into "screenless" environments kills retention, and how LogiVox's model solves it.
+            Why forcing new hires into "screenless" environments kills
+            retention, and how LogiVox's model solves it.
           </p>
           <div className="flex items-center gap-4 text-sm text-slate-500 pt-4 border-t border-slate-200 w-fit pr-10">
             <div className="w-10 h-10 rounded-full bg-slate-200 overflow-hidden">
-                <img src="/avatars/default.png" alt="Author" className="w-full h-full object-cover" />
+              <img
+                src="/avatars/default.png"
+                alt="Author"
+                className="w-full h-full object-cover"
+              />
             </div>
             <div>
-                 <p className="font-semibold text-slate-900">LogiVox Team</p>
-                 <p>March 4, 2026 • 6 min read</p>
+              <p className="font-semibold text-slate-900">LogiVox Team</p>
+              <p>March 4, 2026 • 6 min read</p>
             </div>
           </div>
         </div>
@@ -60,8 +66,12 @@ export default function BlogHybridWarehouseVoicePage() {
         <div className="prose prose-slate prose-lg max-w-none">
           {sections.map((section, index) => (
             <section key={index} className="mb-12">
-              <h2 className="text-2xl font-bold text-slate-900 mb-4">{section.heading}</h2>
-              {section.body && <p className="text-slate-600 leading-relaxed">{section.body}</p>}
+              <h2 className="text-2xl font-bold text-slate-900 mb-4">
+                {section.heading}
+              </h2>
+              {section.body && (
+                <p className="text-slate-600 leading-relaxed">{section.body}</p>
+              )}
               {section.list && (
                 <ul className="mt-4 space-y-2 list-disc pl-6 text-slate-600">
                   {section.list.map((item) => (
@@ -75,9 +85,12 @@ export default function BlogHybridWarehouseVoicePage() {
 
         {/* CTA */}
         <div className="rounded-2xl bg-slate-900 text-white p-8 md:p-12 text-center shadow-xl">
-          <h3 className="text-2xl font-bold mb-4">Experience the difference yourself</h3>
+          <h3 className="text-2xl font-bold mb-4">
+            Experience the difference yourself
+          </h3>
           <p className="text-slate-300 mb-8 max-w-xl mx-auto">
-            Stop paying for expensive proprietary hardware. Start your 14-day trial of LogiVox today.
+            Stop paying for expensive proprietary hardware. Start your 14-day
+            trial of LogiVox today.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
@@ -94,7 +107,6 @@ export default function BlogHybridWarehouseVoicePage() {
             </Link>
           </div>
         </div>
-
       </div>
     </div>
   );

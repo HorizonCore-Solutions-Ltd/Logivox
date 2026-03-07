@@ -1,0 +1,449 @@
+Note: The tool simplified the command to ` npx playwright test e2e/inventory.spec.ts:13 --project=chromium`, and this is the output of running that command instead:
+
+
+[... PREVIOUS OUTPUT TRUNCATED ...]
+
+inventory-item-ch
+romium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────
+    test-results/inventory-Inventory-Manage-55c82-d-create-new-inventory-item-ch
+romium/video.webm
+    ────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/inventory-Inventory-Manage-55c82-d-create-new-in
+ventory-item-chromium/error-context.md
+
+  1 failed
+    [chromium] › e2e/inventory.spec.ts:13:7 › Inventory Management › should crea
+te new inventory item 
+
+  Serving HTML report at http://localhost:9323. Press Ctrl+C to quit.
+^C cat /home/codespace/.vscode-remote/data/User/workspaceStorage/33673dfc/GitHub
+.copilot-chat/chat-session-resources/8fefcba4-f2e9-4428-aa3f-04bd9846d563/call_M
+HxCb3JPcTlCU0JsTWZwbjUxVHA__vscode-1772821687234/content.txt | tail -n 80
+
+@PNdlovu ➜ /workspaces/Logivox (main) $  cat /home/codespace/.vscode-remote/data
+/User/workspaceStorage/33673dfc/GitHub.copilot-chat/chat-session-resources/8fefc
+ba4-f2e9-4428-aa3f-04bd9846d563/call_MHxCb3JPcTlCU0JsTWZwbjUxVHA__vscode-1772821
+687234/content.txt | tail -n 80
+elete inventory item (17.3s)
+  ✘  5 [chromium] › e2e/inventory.spec.ts:74:7 › Inventory Management › should a
+djust stock levels (17.1s)
+  ✘  6 [chromium] › e2e/inventory.spec.ts:91:7 › Inventory Management › should s
+how low stock alert (17.4s)
+@PNdlovu ➜ /workspaces/Logivox (main) $  cat test_run.log | tail -n 50
+🚀 Starting global setup...
+📦 Seeding test database...
+👤 Creating test users...
+✅ App is running at: http://localhost:3000
+✅ Global setup complete
+
+Running 7 tests using 1 worker
+
+  ✘  1 [chromium] › e2e/inventory.spec.ts:13:7 › Inventory Management › should c
+reate new inventory item (17.7s)
+  ✘  2 [chromium] › e2e/inventory.spec.ts:34:7 › Inventory Management › should s
+earch inventory items (17.3s)
+  ✘  3 [chromium] › e2e/inventory.spec.ts:45:7 › Inventory Management › should u
+pdate inventory item (17.0s)
+  ✘  4 [chromium] › e2e/inventory.spec.ts:60:7 › Inventory Management › should d
+elete inventory item (17.3s)
+  ✘  5 [chromium] › e2e/inventory.spec.ts:74:7 › Inventory Management › should a
+djust stock levels (17.1s)
+  ✘  6 [chromium] › e2e/inventory.spec.ts:91:7 › Inventory Management › should s
+how low stock alert (17.4s)
+@PNdlovu ➜ /workspaces/Logivox (main) $  npx playwright test e2e/inventory.spec.
+ts:13 --project=chromium
+🚀 Starting global setup...
+📦 Seeding test database...
+👤 Creating test users...
+✅ App is running at: http://localhost:3000
+✅ Global setup complete
+
+Running 1 test using 1 worker
+
+  ✘  1 …s:13:7 › Inventory Management › should create new inventory item (17.8s)
+🧹 Starting global teardown...
+🗑️  Cleaning up test data...
+✅ Global teardown complete
+
+
+  1) [chromium] › e2e/inventory.spec.ts:13:7 › Inventory Management › should cre
+ate new inventory item 
+
+    TimeoutError: page.fill: Timeout 15000ms exceeded.
+    Call log:
+      - waiting for locator('input[name="email"]')
+
+
+       at test-utils.ts:17
+
+      15 | ) {
+      16 |   await page.goto("/login");
+    > 17 |   await page.fill('input[name="email"]', email);
+         |              ^
+      18 |   await page.fill('input[name="password"]', password);
+      19 |   await page.click('button[type="submit"]');
+      20 |
+        at login (/workspaces/Logivox/e2e/test-utils.ts:17:14)
+        at /workspaces/Logivox/e2e/inventory.spec.ts:10:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────
+    test-results/inventory-Inventory-Manage-55c82-d-create-new-inventory-item-ch
+romium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────
+    test-results/inventory-Inventory-Manage-55c82-d-create-new-inventory-item-ch
+romium/video.webm
+    ────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/inventory-Inventory-Manage-55c82-d-create-new-in
+ventory-item-chromium/error-context.md
+
+  1 failed
+    [chromium] › e2e/inventory.spec.ts:13:7 › Inventory Management › should crea
+te new inventory item 
+
+  Serving HTML report at http://localhost:9323. Press Ctrl+C to quit.
+@PNdlovu ➜ /workspaces/Logivox (main) $  curl -s http://localhost:3000/login | g
+rep input
+@PNdlovu ➜ /workspaces/Logivox (main) $  curl -I http://localhost:3000/login
+@PNdlovu ➜ /workspaces/Logivox (main) $  ls apps/web/src/app/login
+ls: cannot access 'apps/web/src/app/login': No such file or directory
+@PNdlovu ➜ /workspaces/Logivox (main) $  find apps/web/src/app -name "login" -o 
+-name "auth"
+apps/web/src/app/api/mobile/auth
+apps/web/src/app/api/mobile/auth/login
+apps/web/src/app/api/supplier/auth
+apps/web/src/app/api/auth
+apps/web/src/app/api/auth/mobile/login
+apps/web/src/app/auth
+apps/web/src/app/(dashboard)/supplier/login
+@PNdlovu ➜ /workspaces/Logivox (main) $  ls apps/web/src/app/auth
+error
+@PNdlovu ➜ /workspaces/Logivox (main) $  find apps/web/src/app -name "page.tsx" 
+| grep -i "login\|signin\|auth"
+apps/web/src/app/(auth)/sign-up/page.tsx
+apps/web/src/app/(auth)/forgot-password/page.tsx
+apps/web/src/app/(auth)/sign-in/page.tsx
+apps/web/src/app/(auth)/verify-email/page.tsx
+apps/web/src/app/(auth)/reset-password/page.tsx
+apps/web/src/app/auth/error/page.tsx
+apps/web/src/app/(dashboard)/supplier/login/page.tsx
+@PNdlovu ➜ /workspaces/Logivox (main) $  cat e2e/test-utils.ts | head -n 30
+/**
+ * Test Utilities
+ * Helper functions for testing
+ */
+
+import { Page } from "@playwright/test";
+
+/**
+ * Login helper for E2E tests
+ */
+export async function login(
+  page: Page,
+  email: string = "admin@logivox.ai",
+  password: string = "password",
+) {
+  await page.goto("/login");
+  await page.fill('input[name="email"]', email);
+  await page.fill('input[name="password"]', password);
+  await page.click('button[type="submit"]');
+
+  // Wait for redirect after login
+  await page.waitForURL("/dashboard", { timeout: 10000 });
+}
+
+/**
+ * Logout helper for E2E tests
+ */
+export async function logout(page: Page) {
+  await page.click('[data-testid="user-menu"]');
+  await page.click('[data-testid="logout-button"]');
+@PNdlovu ➜ /workspaces/Logivox (main) $  cat apps/web/next.config.js || cat apps
+/web/next.config.mjs
+const withPWA = require("next-pwa")({
+  dest: "public",
+  register: true,
+  skipWaiting: true,
+  // Disable PWA in all non-production envs AND when BUILD_VERIFY=1 to save memo
+ry
+  disable:
+    process.env.NODE_ENV === "development" || process.env.BUILD_VERIFY === "1",
+  buildExcludes: [/middleware-manifest\.json$/],
+});
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  output: "standalone",
+  experimental: {
+    serverComponentsExternalPackages: ["@prisma/client"],
+    optimizePackageImports: [
+      "lucide-react",
+      "@radix-ui/react-icons",
+      "date-fns",
+      "recharts",
+    ],
+  },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**",
+      },
+    ],
+  },
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "X-DNS-Prefetch-Control",
+            value: "on",
+          },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=31536000; includeSubDomains; preload",
+          },
+          {
+            key: "X-Frame-Options",
+            value: "SAMEORIGIN", // Changed from DENY to allow same-origin ifram
+es
+          },
+          {
+            key: "X-Content-Type-Options",
+            value: "nosniff",
+          },
+          {
+            key: "X-XSS-Protection",
+            value: "1; mode=block",
+          },
+          {
+            key: "Referrer-Policy",
+            value: "strict-origin-when-cross-origin",
+          },
+          {
+            key: "Permissions-Policy",
+            value:
+              "camera=(), microphone=(), geolocation=(), interest-cohort=()",
+          },
+          {
+            key: "Content-Security-Policy",
+            value:
+              process.env.NODE_ENV === "production"
+                ? "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-i
+nline' https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline'; img-src 
+'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https:; fra
+me-ancestors 'self'; base-uri 'self'; form-action 'self';"
+                : "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-i
+nline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; fon
+t-src 'self' data:; connect-src 'self' http: https: ws: wss:; frame-ancestors 's
+elf'; base-uri 'self'; form-action 'self';",
+          },
+        ],
+      },
+      {
+        source: "/api/:path*",
+        headers: [
+          {
+            key: "Access-Control-Allow-Credentials",
+            value: "true",
+          },
+          {
+            key: "Access-Control-Allow-Origin",
+            value:
+              process.env.ALLOWED_ORIGINS ||
+              process.env.NEXT_PUBLIC_APP_URL ||
+              "https://flowstock.com",
+          },
+          {
+            key: "Access-Control-Allow-Methods",
+            value: "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+          },
+          {
+            key: "Access-Control-Allow-Headers",
+            value:
+              "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-L
+ength, Content-MD5, Content-Type, Date, X-Api-Version, Authorization",
+          },
+        ],
+      },
+    ];
+  },
+  transpilePackages: [
+    "@flowstock/ui",
+    "@flowstock/database",
+    "@flowstock/auth",
+  ],
+  poweredByHeader: false,
+  compress: true,
+  swcMinify: true,
+  output: "standalone",
+};
+
+module.exports = withPWA(nextConfig);
+@PNdlovu ➜ /workspaces/Logivox (main) $  cat apps/web/src/middleware.ts | head -
+n 30
+import { withAuth } from "next-auth/middleware";
+import { NextResponse } from "next/server";
+
+export default withAuth(
+  function middleware(req) {
+    const token = req.nextauth.token;
+    const isAuth = !!token;
+    const isAuthPage =
+      req.nextUrl.pathname.startsWith("/sign-in") ||
+      req.nextUrl.pathname.startsWith("/sign-up");
+    const isDashboard = req.nextUrl.pathname.startsWith("/dashboard");
+
+    // Redirect to dashboard if trying to access auth pages while logged in
+    if (isAuthPage && isAuth) {
+      return NextResponse.redirect(new URL("/dashboard/dashboard", req.url));
+    }
+
+    // Allow access to dashboard if authenticated
+    if (isDashboard && isAuth) {
+      return NextResponse.next();
+    }
+
+    // Redirect to sign-in if trying to access dashboard without auth
+    if (isDashboard && !isAuth) {
+      let from = req.nextUrl.pathname;
+      if (req.nextUrl.search) {
+        from += req.nextUrl.search;
+      }
+
+      return NextResponse.redirect(
+@PNdlovu ➜ /workspaces/Logivox (main) $  cat apps/web/src/middleware.ts | tail -
+n 25
+
+    // Redirect to sign-in if trying to access dashboard without auth
+    if (isDashboard && !isAuth) {
+      let from = req.nextUrl.pathname;
+      if (req.nextUrl.search) {
+        from += req.nextUrl.search;
+      }
+
+      return NextResponse.redirect(
+        new URL(`/sign-in?callbackUrl=${encodeURIComponent(from)}`, req.url),
+      );
+    }
+
+    return NextResponse.next();
+  },
+  {
+    callbacks: {
+      authorized: () => true, // We handle authorization in the middleware funct
+ion
+    },
+  },
+);
+
+export const config = {
+  matcher: ["/dashboard/:path*", "/sign-in", "/sign-up"],
+};
+@PNdlovu ➜ /workspaces/Logivox (main) $  grep -rnw e2e -e "/login"
+e2e/test-utils.ts:31:  await page.waitForURL("/login");
+e2e/auth.spec.ts:10:    await page.goto("/login");
+e2e/auth.spec.ts:24:    await page.goto("/login");
+e2e/auth.spec.ts:36:    await expect(page).toHaveURL("/login");
+e2e/auth.spec.ts:47:    await expect(page).toHaveURL("/login");
+e2e/auth.spec.ts:54:    await expect(page).toHaveURL("/login");
+e2e/auth.spec.ts:58:    await page.goto("/login");
+e2e/smoke.spec.ts:27:    await page.goto("/login");
+e2e/smoke.spec.ts:47:      url.includes("/login") ||
+e2e/smoke.spec.ts:209:    await page.goto("/login");
+e2e/smoke.spec.ts:298:    await page.goto("/login");
+@PNdlovu ➜ /workspaces/Logivox (main) $  find e2e -type f -name "*.ts" -exec sed
+ -i 's|/login|/sign-in|g' {} +
+@PNdlovu ➜ /workspaces/Logivox (main) $  npx playwright test e2e/inventory.spec.
+ts --project=chromium --reporter=list
+🚀 Starting global setup...
+📦 Seeding test database...
+👤 Creating test users...
+✅ App is running at: http://localhost:3000
+✅ Global setup complete
+
+Running 7 tests using 1 worker
+
+  ✘  1 …s:13:7 › Inventory Management › should create new inventory item (22.5s)
+  ✘  2 …c.ts:34:7 › Inventory Management › should search inventory items (17.0s)
+  ✘  3 …ec.ts:45:7 › Inventory Management › should update inventory item (16.9s)
+  ✘  4 …ec.ts:60:7 › Inventory Management › should delete inventory item (17.3s)
+  ✘  5 …spec.ts:74:7 › Inventory Management › should adjust stock levels (17.1s)
+     6 …entory.spec.ts:91:7 › Inventory Management › should show low stock alert
+^C cat /home/codespace/.vscode-remote/data/User/workspaceStorage/33673dfc/GitHub
+.copilot-chat/chat-session-resources/8fefcba4-f2e9-4428-aa3f-04bd9846d563/call_M
+Hw4ang0Tk94V1dZanIxYWJETWo__vscode-1772821687251/content.txt | tail -n 60
+
+@PNdlovu ➜ /workspaces/Logivox (main) $  cat /home/codespace/.vscode-remote/data
+/User/workspaceStorage/33673dfc/GitHub.copilot-chat/chat-session-resources/8fefc
+ba4-f2e9-4428-aa3f-04bd9846d563/call_MHw4ang0Tk94V1dZanIxYWJETWo__vscode-1772821
+687251/content.txt | tail -n 60
+      }
+
+      return NextResponse.redirect(
+@PNdlovu ➜ /workspaces/Logivox (main) $  cat apps/web/src/middleware.ts | tail -
+n 25
+
+    // Redirect to sign-in if trying to access dashboard without auth
+    if (isDashboard && !isAuth) {
+      let from = req.nextUrl.pathname;
+      if (req.nextUrl.search) {
+        from += req.nextUrl.search;
+      }
+
+      return NextResponse.redirect(
+        new URL(`/sign-in?callbackUrl=${encodeURIComponent(from)}`, req.url),
+      );
+    }
+
+    return NextResponse.next();
+  },
+  {
+    callbacks: {
+      authorized: () => true, // We handle authorization in the middleware funct
+ion
+    },
+  },
+);
+
+export const config = {
+  matcher: ["/dashboard/:path*", "/sign-in", "/sign-up"],
+};
+@PNdlovu ➜ /workspaces/Logivox (main) $  grep -rnw e2e -e "/login"
+e2e/test-utils.ts:31:  await page.waitForURL("/login");
+e2e/auth.spec.ts:10:    await page.goto("/login");
+e2e/auth.spec.ts:24:    await page.goto("/login");
+e2e/auth.spec.ts:36:    await expect(page).toHaveURL("/login");
+e2e/auth.spec.ts:47:    await expect(page).toHaveURL("/login");
+e2e/auth.spec.ts:54:    await expect(page).toHaveURL("/login");
+e2e/auth.spec.ts:58:    await page.goto("/login");
+e2e/smoke.spec.ts:27:    await page.goto("/login");
+e2e/smoke.spec.ts:47:      url.includes("/login") ||
+e2e/smoke.spec.ts:209:    await page.goto("/login");
+e2e/smoke.spec.ts:298:    await page.goto("/login");
+@PNdlovu ➜ /workspaces/Logivox (main) $  find e2e -type f -name "*.ts" -exec sed
+ -i 's|/login|/sign-in|g' {} +
+@PNdlovu ➜ /workspaces/Logivox (main) $  npx playwright test e2e/inventory.spec.
+ts --project=chromium --reporter=list
+🚀 Starting global setup...
+📦 Seeding test database...
+👤 Creating test users...
+✅ App is running at: http://localhost:3000
+✅ Global setup complete
+
+Running 7 tests using 1 worker
+
+  ✘  1 …s:13:7 › Inventory Management › should create new inventory item (22.5s)
+  ✘  2 …c.ts:34:7 › Inventory Management › should search inventory items (17.0s)
+  ✘  3 …ec.ts:45:7 › Inventory Management › should update inventory item (16.9s)
+  ✘  4 …ec.ts:60:7 › Inventory Management › should delete inventory item (17.3s)
+     5 …ventory.spec.ts:74:7 › Inventory Management › should adjust stock levels
+@PNdlovu ➜ /workspaces/Logivox (main) $  npx playwright test e2e/inventory.spec.
+ts:13 --project=chromium

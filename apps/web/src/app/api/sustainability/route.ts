@@ -8,7 +8,7 @@ export async function GET() {
       change: -0.05,
       breakdown: {
         transportation: 0.45,
-        facilities: 0.30,
+        facilities: 0.3,
         packaging: 0.25,
       },
     },
@@ -37,6 +37,9 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-    // Handle manual ESG data entry
-    return NextResponse.json({ message: "Sustainability record added" }, { status: 201 });
+  // Handle manual ESG data entry
+  return NextResponse.json(
+    { message: "Sustainability record added" },
+    { status: 201 },
+  );
 }

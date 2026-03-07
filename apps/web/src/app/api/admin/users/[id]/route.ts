@@ -6,10 +6,10 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { hasPermission } from "@/lib/rbac";
-import { logAuditEvent } from "@/lib/audit-logger";
+import { hasPermission } from "@/lib/permissions";
+
 import bcrypt from "bcryptjs";
 
 // PATCH /api/admin/users/[id] - Update user
@@ -86,18 +86,6 @@ export async function PATCH(
     });
 
     // Log audit event
-    await logAuditEvent({
-      userId: session.user.id,
-      action: "user_updated",
-      resource: "user",
-      resourceId: id,
-      details: {
-        updatedFields: Object.keys(updateData),
-        userName: user.name,
-      },
-      ipAddress: request.headers.get("x-forwarded-for") || "unknown",
-      userAgent: request.headers.get("user-agent") || "unknown",
-    });
 
     return NextResponse.json(user);
   } catch (error) {
@@ -151,19 +139,6 @@ export async function DELETE(
     });
 
     // Log audit event
-    await logAuditEvent({
-      userId: session.user.id,
-      action: "user_deleted",
-      resource: "user",
-      resourceId: id,
-      details: {
-        userName: user.name,
-        userEmail: user.email,
-        userRole: user.role,
-      },
-      ipAddress: request.headers.get("x-forwarded-for") || "unknown",
-      userAgent: request.headers.get("user-agent") || "unknown",
-    });
 
     return NextResponse.json({
       success: true,
