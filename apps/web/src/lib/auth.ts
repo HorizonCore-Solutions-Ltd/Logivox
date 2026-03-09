@@ -1,7 +1,5 @@
 import { NextAuthOptions } from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import GoogleProvider from "next-auth/providers/google";
-import GitHubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { authenticator } from "otplib";
@@ -16,21 +14,6 @@ const ACCOUNT_LOCKOUT = {
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as any,
   providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID || "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-      authorization: {
-        params: {
-          prompt: "consent",
-          access_type: "offline",
-          response_type: "code",
-        },
-      },
-    }),
-    GitHubProvider({
-      clientId: process.env.GITHUB_ID || "",
-      clientSecret: process.env.GITHUB_SECRET || "",
-    }),
     CredentialsProvider({
       name: "credentials",
       credentials: {
@@ -39,7 +22,9 @@ export const authOptions: NextAuthOptions = {
         mfaCode: { label: "2FA Code", type: "text" },
       },
       async authorize(credentials) {
+        console.log("Authorizing credentials for email:", credentials?.email);
         if (!credentials?.email || !credentials?.password) {
+          console.error("Missing email or password");
           throw new Error("Invalid credentials");
         }
 
@@ -51,6 +36,7 @@ export const authOptions: NextAuthOptions = {
         });
 
         if (!user || !user.password) {
+          console.error("User not found or has no password:", credentials.email);
           // Prevent timing attacks
           await bcrypt.compare(
             "dummy",
@@ -79,6 +65,7 @@ export const authOptions: NextAuthOptions = {
         );
 
         if (!isValidPassword) {
+          console.error("Invalid password for", credentials.email);
           // Track failed attempts (A-5)
           await trackFailedLogin(user.id);
           throw new Error("Invalid credentials");
@@ -86,16 +73,20 @@ export const authOptions: NextAuthOptions = {
 
         // Verify MFA if enabled (A-1)
         if (user.securityProfile?.mfaEnabled && !credentials.mfaCode) {
+          console.error("MFA required for", credentials.email);
           throw new Error("MFA code required");
         }
 
         if (user.securityProfile?.mfaEnabled && credentials.mfaCode) {
           const isValidMFA = await verifyMFACode(user.id, credentials.mfaCode);
           if (!isValidMFA) {
+            console.error("Invalid MFA for", credentials.email);
             await trackFailedLogin(user.id);
             throw new Error("Invalid MFA code");
           }
         }
+
+        console.log("Login successful for", credentials.email);
 
         // Reset failed attempts on successful login
         await resetFailedAttempts(user.id);
@@ -132,12 +123,15 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async signIn({ user, account, profile }) {
+      console.log("signIn callback for:", user.email);
       // Additional security checks
       if (!user.email) return false;
 
       // Check for suspicious activity
       const suspiciousActivity = await checkSuspiciousActivity(user.email);
+      console.log("suspiciousActivity:", suspiciousActivity);
       if (suspiciousActivity) {
+        console.error("SUSPICIOUS_LOGIN_BLOCKED for:", user.email);
         await logSecurityEvent(user.id, "SUSPICIOUS_LOGIN_BLOCKED", {
           email: user.email,
           provider: account?.provider,
@@ -145,6 +139,7 @@ export const authOptions: NextAuthOptions = {
         return false;
       }
 
+      console.log("signIn callback returning true");
       return true;
     },
     async jwt({ token, user, account }) {

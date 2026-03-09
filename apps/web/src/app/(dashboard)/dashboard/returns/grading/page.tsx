@@ -19,6 +19,7 @@ import {
   Truck,
   RotateCcw,
   AlertTriangle,
+  Bot,
 } from "lucide-react";
 
 export default function ReturnsGradingPage() {

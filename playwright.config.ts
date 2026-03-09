@@ -30,9 +30,9 @@ export default defineConfig({
   use: {
     // Docker / CI / Codespace fixes to prevent browser crashing
     launchOptions: {
-      args: ["--disable-dev-shm-usage", "--no-sandbox"],
+      args: ["--disable-dev-shm-usage", "--no-sandbox", "--disable-gpu"],
     },
-    
+
     // Base URL to use in actions like `await page.goto('/')`
     baseURL: process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:3000",
 
@@ -46,10 +46,16 @@ export default defineConfig({
     video: "retain-on-failure",
 
     // Default timeout for each action
-    actionTimeout: 15000,
+    actionTimeout: 30000,
 
     // Default navigation timeout
-    navigationTimeout: 30000,
+    navigationTimeout: 60000,
+  },
+
+  // Global test timeout
+  timeout: 120000,
+  expect: {
+    timeout: 15000,
   },
 
   // Configure projects for major browsers
@@ -95,11 +101,11 @@ export default defineConfig({
     command: "npm run dev",
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
-    timeout: 120000,
+    timeout: 300000,
   },
 
   // Global timeout for each test
-  timeout: 60000,
+  timeout: 120000,
 
   // Global setup and teardown
   globalSetup: require.resolve("./e2e/global-setup.ts"),

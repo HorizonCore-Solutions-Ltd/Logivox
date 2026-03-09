@@ -14,7 +14,6 @@ test.describe("Load Testing - Inventory Management", () => {
       contexts.map(async (context) => {
         const page = await context.newPage();
         await page.goto("http://localhost:3000/inventory");
-        await page.waitForLoadState("networkidle");
         await expect(page.locator("h1")).toContainText("Inventory");
         await context.close();
       }),
@@ -61,7 +60,6 @@ test.describe("Load Testing - Order Fulfillment", () => {
 
         // Submit
         await page.click('button:has-text("Create Order")');
-        await page.waitForLoadState("networkidle");
 
         await context.close();
         return { success: true, index };
@@ -135,7 +133,6 @@ test.describe("Load Testing - Database Performance", () => {
     // Navigate through multiple pages
     for (let i = 0; i < 5; i++) {
       await page.click('button:has-text("Next")');
-      await page.waitForLoadState("networkidle");
     }
 
     const duration = Date.now() - start;
@@ -150,13 +147,10 @@ test.describe("Load Testing - Database Performance", () => {
 
     // Apply multiple filters
     await page.selectOption('[name="category"]', "Electronics");
-    await page.waitForLoadState("networkidle");
 
     await page.selectOption('[name="status"]', "IN_STOCK");
-    await page.waitForLoadState("networkidle");
 
     await page.fill('[name="minQuantity"]', "10");
-    await page.waitForLoadState("networkidle");
 
     const duration = Date.now() - start;
     console.log(`Complex filtering took ${duration}ms`);

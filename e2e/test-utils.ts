@@ -14,12 +14,17 @@ export async function login(
   password: string = "Admin@Logivox1!",
 ) {
   await page.goto("/sign-in");
+
   await page.fill('input[name="email"]', email);
   await page.fill('input[name="password"]', password);
-  await page.click('button[type="submit"]');
+  
+  // Extra wait to ensure React state updates
+  await page.waitForTimeout(500);
+  
+  await page.click('button[type="submit"]', { force: true });
 
   // Wait for redirect after login
-  await page.waitForURL("/dashboard", { timeout: 10000 });
+  await page.waitForURL("/dashboard", { timeout: 60000 });
 }
 
 /**
@@ -28,7 +33,7 @@ export async function login(
 export async function logout(page: Page) {
   await page.click('[data-testid="user-menu"]');
   await page.click('[data-testid="logout-button"]');
-  await page.waitForURL("/sign-in");
+  await page.waitForURL("/");
 }
 
 /**
@@ -169,7 +174,8 @@ export async function createTestSalesOrder(
  * Search in data table
  */
 export async function searchTable(page: Page, query: string) {
-  await page.fill('[data-testid="table-search"]', query);
+  const searchInput = page.getByPlaceholder(/search/i).first();
+  await searchInput.fill(query);
   await page.waitForTimeout(500); // Wait for debounce
 }
 

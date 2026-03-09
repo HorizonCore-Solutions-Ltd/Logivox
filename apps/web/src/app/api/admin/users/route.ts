@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
         },
         ipAddress: request.headers.get("x-forwarded-for") || "unknown",
         userAgent: request.headers.get("user-agent") || "unknown",
-      }
+      },
     });
 
     return NextResponse.json(user, { status: 201 });

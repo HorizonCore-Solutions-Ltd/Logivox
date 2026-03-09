@@ -137,20 +137,6 @@ export default function SignUpPage() {
     }
   };
 
-  const handleOAuthSignUp = async (provider: "google" | "github") => {
-    setIsSubmitting(true);
-    setError(null);
-
-    try {
-      await signIn(provider, {
-        callbackUrl: "/dashboard/dashboard",
-      });
-    } catch (err) {
-      setError(`Failed to sign up with ${provider}. Please try again.`);
-      setIsSubmitting(false);
-    }
-  };
-
   const getPasswordStrengthColor = () => {
     if (passwordStrength <= 1) return "bg-red-500";
     if (passwordStrength <= 3) return "bg-yellow-500";
@@ -203,41 +189,6 @@ export default function SignUpPage() {
                 <p className="text-sm">{error}</p>
               </div>
             )}
-
-            {/* OAuth Buttons */}
-            <div className="space-y-3">
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => handleOAuthSignUp("google")}
-                disabled={isSubmitting}
-              >
-                <Chrome className="mr-2 h-4 w-4" />
-                Continue with Google
-              </Button>
-
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => handleOAuthSignUp("github")}
-                disabled={isSubmitting}
-              >
-                <Github className="mr-2 h-4 w-4" />
-                Continue with GitHub
-              </Button>
-            </div>
-
-            {/* Divider */}
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">
-                  Or continue with email
-                </span>
-              </div>
-            </div>
 
             {/* Sign Up Form */}
             <form onSubmit={handleSubmit} className="space-y-4">

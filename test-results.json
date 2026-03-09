@@ -1,0 +1,598 @@
+🚀 Starting global setup...
+📦 Seeding test database...
+👤 Creating test users...
+✅ App is running at: http://localhost:3000
+✅ Global setup complete
+🧹 Starting global teardown...
+🗑️  Cleaning up test data...
+✅ Global teardown complete
+{
+  "config": {
+    "configFile": "/workspaces/Logivox/playwright.config.ts",
+    "rootDir": "/workspaces/Logivox/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": "/workspaces/Logivox/e2e/global-setup.ts",
+    "globalTeardown": "/workspaces/Logivox/e2e/global-teardown.ts",
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/workspaces/Logivox/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/workspaces/Logivox/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/workspaces/Logivox/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "/workspaces/Logivox/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/workspaces/Logivox/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "/workspaces/Logivox/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/workspaces/Logivox/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "Mobile Chrome",
+        "name": "Mobile Chrome",
+        "testDir": "/workspaces/Logivox/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/workspaces/Logivox/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "Mobile Safari",
+        "name": "Mobile Safari",
+        "testDir": "/workspaces/Logivox/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/workspaces/Logivox/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "Microsoft Edge",
+        "name": "Microsoft Edge",
+        "testDir": "/workspaces/Logivox/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/workspaces/Logivox/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "Google Chrome",
+        "name": "Google Chrome",
+        "testDir": "/workspaces/Logivox/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.56.0",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run dev",
+      "url": "http://localhost:3000",
+      "reuseExistingServer": true,
+      "timeout": 120000
+    }
+  },
+  "suites": [
+    {
+      "title": "inventory.spec.ts",
+      "file": "inventory.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Inventory Management",
+          "file": "inventory.spec.ts",
+          "line": 8,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should create new inventory item",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 49170,
+                      "error": {
+                        "message": "TimeoutError: page.waitForURL: Timeout 45000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"/dashboard\" until \"load\"\n  navigated to \"http://localhost:3000/sign-in?callbackUrl=%2Fdashboard\"\n============================================================",
+                        "stack": "TimeoutError: page.waitForURL: Timeout 45000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"/dashboard\" until \"load\"\n  navigated to \"http://localhost:3000/sign-in?callbackUrl=%2Fdashboard\"\n============================================================\n    at login (/workspaces/Logivox/e2e/test-utils.ts:27:14)\n    at /workspaces/Logivox/e2e/inventory.spec.ts:10:5",
+                        "location": {
+                          "file": "/workspaces/Logivox/e2e/test-utils.ts",
+                          "column": 14,
+                          "line": 27
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mtest-utils.ts:27\n\n  25 |\n  26 |   // Wait for redirect after login\n> 27 |   await page.waitForURL(\"/dashboard\", { timeout: 45000 });\n     |              ^\n  28 | }\n  29 |\n  30 | /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/workspaces/Logivox/e2e/test-utils.ts",
+                            "column": 14,
+                            "line": 27
+                          },
+                          "message": "TimeoutError: page.waitForURL: Timeout 45000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"/dashboard\" until \"load\"\n  navigated to \"http://localhost:3000/sign-in?callbackUrl=%2Fdashboard\"\n============================================================\n\n   at test-utils.ts:27\n\n  25 |\n  26 |   // Wait for redirect after login\n> 27 |   await page.waitForURL(\"/dashboard\", { timeout: 45000 });\n     |              ^\n  28 | }\n  29 |\n  30 | /**\n    at login (/workspaces/Logivox/e2e/test-utils.ts:27:14)\n    at /workspaces/Logivox/e2e/inventory.spec.ts:10:5"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-08T20:46:32.049Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/workspaces/Logivox/test-results/inventory-Inventory-Manage-55c82-d-create-new-inventory-item-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/workspaces/Logivox/test-results/inventory-Inventory-Manage-55c82-d-create-new-inventory-item-chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/workspaces/Logivox/test-results/inventory-Inventory-Manage-55c82-d-create-new-inventory-item-chromium/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/workspaces/Logivox/e2e/test-utils.ts",
+                        "column": 14,
+                        "line": 27
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "491382254a121adeeb47-be9f2c4c68c618ae9ae4",
+              "file": "inventory.spec.ts",
+              "line": 13,
+              "column": 7
+            },
+            {
+              "title": "should search inventory items",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 22465,
+                      "error": {
+                        "message": "Error: page.goto: Page crashed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/dashboard/inventory\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Page crashed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/dashboard/inventory\", waiting until \"load\"\u001b[22m\n\n    at /workspaces/Logivox/e2e/inventory.spec.ts:36:16",
+                        "location": {
+                          "file": "/workspaces/Logivox/e2e/inventory.spec.ts",
+                          "column": 16,
+                          "line": 36
+                        },
+                        "snippet": "  34 |\n  35 |   test(\"should search inventory items\", async ({ page }) => {\n> 36 |     await page.goto(\"/dashboard/inventory\");\n     |                ^\n  37 |\n  38 |     // Search for item\n  39 |     await searchTable(page, \"TEST-SKU\");"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/workspaces/Logivox/e2e/inventory.spec.ts",
+                            "column": 16,
+                            "line": 36
+                          },
+                          "message": "Error: page.goto: Page crashed\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/dashboard/inventory\", waiting until \"load\"\u001b[22m\n\n\n  34 |\n  35 |   test(\"should search inventory items\", async ({ page }) => {\n> 36 |     await page.goto(\"/dashboard/inventory\");\n     |                ^\n  37 |\n  38 |     // Search for item\n  39 |     await searchTable(page, \"TEST-SKU\");\n    at /workspaces/Logivox/e2e/inventory.spec.ts:36:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-08T20:47:22.643Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/workspaces/Logivox/test-results/inventory-Inventory-Management-should-search-inventory-items-chromium/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/workspaces/Logivox/e2e/inventory.spec.ts",
+                        "column": 16,
+                        "line": 36
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "491382254a121adeeb47-c376d9d0d5edccbd5b5b",
+              "file": "inventory.spec.ts",
+              "line": 35,
+              "column": 7
+            },
+            {
+              "title": "should update inventory item",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 4957,
+                      "error": {
+                        "message": "Error: page.waitForURL: Navigation failed because page crashed!\n=========================== logs ===========================\nwaiting for navigation to \"/dashboard\" until \"load\"\n============================================================",
+                        "stack": "Error: page.waitForURL: Navigation failed because page crashed!\n=========================== logs ===========================\nwaiting for navigation to \"/dashboard\" until \"load\"\n============================================================\n    at login (/workspaces/Logivox/e2e/test-utils.ts:27:14)\n    at /workspaces/Logivox/e2e/inventory.spec.ts:10:5",
+                        "location": {
+                          "file": "/workspaces/Logivox/e2e/test-utils.ts",
+                          "column": 14,
+                          "line": 27
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mtest-utils.ts:27\n\n  25 |\n  26 |   // Wait for redirect after login\n> 27 |   await page.waitForURL(\"/dashboard\", { timeout: 45000 });\n     |              ^\n  28 | }\n  29 |\n  30 | /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/workspaces/Logivox/e2e/test-utils.ts",
+                            "column": 14,
+                            "line": 27
+                          },
+                          "message": "Error: page.waitForURL: Navigation failed because page crashed!\n=========================== logs ===========================\nwaiting for navigation to \"/dashboard\" until \"load\"\n============================================================\n\n   at test-utils.ts:27\n\n  25 |\n  26 |   // Wait for redirect after login\n> 27 |   await page.waitForURL(\"/dashboard\", { timeout: 45000 });\n     |              ^\n  28 | }\n  29 |\n  30 | /**\n    at login (/workspaces/Logivox/e2e/test-utils.ts:27:14)\n    at /workspaces/Logivox/e2e/inventory.spec.ts:10:5"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-08T20:47:49.499Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/workspaces/Logivox/test-results/inventory-Inventory-Management-should-update-inventory-item-chromium/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/workspaces/Logivox/e2e/test-utils.ts",
+                        "column": 14,
+                        "line": 27
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "491382254a121adeeb47-b57a92d32b8cd81c22de",
+              "file": "inventory.spec.ts",
+              "line": 45,
+              "column": 7
+            },
+            {
+              "title": "should adjust stock levels",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 2337,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/sign-in\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/sign-in\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/sign-in\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/sign-in\", waiting until \"load\"\u001b[22m\n\n    at login (/workspaces/Logivox/e2e/test-utils.ts:16:14)\n    at /workspaces/Logivox/e2e/inventory.spec.ts:10:16",
+                        "location": {
+                          "file": "/workspaces/Logivox/e2e/test-utils.ts",
+                          "column": 14,
+                          "line": 16
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mtest-utils.ts:16\n\n  14 |   password: string = \"Admin@Logivox1!\",\n  15 | ) {\n> 16 |   await page.goto(\"/sign-in\");\n     |              ^\n  17 |\n  18 |   await page.fill('input[name=\"email\"]', email);\n  19 |   await page.fill('input[name=\"password\"]', password);"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/workspaces/Logivox/e2e/test-utils.ts",
+                            "column": 14,
+                            "line": 16
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/sign-in\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/sign-in\", waiting until \"load\"\u001b[22m\n\n\n   at test-utils.ts:16\n\n  14 |   password: string = \"Admin@Logivox1!\",\n  15 | ) {\n> 16 |   await page.goto(\"/sign-in\");\n     |              ^\n  17 |\n  18 |   await page.fill('input[name=\"email\"]', email);\n  19 |   await page.fill('input[name=\"password\"]', password);\n    at login (/workspaces/Logivox/e2e/test-utils.ts:16:14)\n    at /workspaces/Logivox/e2e/inventory.spec.ts:10:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-08T20:47:58.606Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/workspaces/Logivox/test-results/inventory-Inventory-Management-should-adjust-stock-levels-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/workspaces/Logivox/test-results/inventory-Inventory-Management-should-adjust-stock-levels-chromium/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/workspaces/Logivox/e2e/test-utils.ts",
+                        "column": 14,
+                        "line": 16
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "491382254a121adeeb47-841324e9d82c32cf9347",
+              "file": "inventory.spec.ts",
+              "line": 60,
+              "column": 7
+            },
+            {
+              "title": "should delete inventory item",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 401,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/sign-in\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/sign-in\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/sign-in\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/sign-in\", waiting until \"load\"\u001b[22m\n\n    at login (/workspaces/Logivox/e2e/test-utils.ts:16:14)\n    at /workspaces/Logivox/e2e/inventory.spec.ts:10:16",
+                        "location": {
+                          "file": "/workspaces/Logivox/e2e/test-utils.ts",
+                          "column": 14,
+                          "line": 16
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mtest-utils.ts:16\n\n  14 |   password: string = \"Admin@Logivox1!\",\n  15 | ) {\n> 16 |   await page.goto(\"/sign-in\");\n     |              ^\n  17 |\n  18 |   await page.fill('input[name=\"email\"]', email);\n  19 |   await page.fill('input[name=\"password\"]', password);"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/workspaces/Logivox/e2e/test-utils.ts",
+                            "column": 14,
+                            "line": 16
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/sign-in\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/sign-in\", waiting until \"load\"\u001b[22m\n\n\n   at test-utils.ts:16\n\n  14 |   password: string = \"Admin@Logivox1!\",\n  15 | ) {\n> 16 |   await page.goto(\"/sign-in\");\n     |              ^\n  17 |\n  18 |   await page.fill('input[name=\"email\"]', email);\n  19 |   await page.fill('input[name=\"password\"]', password);\n    at login (/workspaces/Logivox/e2e/test-utils.ts:16:14)\n    at /workspaces/Logivox/e2e/inventory.spec.ts:10:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-08T20:48:05.105Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/workspaces/Logivox/test-results/inventory-Inventory-Management-should-delete-inventory-item-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/workspaces/Logivox/test-results/inventory-Inventory-Management-should-delete-inventory-item-chromium/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/workspaces/Logivox/e2e/test-utils.ts",
+                        "column": 14,
+                        "line": 16
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "491382254a121adeeb47-eb23fba85dfae9e08f78",
+              "file": "inventory.spec.ts",
+              "line": 92,
+              "column": 7
+            },
+            {
+              "title": "should export inventory data",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 394,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/sign-in\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/sign-in\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/sign-in\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/sign-in\", waiting until \"load\"\u001b[22m\n\n    at login (/workspaces/Logivox/e2e/test-utils.ts:16:14)\n    at /workspaces/Logivox/e2e/inventory.spec.ts:10:16",
+                        "location": {
+                          "file": "/workspaces/Logivox/e2e/test-utils.ts",
+                          "column": 14,
+                          "line": 16
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mtest-utils.ts:16\n\n  14 |   password: string = \"Admin@Logivox1!\",\n  15 | ) {\n> 16 |   await page.goto(\"/sign-in\");\n     |              ^\n  17 |\n  18 |   await page.fill('input[name=\"email\"]', email);\n  19 |   await page.fill('input[name=\"password\"]', password);"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/workspaces/Logivox/e2e/test-utils.ts",
+                            "column": 14,
+                            "line": 16
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/sign-in\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/sign-in\", waiting until \"load\"\u001b[22m\n\n\n   at test-utils.ts:16\n\n  14 |   password: string = \"Admin@Logivox1!\",\n  15 | ) {\n> 16 |   await page.goto(\"/sign-in\");\n     |              ^\n  17 |\n  18 |   await page.fill('input[name=\"email\"]', email);\n  19 |   await page.fill('input[name=\"password\"]', password);\n    at login (/workspaces/Logivox/e2e/test-utils.ts:16:14)\n    at /workspaces/Logivox/e2e/inventory.spec.ts:10:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-08T20:48:07.043Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/workspaces/Logivox/test-results/inventory-Inventory-Management-should-export-inventory-data-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/workspaces/Logivox/test-results/inventory-Inventory-Management-should-export-inventory-data-chromium/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/workspaces/Logivox/e2e/test-utils.ts",
+                        "column": 14,
+                        "line": 16
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "491382254a121adeeb47-4910930cca08e3480fca",
+              "file": "inventory.spec.ts",
+              "line": 103,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-03-08T20:46:00.882Z",
+    "duration": 126768.28000000001,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 6,
+    "flaky": 0
+  }
+}

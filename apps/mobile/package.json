@@ -10,7 +10,8 @@
     "build:ios": "eas build --platform ios",
     "submit:android": "eas submit --platform android",
     "submit:ios": "eas submit --platform ios",
-    "test": "jest --watchAll",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watchAll",
     "tsc": "tsc --noEmit",
     "lint": "eslint . --ext .ts,.tsx"
   },

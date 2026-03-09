@@ -213,7 +213,7 @@ export async function GET(req: NextRequest) {
 
     // Build where clause
     const where: any = { organizationId };
-    if (status) where.status = status;
+    if (status && status !== "all") where.status = status;
     if (supplierId) where.supplierId = supplierId;
 
     // Get purchase orders with pagination

@@ -102,18 +102,23 @@ class SecretsService {
   private getLocalFallback(secretName: string): Record<string, any> {
     switch (secretName) {
       case "logivox/database":
+        if (!process.env.DB_USERNAME || !process.env.DB_PASSWORD) {
+          throw new Error(`CRITICAL: Local secrets missing for ${secretName}. Add DB_USERNAME and DB_PASSWORD to .env.local immediately.`);
+        }
         return {
-          username: process.env.DB_USERNAME || "postgres",
-          password: process.env.DB_PASSWORD || "postgres",
+          username: process.env.DB_USERNAME,
+          password: process.env.DB_PASSWORD,
           host: process.env.DB_HOST || "localhost",
           port: process.env.DB_PORT || "5432",
           database: process.env.DB_NAME || "logivox_dev",
         };
 
       case "logivox/auth":
+        if (!process.env.NEXTAUTH_SECRET) {
+          throw new Error(`CRITICAL: Local secrets missing for ${secretName}. Add NEXTAUTH_SECRET to .env.local immediately.`);
+        }
         return {
-          nextauth_secret:
-            process.env.NEXTAUTH_SECRET || "dev-secret-change-me",
+          nextauth_secret: process.env.NEXTAUTH_SECRET,
           nextauth_url: process.env.NEXTAUTH_URL || "http://localhost:3000",
         };
 

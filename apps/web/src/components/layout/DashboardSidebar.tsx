@@ -4,7 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -470,7 +470,7 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
                 JD
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">John Doe</p>
+                <p className="text-sm font-medium truncate" data-testid="user-name">{session?.user?.name || "User"}</p>
                 <p className="text-xs text-muted-foreground truncate">
                   john@acme.com
                 </p>
@@ -487,6 +487,15 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
               ) : (
                 <Moon className="h-4 w-4" />
               )}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 ml-1 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+              onClick={() => signOut({ callbackUrl: '/' })}
+              data-testid="logout-button"
+            >
+              <LogOut className="h-4 w-4" />
             </Button>
           </div>
         </div>
@@ -549,18 +558,19 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                data-testid="user-menu"
               >
                 <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary-600 to-primary-500 flex items-center justify-center text-white font-medium text-sm">
-                  JD
+                  {session?.user?.name ? session.user.name.charAt(0).toUpperCase() : "U"}
                 </div>
               </Button>
 
               {isUserMenuOpen && (
                 <div className="absolute right-0 mt-2 w-56 bg-card border rounded-lg shadow-lg py-2">
                   <div className="px-4 py-2 border-b">
-                    <p className="text-sm font-medium">John Doe</p>
+                    <p className="text-sm font-medium" data-testid="user-name">{session?.user?.name || "User"}</p>
                     <p className="text-xs text-muted-foreground">
-                      john@acme.com
+                      {session?.user?.email || ""}
                     </p>
                   </div>
                   <Link
@@ -578,7 +588,11 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
                     Settings
                   </Link>
                   <div className="border-t mt-2 pt-2">
-                    <button className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-muted">
+                    <button 
+                      onClick={() => signOut({ callbackUrl: "/" })}
+                      data-testid="logout-button"
+                      className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-muted"
+                    >
                       <LogOut className="mr-2 h-4 w-4" />
                       Sign Out
                     </button>

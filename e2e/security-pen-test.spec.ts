@@ -324,7 +324,7 @@ test.describe("Security & Penetration Testing", () => {
   test.describe("Session Management", () => {
     test("should expire sessions after timeout", async ({ page, context }) => {
       // Login
-      await page.goto("/auth/signin");
+      await page.goto("/sign-in");
       // ... login process ...
 
       // Wait for session timeout (in test, we'd mock this)
@@ -354,7 +354,7 @@ test.describe("Security & Penetration Testing", () => {
       );
 
       // Login
-      await page.goto("/auth/signin");
+      await page.goto("/sign-in");
       // ... login process ...
 
       // Get post-login session token

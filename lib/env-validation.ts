@@ -17,14 +17,9 @@ const requiredEnvSchema = z.object({
   NEXTAUTH_URL: z.string().url("NEXTAUTH_URL must be a valid URL"),
   NEXTAUTH_SECRET: z
     .string()
-    .min(32, "NEXTAUTH_SECRET must be at least 32 characters"),
+    .min(32, "NEXTAUTH_SECRET must be at least 32 characters")
+    .refine((val) => !/^(123|abc|password|changeme|test)/i.test(val), "NEXTAUTH_SECRET contains weak or default patterns"),
   JWT_SECRET: z.string().min(32, "JWT_SECRET must be at least 32 characters"),
-
-  // OAuth Providers (optional but warn if missing)
-  GOOGLE_CLIENT_ID: z.string().optional(),
-  GOOGLE_CLIENT_SECRET: z.string().optional(),
-  GITHUB_ID: z.string().optional(),
-  GITHUB_SECRET: z.string().optional(),
 
   // Security
   ENCRYPTION_KEY: z
@@ -115,13 +110,6 @@ export function validateEnvironment(): ValidationResult {
         }
       }
 
-      // Check OAuth configuration
-      if (!requiredEnv.GOOGLE_CLIENT_ID && !requiredEnv.GITHUB_ID) {
-        warnings.push(
-          "No OAuth providers configured - users can only use credentials login",
-        );
-      }
-
       // Check email configuration
       if (!optionalEnv.SMTP_HOST) {
         warnings.push(
@@ -161,19 +149,14 @@ export function validateEnvironment(): ValidationResult {
       success: errors.length === 0,
       errors,
       warnings,
-      environment: {
-        ...requiredEnv,
-        ...optionalEnv,
-        // Redact sensitive values in logs
-        DATABASE_URL: "***REDACTED***",
-        NEXTAUTH_SECRET: "***REDACTED***",
-        JWT_SECRET: "***REDACTED***",
-        ENCRYPTION_KEY: "***REDACTED***",
-        GOOGLE_CLIENT_SECRET: requiredEnv.GOOGLE_CLIENT_SECRET
-          ? "***REDACTED***"
-          : undefined,
-        GITHUB_SECRET: requiredEnv.GITHUB_SECRET ? "***REDACTED***" : undefined,
-      },
+      environment: Object.fromEntries(
+        Object.entries({ ...requiredEnv, ...optionalEnv }).map(([key, value]) => [
+          key,
+          key.includes("SECRET") || key.includes("KEY") || key.includes("URL") 
+          ? "***REDACTED***" 
+          : value
+        ])
+      ),
     };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -241,9 +224,6 @@ export function validateStartupEnvironment() {
   );
   console.log(
     `  Authentication: ${result.environment.NEXTAUTH_SECRET ? "Configured" : "Not configured"}`,
-  );
-  console.log(
-    `  OAuth Providers: ${result.environment.GOOGLE_CLIENT_ID || result.environment.GITHUB_ID ? "Configured" : "Not configured"}`,
   );
   console.log(
     `  Security Features: ${result.environment.SECURITY_HEADERS_ENABLED === "true" ? "Enabled" : "Disabled"}`,

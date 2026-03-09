@@ -710,7 +710,7 @@ export default function MarshallingBoard() {
               <Checkbox
                 id="safety"
                 checked={safetyCleared}
-                // @ts-ignore - Checkbox types from Radix sometimes differ
+                // @ts-expect-error - Checkbox types from Radix sometimes differ
                 onCheckedChange={(c) => setSafetyCleared(c === true)}
               />
               <div className="grid gap-1.5 leading-none">

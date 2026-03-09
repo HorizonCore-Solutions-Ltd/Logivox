@@ -85,6 +85,7 @@ export function DataTable<TData, TValue>({
               table.getColumn(searchKey)?.setFilterValue(event.target.value)
             }
             className="max-w-sm"
+            data-testid="table-search"
           />
         )}
 
@@ -143,6 +144,7 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  data-testid={`table-row-${(row.original as any)?.id || row.id}`}
                   onClick={() => onRowClick?.(row.original)}
                   className={onRowClick ? "cursor-pointer" : ""}
                 >

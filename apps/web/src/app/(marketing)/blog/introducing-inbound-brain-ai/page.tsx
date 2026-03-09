@@ -86,14 +86,14 @@ export default function InboundBrainBlogPost() {
                     <span className="flex-none bg-white border border-slate-200 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">1</span>
                     <div>
                         <strong className="block text-slate-900">Urgency Check</strong>
-                        <span className="text-slate-600">Scan active orders. Is this SKU backordered? If yes -> <span className="text-red-600 font-medium">Flag as Cross-Dock</span>.</span>
+                        <span className="text-slate-600">Scan active orders. Is this SKU backordered? If yes -&gt; <span className="text-red-600 font-medium">Flag as Cross-Dock</span>.</span>
                     </div>
                 </li>
                 <li className="flex gap-3">
                     <span className="flex-none bg-white border border-slate-200 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">2</span>
                     <div>
                         <strong className="block text-slate-900">Quality Risk Assessment</strong>
-                        <span className="text-slate-600">Check supplier history. Is this a new vendor or one with high defect rates? If yes -> <span className="text-amber-600 font-medium">Trigger QC Inspection</span>.</span>
+                        <span className="text-slate-600">Check supplier history. Is this a new vendor or one with high defect rates? If yes -&gt; <span className="text-amber-600 font-medium">Trigger QC Inspection</span>.</span>
                     </div>
                 </li>
                 <li className="flex gap-3">

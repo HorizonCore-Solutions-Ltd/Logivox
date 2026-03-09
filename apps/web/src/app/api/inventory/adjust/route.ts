@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { validateContract } from "../../../../../../../lib/api-middleware";
 
 const adjustSchema = z.object({
   inventoryItemId: z.string(),
@@ -17,10 +18,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const { data, errorResponse } = await validateContract(request, adjustSchema);
+  if (errorResponse) return errorResponse;
+
   try {
-    const body = await request.json();
-    const { inventoryItemId, quantityChange, reason, notes } =
-      adjustSchema.parse(body);
+    const { inventoryItemId, quantityChange, reason, notes } = data!;
 
     // Get current item
     const item = await prisma.inventoryItem.findUnique({

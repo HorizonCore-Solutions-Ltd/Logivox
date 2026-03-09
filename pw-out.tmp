@@ -1,0 +1,22 @@
+🚀 Starting global setup...
+📦 Seeding test database...
+👤 Creating test users...
+Error: page.goto: Page crashed
+Call log:
+[2m  - navigating to "http://localhost:3000/", waiting until "load"[22m
+
+
+   at global-setup.ts:24
+
+  22 |   // Navigate to app to ensure it's running
+  23 |   const baseURL = config.projects[0].use.baseURL || "http://localhost:3000";
+> 24 |   await page.goto(baseURL);
+     |              ^
+  25 |   await page.waitForLoadState("domcontentloaded");
+  26 |
+  27 |   console.log("✅ App is running at:", baseURL);
+    at globalSetup (/workspaces/Logivox/e2e/global-setup.ts:24:14)
+🧹 Starting global teardown...
+🗑️  Cleaning up test data...
+✅ Global teardown complete
+

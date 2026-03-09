@@ -1,7 +1,48 @@
-Error: Timed out waiting 120000ms from config.webServer.
+🚀 Starting global setup...
+📦 Seeding test database...
+👤 Creating test users...
+✅ App is running at: http://localhost:3000
+✅ Global setup complete
+
+Running 1 test using 1 worker
+
+  ✘  1 [chromium] › e2e/inventory.spec.ts:13:7 › Inventory Management › should create new inventory item (1.1m)
+🧹 Starting global teardown...
+🗑️  Cleaning up test data...
+✅ Global teardown complete
 
 
-To open last HTML report run:
-[36m[39m
-[36m  npx playwright show-report[39m
-[36m[39m
+  1) [chromium] › e2e/inventory.spec.ts:13:7 › Inventory Management › should create new inventory item 
+
+    TimeoutError: page.waitForURL: Timeout 60000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation to "/dashboard" until "load"
+      navigated to "http://localhost:3000/sign-in?callbackUrl=%2Fdashboard"
+    ============================================================
+
+       at test-utils.ts:27
+
+      25 |
+      26 |   // Wait for redirect after login
+    > 27 |   await page.waitForURL("/dashboard", { timeout: 60000 });
+         |              ^
+      28 | }
+      29 |
+      30 | /**
+        at login (/workspaces/Logivox/e2e/test-utils.ts:27:14)
+        at /workspaces/Logivox/e2e/inventory.spec.ts:10:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/inventory-Inventory-Manage-55c82-d-create-new-inventory-item-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/inventory-Inventory-Manage-55c82-d-create-new-inventory-item-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/inventory-Inventory-Manage-55c82-d-create-new-inventory-item-chromium/error-context.md
+
+  1 failed
+    [chromium] › e2e/inventory.spec.ts:13:7 › Inventory Management › should create new inventory item 
+
+[36m  Serving HTML report at http://localhost:9323. Press Ctrl+C to quit.[39m

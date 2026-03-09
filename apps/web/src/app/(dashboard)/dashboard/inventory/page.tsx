@@ -205,6 +205,7 @@ export default function InventoryPage() {
                 onClick={() =>
                   router.push(`/dashboard/inventory/${item.id}/edit`)
                 }
+                data-testid={`edit-${item.id}`}
               >
                 <Pencil className="mr-2 h-4 w-4" />
                 Edit
@@ -212,6 +213,7 @@ export default function InventoryPage() {
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-destructive"
+                data-testid={`delete-${item.id}`}
                 onClick={() => {
                   if (
                     confirm(`Are you sure you want to delete ${item.name}?`)

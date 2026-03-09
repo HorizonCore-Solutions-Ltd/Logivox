@@ -1,0 +1,53 @@
+🚀 Starting global setup...
+📦 Seeding test database...
+👤 Creating test users...
+✅ App is running at: http://localhost:3000
+✅ Global setup complete
+
+Running 1 test using 1 worker
+
+  ✘  1 [chromium] › e2e/inventory.spec.ts:13:7 › Inventory Management › should create new inventory item (11.4s)
+🧹 Starting global teardown...
+🗑️  Cleaning up test data...
+✅ Global teardown complete
+
+
+  1) [chromium] › e2e/inventory.spec.ts:13:7 › Inventory Management › should create new inventory item 
+
+    Test was interrupted.
+
+    Error: page.fill: Test ended.
+    Call log:
+    [2m  - waiting for locator('[name="description"]')[22m
+    [2m    - locator resolved to 2 elements. Proceeding with the first one: <meta name="description" content="Industry-leading Warehouse Management System (WMS) with intelligent automation, wave picking, quality control, and real-time analytics. Fully adaptable, mobile-enabled WMS software driving supply chain efficiency."/>[22m
+    [2m    - fill("Test description")[22m
+    [2m  - attempting fill action[22m
+    [2m    2 × waiting for element to be visible, enabled and editable[22m
+    [2m      - element is not visible[22m
+    [2m    - retrying fill action[22m
+    [2m    - waiting 20ms[22m
+    [2m    2 × waiting for element to be visible, enabled and editable[22m
+    [2m      - element is not visible[22m
+    [2m    - retrying fill action[22m
+    [2m      - waiting 100ms[22m
+
+
+      17 |     await page.fill('[name="sku"]', "TEST-SKU-001");
+      18 |     await page.fill('[name="name"]', "Test Product");
+    > 19 |     await page.fill('[name="description"]', "Test description");
+         |                ^
+      20 |     await page.fill('[name="sellingPrice"]', "99.99");
+      21 |     await page.fill('[name="costPrice"]', "49.99");
+      22 |     await page.fill('[name="reorderPoint"]', "10");
+        at /workspaces/Logivox/e2e/inventory.spec.ts:19:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/inventory-Inventory-Manage-55c82-d-create-new-inventory-item-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/inventory-Inventory-Manage-55c82-d-create-new-inventory-item-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 interrupted
+    [chromium] › e2e/inventory.spec.ts:13:7 › Inventory Management › should create new inventory item 

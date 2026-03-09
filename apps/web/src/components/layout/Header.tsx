@@ -278,12 +278,13 @@ export function Header() {
                   variant="ghost"
                   className="flex items-center space-x-2"
                   onClick={() => setShowUserMenu(!showUserMenu)}
+                  data-testid="user-menu"
                 >
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-medium">
                     {user.name?.charAt(0).toUpperCase() ||
                       user.email?.charAt(0).toUpperCase()}
                   </div>
-                  <span className="text-sm font-medium">
+                  <span className="text-sm font-medium" data-testid="user-name">
                     {user.name || user.email}
                   </span>
                   <ChevronDown
@@ -328,6 +329,7 @@ export function Header() {
                       <button
                         onClick={handleSignOut}
                         className="flex items-center w-full px-4 py-2 text-sm text-destructive hover:bg-muted"
+                        data-testid="logout-button"
                       >
                         <LogOut className="h-4 w-4 mr-2" />
                         Sign Out

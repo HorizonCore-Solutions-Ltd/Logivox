@@ -60,19 +60,6 @@ export function withTenantContext(handler: TenantAwareHandler) {
 /**
  * Extended NextRequest with tenant context
  */
-declare global {
-  namespace Express {
-    interface Request {
-      tenant?: {
-        organizationId: string;
-        userId: string;
-        role: string;
-        isAdmin: boolean;
-      };
-    }
-  }
-}
-
 declare module "next/server" {
   interface NextRequest {
     tenant?: {

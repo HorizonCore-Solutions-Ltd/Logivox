@@ -8,7 +8,7 @@ test.describe("Production Deployment Validation", () => {
   });
 
   test("authentication system works", async ({ page }) => {
-    await page.goto("/auth/signin");
+    await page.goto("/sign-in");
     await expect(page.locator("form")).toBeVisible();
     await expect(page.locator('button[type="submit"]')).toBeVisible();
   });
@@ -16,7 +16,7 @@ test.describe("Production Deployment Validation", () => {
   test("dashboard requires authentication", async ({ page }) => {
     await page.goto("/dashboard");
     // Should redirect to signin
-    await expect(page.url()).toContain("/auth/signin");
+    await expect(page.url()).toContain("/sign-in");
   });
 
   test("API health check responds", async ({ request }) => {

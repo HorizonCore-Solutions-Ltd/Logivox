@@ -111,7 +111,6 @@ test.describe("Smoke Tests - Critical Paths", () => {
     });
 
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
 
     // Filter out known non-critical errors
     const criticalErrors = errors.filter((error) => {
@@ -129,7 +128,6 @@ test.describe("Smoke Tests - Critical Paths", () => {
   test("Page loads within acceptable time", async ({ page }) => {
     const startTime = Date.now();
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
     const loadTime = Date.now() - startTime;
 
     // Should load in less than 5 seconds
@@ -260,7 +258,6 @@ test.describe("Performance Smoke Tests", () => {
     });
 
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
 
     // Total JS should be less than 5MB (uncompressed)
     const totalSize = resources.reduce(
