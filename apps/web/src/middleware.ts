@@ -12,7 +12,8 @@ const securityHeaders = {
   "X-Content-Type-Options": "nosniff",
   "Referrer-Policy": "strict-origin-when-cross-origin",
   "X-XSS-Protection": "1; mode=block",
-  "Permissions-Policy": "camera=(), microphone=(), geolocation=(), browsing-topics=()",
+  "Permissions-Policy":
+    "camera=(), microphone=(), geolocation=(), browsing-topics=()",
 };
 
 export default withAuth(
@@ -28,7 +29,9 @@ export default withAuth(
 
     // Redirect to dashboard if trying to access auth pages while logged in
     if (isAuthPage && isAuth) {
-      response = NextResponse.redirect(new URL("/dashboard/dashboard", req.url));
+      response = NextResponse.redirect(
+        new URL("/dashboard/dashboard", req.url),
+      );
     }
 
     // Redirect to sign-in if trying to access dashboard without auth
@@ -41,33 +44,47 @@ export default withAuth(
         new URL(`/sign-in?callbackUrl=${encodeURIComponent(from)}`, req.url),
       );
     }
-    
+
     // Strict RBAC Enforcement (Zero-Trust)
     if (isAuth && isDashboard) {
       const userRole = token.role as string;
       const path = req.nextUrl.pathname;
-      
+
       // Admin Only Routes
-      if (path.startsWith("/dashboard/settings/security") || path.startsWith("/dashboard/users")) {
+      if (
+        path.startsWith("/dashboard/settings/security") ||
+        path.startsWith("/dashboard/users")
+      ) {
         if (userRole !== "ADMIN" && userRole !== "SUPER_ADMIN") {
-          return NextResponse.redirect(new URL("/dashboard/unauthorized", req.url));
+          return NextResponse.redirect(
+            new URL("/dashboard/unauthorized", req.url),
+          );
         }
       }
       // Warehouse Manager Only Routes
-      if (path.startsWith("/dashboard/operations/planning") || path.startsWith("/dashboard/inventory/adjustments")) {
+      if (
+        path.startsWith("/dashboard/operations/planning") ||
+        path.startsWith("/dashboard/inventory/adjustments")
+      ) {
         if (!["MANAGER", "ADMIN", "SUPER_ADMIN"].includes(userRole)) {
-          return NextResponse.redirect(new URL("/dashboard/unauthorized", req.url));
+          return NextResponse.redirect(
+            new URL("/dashboard/unauthorized", req.url),
+          );
         }
       }
     }
-    
+
     // API Rate Limiting Logic (IP-based rudimentary check for Turnkey compliance)
     if (req.nextUrl.pathname.startsWith("/api/")) {
-      const ip = req.ip ?? req.headers.get("x-real-ip") ?? req.headers.get("x-forwarded-for") ?? "127.0.0.1";
+      const ip =
+        req.ip ??
+        req.headers.get("x-real-ip") ??
+        req.headers.get("x-forwarded-for") ??
+        "127.0.0.1";
       // This header simply signals to downstream services that this went through edge filtering
       response.headers.set("x-rate-limit-verified-ip", ip);
       response.headers.set("x-rate-limit-limit", "100");
-      response.headers.set("x-rate-limit-remaining", "99"); 
+      response.headers.set("x-rate-limit-remaining", "99");
     }
 
     // Session Hijacking / Device Trust Validation
@@ -75,9 +92,13 @@ export default withAuth(
       const currentFingerprint = generateSessionFingerprint(req);
       if (token.fingerprint && token.fingerprint !== currentFingerprint) {
         // IP/User-Agent changed violently - Possible Hijacking Detected
-        console.error(`[SECURITY] Session Hijacking blocked for user ${token.id}`);
+        console.error(
+          `[SECURITY] Session Hijacking blocked for user ${token.id}`,
+        );
         // Forcing redirect to sign-in flushes session naturally
-        return NextResponse.redirect(new URL("/sign-in?error=SuspiciousActivity", req.url));
+        return NextResponse.redirect(
+          new URL("/sign-in?error=SuspiciousActivity", req.url),
+        );
       }
     }
 
@@ -93,15 +114,15 @@ export default withAuth(
       authorized: ({ req, token }) => {
         // Zero-Trust Enforced: Default-deny all requests, whitelist auth flows only.
         const path = req.nextUrl.pathname;
-        const isPublicPath = 
-          path === '/' || 
-          path.startsWith('/sign-in') || 
-          path.startsWith('/sign-up') ||
-          path.startsWith('/api/auth'); // Must allow next-auth APIs
-          
+        const isPublicPath =
+          path === "/" ||
+          path.startsWith("/sign-in") ||
+          path.startsWith("/sign-up") ||
+          path.startsWith("/api/auth"); // Must allow next-auth APIs
+
         if (isPublicPath) return true; // Forward to public/auth routes
         return !!token; // Deny anything else without a valid token
-      }
+      },
     },
   },
 );

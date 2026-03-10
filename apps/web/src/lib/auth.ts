@@ -36,7 +36,10 @@ export const authOptions: NextAuthOptions = {
         });
 
         if (!user || !user.password) {
-          console.error("User not found or has no password:", credentials.email);
+          console.error(
+            "User not found or has no password:",
+            credentials.email,
+          );
           // Prevent timing attacks
           await bcrypt.compare(
             "dummy",

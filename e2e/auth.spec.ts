@@ -27,9 +27,9 @@ test.describe("Authentication", () => {
     await page.click('button[type="submit"]', { force: true });
 
     // Should show error message
-    await expect(page.locator('.text-destructive').last()).toContainText(
+    await expect(page.locator(".text-destructive").last()).toContainText(
       "Invalid email or password",
-      { timeout: 15000 }
+      { timeout: 15000 },
     );
 
     // Should stay on login page
@@ -41,7 +41,10 @@ test.describe("Authentication", () => {
 
     // Click user menu
     // UI has direct logout button on desktop
-    await page.locator('[data-testid="logout-button"]').first().click({ force: true });
+    await page
+      .locator('[data-testid="logout-button"]')
+      .first()
+      .click({ force: true });
 
     // Should redirect to homepage
     await page.waitForURL("/", { timeout: 10000 }).catch(() => {});

@@ -1,11 +1,11 @@
-const fs = require('fs');
-const file = 'apps/web/src/components/layout/DashboardSidebar.tsx';
-let content = fs.readFileSync(file, 'utf8');
+const fs = require("fs");
+const file = "apps/web/src/components/layout/DashboardSidebar.tsx";
+let content = fs.readFileSync(file, "utf8");
 
 // Replace John Doe with session name
 content = content.replace(
   '<p className="text-sm font-medium truncate">John Doe</p>',
-  '<p className="text-sm font-medium truncate" data-testid="user-name">{session?.user?.name || "User"}</p>'
+  '<p className="text-sm font-medium truncate" data-testid="user-name">{session?.user?.name || "User"}</p>',
 );
 
 // Add Logout button next to theme toggle
@@ -25,7 +25,10 @@ const logoutBtn = `${themeBtn}
 content = content.replace(themeBtn, logoutBtn);
 
 // Clean up the duplicate data-testid="user-menu" error we introduced earlier
-content = content.replace(/data-testid="user-menu"\s+data-testid="user-menu"\s+data-testid="user-menu"/g, 'data-testid="user-menu"');
+content = content.replace(
+  /data-testid="user-menu"\s+data-testid="user-menu"\s+data-testid="user-menu"/g,
+  'data-testid="user-menu"',
+);
 
 fs.writeFileSync(file, content);
 console.log("Desktop sidebar patched!");

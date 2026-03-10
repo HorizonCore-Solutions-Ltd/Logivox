@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { logAudit } from "../../../../../../../../lib/audit-service";
+import { publishEvent } from "../../../../../../../../lib/event-service";
+import { logAudit } from "../../../../../../../../lib/audit-service";
+import { publishEvent } from "../../../../../../../../lib/event-service";
 
 // GET /api/picking-tasks/[id] - Get task details
 export async function GET(
@@ -118,16 +122,25 @@ export async function PATCH(
       switch (action) {
         case "assign":
           return handleAssignTask(
+            request,
+
+            request,
+
             params.id,
             updateData.assignedToId,
             session.user.id,
           );
         case "start":
-          return handleStartTask(params.id, session.user.id);
+          return handleStartTask(request, params.id, session.user.id);
         case "complete":
-          return handleCompleteTask(params.id, session.user.id, updateData);
+          return handleCompleteTask(
+            request,
+            params.id,
+            session.user.id,
+            updateData,
+          );
         case "cancel":
-          return handleCancelTask(params.id, session.user.id);
+          return handleCancelTask(request, params.id, session.user.id);
         default:
           return NextResponse.json(
             { error: "Invalid action" },
@@ -207,6 +220,7 @@ export async function DELETE(
 
 // Helper: Assign task to user
 async function handleAssignTask(
+  request: Request,
   taskId: string,
   assignedToId: string,
   userId: string,
@@ -229,11 +243,27 @@ async function handleAssignTask(
     },
   });
 
+  await logAudit({
+    eventType: "TASK_ASSIGNED",
+    userId,
+    resource: "PickingTask",
+    resourceId: taskId,
+    action: `Task assigned to user ${assignedToId}`,
+    ipAddress: request.headers.get("x-forwarded-for") || "unknown",
+    userAgent: request.headers.get("user-agent") || "unknown",
+    success: true,
+    changes: { assignedToId },
+  });
+
   return NextResponse.json(task);
 }
 
 // Helper: Start task
-async function handleStartTask(taskId: string, userId: string) {
+async function handleStartTask(
+  request: Request,
+  taskId: string,
+  userId: string,
+) {
   const task = await prisma.pickingTask.findUnique({
     where: { id: taskId },
     select: { status: true, assignedToId: true },
@@ -260,14 +290,30 @@ async function handleStartTask(taskId: string, userId: string) {
     },
   });
 
+  await logAudit({
+    eventType: "TASK_STARTED",
+    userId,
+    resource: "PickingTask",
+    resourceId: taskId,
+    action: `Picker started taking stock for task ${taskId}`,
+    ipAddress: request.headers.get("x-forwarded-for") || "unknown",
+    userAgent: request.headers.get("user-agent") || "unknown",
+    success: true,
+  });
+
   return NextResponse.json(updated);
 }
 
 // Helper: Complete task
-async function handleCompleteTask(taskId: string, userId: string, data: any) {
+async function handleCompleteTask(
+  request: Request,
+  taskId: string,
+  userId: string,
+  data: any,
+) {
   const task = await prisma.pickingTask.findUnique({
     where: { id: taskId },
-    select: { status: true, startedAt: true },
+    select: { status: true, startedAt: true, warehouseId: true },
   });
 
   if (!task) {
@@ -307,11 +353,39 @@ async function handleCompleteTask(taskId: string, userId: string, data: any) {
     },
   });
 
+  await logAudit({
+    eventType: "TASK_COMPLETED",
+    userId,
+    resource: "PickingTask",
+    resourceId: taskId,
+    action: `Picker successfully handed off stock for task ${taskId}`,
+    ipAddress: request.headers.get("x-forwarded-for") || "unknown",
+    userAgent: request.headers.get("user-agent") || "unknown",
+    success: true,
+  });
+
+  // Outbox pattern for syncing down to central inventory/webhook dead-letter queue
+  await publishEvent({
+    eventType: "picking_task.completed",
+    payload: {
+      taskId,
+      completedById: userId,
+      warehouseId: task.warehouseId,
+      duration,
+    },
+    aggregateId: taskId,
+    aggregateType: "PickingTask",
+  });
+
   return NextResponse.json(updated);
 }
 
 // Helper: Cancel task
-async function handleCancelTask(taskId: string, userId: string) {
+async function handleCancelTask(
+  request: Request,
+  taskId: string,
+  userId: string,
+) {
   const task = await prisma.pickingTask.findUnique({
     where: { id: taskId },
     select: { status: true },
@@ -333,6 +407,17 @@ async function handleCancelTask(taskId: string, userId: string) {
     data: {
       status: "CANCELLED",
     },
+  });
+
+  await logAudit({
+    eventType: "TASK_CANCELLED",
+    userId,
+    resource: "PickingTask",
+    resourceId: taskId,
+    action: `Picker flow cancelled for task ${taskId}`,
+    ipAddress: request.headers.get("x-forwarded-for") || "unknown",
+    userAgent: request.headers.get("user-agent") || "unknown",
+    success: true,
   });
 
   return NextResponse.json(updated);

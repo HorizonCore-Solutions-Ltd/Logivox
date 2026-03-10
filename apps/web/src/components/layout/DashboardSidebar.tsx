@@ -470,7 +470,12 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
                 JD
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate" data-testid="user-name">{session?.user?.name || "User"}</p>
+                <p
+                  className="text-sm font-medium truncate"
+                  data-testid="user-name"
+                >
+                  {session?.user?.name || "User"}
+                </p>
                 <p className="text-xs text-muted-foreground truncate">
                   john@acme.com
                 </p>
@@ -492,7 +497,7 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
               variant="ghost"
               size="sm"
               className="h-8 w-8 p-0 ml-1 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
-              onClick={() => signOut({ callbackUrl: '/' })}
+              onClick={() => signOut({ callbackUrl: "/" })}
               data-testid="logout-button"
             >
               <LogOut className="h-4 w-4" />
@@ -561,14 +566,18 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
                 data-testid="user-menu"
               >
                 <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary-600 to-primary-500 flex items-center justify-center text-white font-medium text-sm">
-                  {session?.user?.name ? session.user.name.charAt(0).toUpperCase() : "U"}
+                  {session?.user?.name
+                    ? session.user.name.charAt(0).toUpperCase()
+                    : "U"}
                 </div>
               </Button>
 
               {isUserMenuOpen && (
                 <div className="absolute right-0 mt-2 w-56 bg-card border rounded-lg shadow-lg py-2">
                   <div className="px-4 py-2 border-b">
-                    <p className="text-sm font-medium" data-testid="user-name">{session?.user?.name || "User"}</p>
+                    <p className="text-sm font-medium" data-testid="user-name">
+                      {session?.user?.name || "User"}
+                    </p>
                     <p className="text-xs text-muted-foreground">
                       {session?.user?.email || ""}
                     </p>
@@ -588,7 +597,7 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
                     Settings
                   </Link>
                   <div className="border-t mt-2 pt-2">
-                    <button 
+                    <button
                       onClick={() => signOut({ callbackUrl: "/" })}
                       data-testid="logout-button"
                       className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-muted"

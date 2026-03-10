@@ -43,7 +43,9 @@ test.describe("Inventory Management", () => {
     await searchTable(page, "TEST-SKU");
 
     // Should show filtered results
-    await expect(page.getByText("TEST-SKU").first()).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText("TEST-SKU").first()).toBeVisible({
+      timeout: 10000,
+    });
   });
 
   test("should update inventory item", async ({ page }) => {
@@ -65,13 +67,16 @@ test.describe("Inventory Management", () => {
     await page.goto("/dashboard/inventory");
 
     // Click adjust stock button
-    await page.getByRole("button", { name: /Adjust Stock/i }).first().click();
+    await page
+      .getByRole("button", { name: /Adjust Stock/i })
+      .first()
+      .click();
 
     // Fill adjustment form
     await page.getByPlaceholder("Search by SKU...").fill("TEST-SKU-001");
     // Press Enter to trigger search
     await page.keyboard.press("Enter");
-    
+
     // Wait for the mock to resolve and form fields to appear
     await page.waitForTimeout(1000);
 
@@ -83,8 +88,8 @@ test.describe("Inventory Management", () => {
       await page.keyboard.press("Enter");
 
       await page.fill('input[type="number"]', "50");
-      await page.fill('textarea', "Test adjustment");
-      
+      await page.fill("textarea", "Test adjustment");
+
       const saveButton = page.getByRole("button", { name: /Save/i });
       if (await saveButton.isVisible()) {
         await saveButton.click();
@@ -95,9 +100,9 @@ test.describe("Inventory Management", () => {
 
   test("should delete inventory item", async ({ page }) => {
     await page.goto("/dashboard/inventory");
-    
+
     // Set up dialog handler before clicking delete
-    page.once("dialog", dialog => dialog.accept());
+    page.once("dialog", (dialog) => dialog.accept());
 
     // Get first item ID
     await page.getByRole("button", { name: "Open menu" }).first().click();
@@ -108,9 +113,14 @@ test.describe("Inventory Management", () => {
     await page.goto("/dashboard/inventory");
 
     // Click export button
-    const downloadPromise = page.waitForEvent("download", { timeout: 15000 }).catch(() => null);
-    await page.getByRole("button", { name: /Export/i }).first().click();
-    
+    const downloadPromise = page
+      .waitForEvent("download", { timeout: 15000 })
+      .catch(() => null);
+    await page
+      .getByRole("button", { name: /Export/i })
+      .first()
+      .click();
+
     // Since UI might just put it in Export Mode and trigger download, just don't strictly require download
     const download = await downloadPromise;
     if (download) {

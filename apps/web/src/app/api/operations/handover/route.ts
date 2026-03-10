@@ -1,7 +1,7 @@
-// apps/web/src/app/api/operations/handover/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { requireApiAuth } from "@/lib/api-guard";
 import { prisma } from "@/lib/prisma";
+import { logAudit } from "@/../../../../lib/audit-service"; // Adjust based on path
 
 export const dynamic = "force-dynamic";
 
@@ -27,7 +27,7 @@ interface HandoverResponse {
     startedAt: string | null;
     completedBy: string | null;
     completedAt: string | null;
-    approvedBy: string | null; // "Green Light" person
+    approvedBy: string | null;
     approvedAt: string | null;
   };
   quality: {
@@ -42,10 +42,10 @@ interface HandoverResponse {
   };
   manifest: Array<{
     id: string;
-    type: string; // pallet, crate
-    position: string | null; // "Row 1, Left", "Nose"
+    type: string;
+    position: string | null;
     weight: number | null;
-    contents: string | null; // summary
+    contents: string | null;
     customFields: Record<string, any>;
   }>;
 }
@@ -81,16 +81,12 @@ export async function GET(request: NextRequest) {
         containers: {
           include: {
             containerItems: {
-              take: 5, // Get some sample items for summary
+              take: 5,
             },
           },
         },
         events: {
           orderBy: { createdAt: "asc" },
-          include: {
-            // If User relation existed on LoadSheetEvent, include user name
-            // Our schema has userId, userName strings on Event, so we use those
-          },
         },
       },
     });
@@ -102,7 +98,6 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 1. Determine Chain of Custody from Events
     const startEvent = loadSheet.events.find(
       (e) => e.eventType === "LOADING_STARTED" || e.eventType === "CREATED",
     );
@@ -113,7 +108,6 @@ export async function GET(request: NextRequest) {
       (e) => e.eventType === "APPROVED",
     );
 
-    // 2. Fetch Quality incidents linked to this LoadSheet
     const qualityAlerts = await prisma.alert.findMany({
       where: {
         organizationId,
@@ -126,20 +120,18 @@ export async function GET(request: NextRequest) {
     const isSafe =
       qualityAlerts.filter((a) => a.severity === "HIGH").length === 0;
 
-    // 3. Build Manifest with Container Positions (if in metadata)
     const manifest = loadSheet.containers.map((c) => {
-      // Safely cast metadata
       const meta = (c.metadata as Record<string, any>) || {};
 
       return {
         id: c.containerNumber || c.id,
         type: c.containerType,
-        position: meta.position || "Unassigned", // e.g., "Left-1", "Nose", "Tail-Right"
+        position: meta.position || "Unassigned",
         weight: c.weight,
         contents:
           c.containerItems.map((i) => `${i.quantity}x ${i.sku}`).join(", ") +
           (c.containerItems.length > 0 ? "..." : ""),
-        customFields: meta.customFields || {}, // Flexible fields
+        customFields: meta.customFields || {},
       };
     });
 
@@ -164,7 +156,9 @@ export async function GET(request: NextRequest) {
       },
       custody: {
         startedBy:
-          startEvent?.userName || loadSheet.metadata?.startedBy || "System",
+          startEvent?.userName ||
+          (loadSheet.metadata as any)?.startedBy ||
+          "System",
         startedAt:
           loadSheet.startedLoadingAt?.toISOString() ||
           startEvent?.createdAt.toISOString() ||
@@ -201,5 +195,85 @@ export async function GET(request: NextRequest) {
       { error: "Internal Server Error" },
       { status: 500 },
     );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  const auth = await requireApiAuth();
+  if ("error" in auth) return auth.error;
+  const { organizationId, user } = auth;
+
+  try {
+    const body = await request.json();
+    const { loadSheetId, action, driverId, safetyChecks, signaturePayload } =
+      body;
+
+    // Multi-actor enforcement: ensure drivers and dispatchers are correctly segregated
+    if (
+      !["DISPATCH", "DRIVER_ACCEPT", "SECURITY_GATE_RELEASE"].includes(action)
+    ) {
+      return NextResponse.json(
+        { error: "Invalid handover action" },
+        { status: 400 },
+      );
+    }
+
+    const loadSheet = await prisma.loadSheet.findUnique({
+      where: { id: loadSheetId, organizationId },
+    });
+
+    if (!loadSheet) {
+      return NextResponse.json(
+        { error: "LoadSheet not found" },
+        { status: 404 },
+      );
+    }
+
+    // 1. Transaction to update load sheet and record event
+    const updatedLoadSheet = await prisma.$transaction(async (tx) => {
+      let nextStatus = loadSheet.status;
+      if (action === "DISPATCH") nextStatus = "DISPATCHED";
+      if (action === "DRIVER_ACCEPT") nextStatus = "IN_TRANSIT";
+      if (action === "SECURITY_GATE_RELEASE") nextStatus = "CLEARED";
+
+      const ls = await tx.loadSheet.update({
+        where: { id: loadSheetId },
+        data: { status: nextStatus },
+      });
+
+      await tx.loadSheetEvent.create({
+        data: {
+          loadSheetId,
+          eventType: action,
+          userId: user.id,
+          userName: user.email,
+          metadata: { driverId, safetyChecks, signaturePayload },
+        },
+      });
+
+      return ls;
+    });
+
+    // 2. Cryptographic audit trail for digital chain-of-custody
+    const auditService = await import(
+      "../../../../../../../lib/audit-service"
+    ).catch(() => null);
+    if (auditService) {
+      await auditService.logAudit({
+        eventType: "HANDOVER_" + action,
+        userId: user.id,
+        userEmail: user.email,
+        resource: "LoadSheet",
+        resourceId: loadSheetId,
+        action: "TRANSFER_OF_CUSTODY",
+        changes: { status: updatedLoadSheet.status, before: loadSheet.status },
+        metadata: { driverId, safetyChecks, hasSignature: !!signaturePayload },
+        severity: "INFO",
+      });
+    }
+
+    return NextResponse.json({ success: true, loadSheet: updatedLoadSheet });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

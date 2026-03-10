@@ -16,7 +16,7 @@ export async function publishEvent(params: {
       aggregateId: params.aggregateId,
       aggregateType: params.aggregateType,
       status: "PENDING",
-    }
+    },
   });
 }
 
@@ -29,29 +29,29 @@ export async function processOutboxEvents() {
   const events = await prisma.outboxEvent.findMany({
     where: { status: "PENDING" },
     take: BATCH_SIZE,
-    orderBy: { createdAt: "asc" }
+    orderBy: { createdAt: "asc" },
   });
 
   for (const event of events) {
     try {
       // Simulate event dispatching to Webhook/SQS/Redis/Dead-Letter Queue
       await dispatchToMessageBroker(event);
-      
+
       await prisma.outboxEvent.update({
         where: { id: event.id },
-        data: { 
-          status: "COMPLETED", 
-          processedAt: new Date() 
-        }
+        data: {
+          status: "COMPLETED",
+          processedAt: new Date(),
+        },
       });
     } catch (error) {
       await prisma.outboxEvent.update({
         where: { id: event.id },
-        data: { 
-          status: "FAILED", 
+        data: {
+          status: "FAILED",
           error: error instanceof Error ? error.message : "Unknown error",
-          attempts: { increment: 1 }
-        }
+          attempts: { increment: 1 },
+        },
       });
     }
   }
@@ -62,4 +62,3 @@ async function dispatchToMessageBroker(event: any) {
   // e.g., await redis.publish(event.eventType, JSON.stringify(event.payload));
   return Promise.resolve();
 }
-

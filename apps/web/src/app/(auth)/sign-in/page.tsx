@@ -61,8 +61,7 @@ export default function SignInPage() {
         setError("Invalid email or password. Please try again.");
         setIsSubmitting(false);
       } else if (result?.ok) {
-        const callbackUrl =
-          searchParams.get("callbackUrl") || "/dashboard";
+        const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
         router.push(callbackUrl);
       }
     } catch (err) {
@@ -115,7 +114,10 @@ export default function SignInPage() {
           <CardContent className="space-y-6">
             {/* Error Message */}
             {error && (
-              <div role="alert" className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-md flex items-start space-x-2">
+              <div
+                role="alert"
+                className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-md flex items-start space-x-2"
+              >
                 <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
                 <p className="text-sm">{error}</p>
               </div>

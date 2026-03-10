@@ -18,7 +18,10 @@ const requiredEnvSchema = z.object({
   NEXTAUTH_SECRET: z
     .string()
     .min(32, "NEXTAUTH_SECRET must be at least 32 characters")
-    .refine((val) => !/^(123|abc|password|changeme|test)/i.test(val), "NEXTAUTH_SECRET contains weak or default patterns"),
+    .refine(
+      (val) => !/^(123|abc|password|changeme|test)/i.test(val),
+      "NEXTAUTH_SECRET contains weak or default patterns",
+    ),
   JWT_SECRET: z.string().min(32, "JWT_SECRET must be at least 32 characters"),
 
   // Security
@@ -150,12 +153,14 @@ export function validateEnvironment(): ValidationResult {
       errors,
       warnings,
       environment: Object.fromEntries(
-        Object.entries({ ...requiredEnv, ...optionalEnv }).map(([key, value]) => [
-          key,
-          key.includes("SECRET") || key.includes("KEY") || key.includes("URL") 
-          ? "***REDACTED***" 
-          : value
-        ])
+        Object.entries({ ...requiredEnv, ...optionalEnv }).map(
+          ([key, value]) => [
+            key,
+            key.includes("SECRET") || key.includes("KEY") || key.includes("URL")
+              ? "***REDACTED***"
+              : value,
+          ],
+        ),
       ),
     };
   } catch (error) {

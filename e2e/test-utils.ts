@@ -17,10 +17,10 @@ export async function login(
 
   await page.fill('input[name="email"]', email);
   await page.fill('input[name="password"]', password);
-  
+
   // Extra wait to ensure React state updates
   await page.waitForTimeout(500);
-  
+
   await page.click('button[type="submit"]', { force: true });
 
   // Wait for redirect after login

@@ -5,11 +5,13 @@ export async function detectAndLogRoleEscalation(
   targetUserId: string,
   oldRole: string,
   newRole: string,
-  adminRole: string
+  adminRole: string,
 ) {
   // Enforce zero-trust escalation rules
   if (newRole === "SUPER_ADMIN" && adminRole !== "SUPER_ADMIN") {
-    throw new Error("SECURITY_VIOLATION: Only Super Admins can promote other Super Admins.");
+    throw new Error(
+      "SECURITY_VIOLATION: Only Super Admins can promote other Super Admins.",
+    );
   }
 
   // Log to Audit table
@@ -22,7 +24,7 @@ export async function detectAndLogRoleEscalation(
       userId: adminUserId,
       ipAddress: "identity-governance-module",
       userAgent: "backend",
-    }
+    },
   });
 
   return true;

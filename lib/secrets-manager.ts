@@ -103,7 +103,9 @@ class SecretsService {
     switch (secretName) {
       case "logivox/database":
         if (!process.env.DB_USERNAME || !process.env.DB_PASSWORD) {
-          throw new Error(`CRITICAL: Local secrets missing for ${secretName}. Add DB_USERNAME and DB_PASSWORD to .env.local immediately.`);
+          throw new Error(
+            `CRITICAL: Local secrets missing for ${secretName}. Add DB_USERNAME and DB_PASSWORD to .env.local immediately.`,
+          );
         }
         return {
           username: process.env.DB_USERNAME,
@@ -115,7 +117,9 @@ class SecretsService {
 
       case "logivox/auth":
         if (!process.env.NEXTAUTH_SECRET) {
-          throw new Error(`CRITICAL: Local secrets missing for ${secretName}. Add NEXTAUTH_SECRET to .env.local immediately.`);
+          throw new Error(
+            `CRITICAL: Local secrets missing for ${secretName}. Add NEXTAUTH_SECRET to .env.local immediately.`,
+          );
         }
         return {
           nextauth_secret: process.env.NEXTAUTH_SECRET,

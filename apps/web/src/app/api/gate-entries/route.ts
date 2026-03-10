@@ -2,6 +2,50 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { logAudit } from "../../../../../../../lib/audit-service";
+import { publishEvent } from "../../../../../../../lib/event-service";
+import { z } from "zod";
+import { validateContract } from "../../../../../../../lib/api-middleware";
+import { logAudit } from "../../../../../../../lib/audit-service";
+import { publishEvent } from "../../../../../../../lib/event-service";
+import { z } from "zod";
+import { validateContract } from "../../../../../../../lib/api-middleware";
+
+const gateEntrySchema = z.object({
+  entryType: z.string(),
+  direction: z.string(),
+  vehicleType: z.string().optional(),
+  vehicleNumber: z.string().optional(),
+  licensePlate: z.string().optional(),
+  trailerNumber: z.string().optional(),
+  driverName: z.string().optional(),
+  driverLicense: z.string().optional(),
+  driverPhone: z.string().optional(),
+  carrierName: z.string().optional(),
+  appointmentId: z.string().optional(),
+  referenceNumber: z.string().optional(),
+  gateNumber: z.string().optional(),
+  securityCheckPassed: z.boolean().optional(),
+  notes: z.string().optional(),
+});
+
+const gateEntrySchema = z.object({
+  entryType: z.string(),
+  direction: z.string(),
+  vehicleType: z.string().optional(),
+  vehicleNumber: z.string().optional(),
+  licensePlate: z.string().optional(),
+  trailerNumber: z.string().optional(),
+  driverName: z.string().optional(),
+  driverLicense: z.string().optional(),
+  driverPhone: z.string().optional(),
+  carrierName: z.string().optional(),
+  appointmentId: z.string().optional(),
+  referenceNumber: z.string().optional(),
+  gateNumber: z.string().optional(),
+  securityCheckPassed: z.boolean().optional(),
+  notes: z.string().optional(),
+});
 
 export async function GET(request: Request) {
   try {
@@ -88,8 +132,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const orgId = session.user.organizationId;
+    const userId = session.user.id;
 
-    const body = await request.json();
+    const { data: body, errorResponse } = await validateContract(
+      request,
+      gateEntrySchema,
+    );
+    if (errorResponse) return errorResponse;
+
     const {
       entryType,
       direction,
@@ -106,14 +156,7 @@ export async function POST(request: Request) {
       gateNumber,
       securityCheckPassed,
       notes,
-    } = body;
-
-    if (!entryType || !direction) {
-      return NextResponse.json(
-        { error: "entryType and direction are required" },
-        { status: 400 },
-      );
-    }
+    } = body!;
 
     // Generate sequential entry number
     const count = await prisma.gateEntry.count({
@@ -143,6 +186,32 @@ export async function POST(request: Request) {
         entryTime: new Date(),
         status: "CHECKED_IN",
       },
+    });
+
+    // Zero-trust Traceability: Log the Action
+    await logAudit({
+      eventType: "GATE_ENTRY_CREATED",
+      userId,
+      resource: "GateEntry",
+      resourceId: entry.id,
+      action: `Driver ${driverName || "Unknown"} checked in at gate ${gateNumber || "Unknown"}`,
+      ipAddress: request.headers.get("x-forwarded-for") || "unknown",
+      userAgent: request.headers.get("user-agent") || "unknown",
+      success: true,
+      changes: { direction, entryType, vehicleNumber, driverName },
+    });
+
+    // Indempotency/Eventing: Write to Outbox
+    await publishEvent({
+      eventType: "gate_entry.checked_in",
+      payload: {
+        entryId: entry.id,
+        organizationId: orgId,
+        driverName,
+        entryNumber,
+      },
+      aggregateId: entry.id,
+      aggregateType: "GateEntry",
     });
 
     return NextResponse.json({ success: true, entry }, { status: 201 });

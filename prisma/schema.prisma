@@ -48,6 +48,7 @@ model User {
   role                         UserRole                 @default(USER)
   isActive                     Boolean                  @default(true)
   defaultPrinterId             String?
+  defaultPrinter               Printer?                 @relation(fields: [defaultPrinterId], references: [id])
   createdAt                    DateTime                 @default(now())
   updatedAt                    DateTime                 @updatedAt
   acknowledgedAlerts           Alert[]                  @relation("AlertAcknowledger")
@@ -68,12 +69,11 @@ model User {
   assignedTasks                PickingTask[]            @relation("TaskAssignee")
   completedTasks               PickingTask[]            @relation("TaskCompleter")
   createdTasks                 PickingTask[]            @relation("TaskCreator")
-  processedRefunds             Refund[]                 @relation("RefundProcessor")
   assignedAutomations          TaskAutomation[]         @relation("AutomationAssignee")
   createdAutomations           TaskAutomation[]         @relation("AutomationCreator")
-  createdWaveRules             WaveAutomationRule[]     @relation("WaveRuleCreator")
   assignedWaves                WavePick[]               @relation("WaveAssignee")
   createdWaves                 WavePick[]               @relation("WaveCreator")
+  createdWaveRules             WaveAutomationRule[]     @relation("WaveRuleCreator")
   assignedPickLines            WavePickLine[]           @relation("LinePickerAssignee")
   pickedLines                  WavePickLine[]           @relation("LinePicker")
   verifiedLines                WavePickLine[]           @relation("LineVerifier")
@@ -98,7 +98,7 @@ model User {
   receivedGRNs                 GoodsReceiptNote[]       @relation("GRNReceivedBy")
   createdInventoryItems        InventoryItem[]          @relation("InventoryCreator")
   organizationMemberships      OrganizationMember[]
-  auditLogs                    AuditLog[]
+  processedRefunds             Refund[]                 @relation("RefundProcessor")
   createdOrganizations         Organization[]           @relation("OrganizationCreator")
   initiatedPacks               Pack[]                   @relation("PackInitiator")
   createdPacks                 Pack[]                   @relation("PackCreator")
@@ -110,7 +110,6 @@ model User {
   performedCheckpoints         QCCheckpoint[]           @relation("CheckpointPerformer")
   inspectedQC                  QCInspection[]           @relation("QCInspector")
   qcReceivingInspections       QCReceivingInspection[]  @relation("QCReceivingInspector")
-  assignedReplenishmentTasks   ReplenishmentTask[]      @relation("ReplenAssignedTo")
   executedReports              ReportExecution[]        @relation("ReportExecutor")
   createdReports               Report[]                 @relation("ReportCreator")
   restockedRMAItems            RMAItem[]                @relation("RMARestockedBy")
@@ -120,26 +119,27 @@ model User {
   createdSalesOrders           SalesOrder[]             @relation("SOCreator")
   packedSalesOrders            SalesOrder[]             @relation("SOPacker")
   pickedSalesOrders            SalesOrder[]             @relation("SOPicker")
-  securityLogs                 SecurityLog[]
-  securityProfile              SecurityProfile?
   sessions                     Session[]
   createdShipments             Shipment[]               @relation("ShipmentCreator")
   approvedAdjustments          StockAdjustment[]        @relation("AdjustmentApprovedBy")
   completedAdjustments         StockAdjustment[]        @relation("AdjustmentCompletedBy")
   createdAdjustments           StockAdjustment[]        @relation("AdjustmentCreatedBy")
-  requestedTransferRequests    TransferRequest[]        @relation("TransferRequestor")
-  defaultPrinter               Printer?                 @relation(fields: [defaultPrinterId], references: [id])
-  assignedVasRequests          VASRequest[]
-  voiceSessions                VoiceSession[]
   approvedTransfers            WarehouseTransfer[]      @relation("TransferApprovedBy")
   completedTransfers           WarehouseTransfer[]      @relation("TransferCompletedBy")
   requestedTransfers           WarehouseTransfer[]      @relation("TransferRequestedBy")
+  assignedReplenishmentTasks   ReplenishmentTask[]      @relation("ReplenAssignedTo")
   assignedYardMoves            YardMove[]               @relation("YardMoveAssignee")
+  voiceSessions                VoiceSession[]
+  securityProfile              SecurityProfile?
+  securityLogs                 SecurityLog[]
+  assignedVasRequests          VASRequest[]
+
+  requestedTransferRequests TransferRequest[] @relation("TransferRequestor")
 
   @@index([email])
   @@map("users")
-  @@index([defaultPrinterId])
 }
+
 model VerificationToken {
   identifier String
   token      String   @unique
@@ -166,7 +166,7 @@ model Organization {
   updatedAt                  DateTime                     @updatedAt
   createdById                String
   securitySettings           Json?
-  invoiceSettings            Json?
+  invoiceSettings            Json? // { trigger, termsNet, footerText, showPackingSlip, logoUrl }
   alerts                     Alert[]
   alertRules                 AlertRule[]
   externalIntegrations       ExternalIntegration[]
@@ -179,16 +179,14 @@ model Organization {
   notificationTemplates      NotificationTemplate[]
   pickingRoutes              PickingRoute[]
   pickingTasks               PickingTask[]
-  refunds                    Refund[]
   taskAutomations            TaskAutomation[]
   taskExecutions             TaskExecution[]
-  waveAutomationExecutions   WaveAutomationExecution[]
-  waveAutomationRules        WaveAutomationRule[]
   waves                      WavePick[]
+  yardMoves                  YardMove[]
+  waveAutomationRules        WaveAutomationRule[]
+  waveAutomationExecutions   WaveAutomationExecution[]
   wavePickLines              WavePickLine[]
   accessControlZones         AccessControlZone[]
-  accessorialCodes           AccessorialChargeCode[]
-  accessorialLines           AccessorialChargeLine[]
   activityLogs               ActivityLog[]
   qrReturns                  QRReturn[]
   analyticsEvents            AnalyticsEvent[]
@@ -197,36 +195,48 @@ model Organization {
   audits                     Audit[]
   autonomousConfig           AutonomousConfig?
   autonomousDecisions        AutonomousDecision[]
-  bayDoors                   BayDoor[]
+  cognitivePolicies          CognitivePolicy[]
+  decisionLogs               DecisionLog[]
   rateCards                  BillingRateCard[]
   billingTransactions        BillingTransaction[]
   billsOfMaterials           BillOfMaterials[]
   bookings                   Booking[]
   cameraSystems              CameraSystem[]
   carrierConfigs             CarrierConfig[]
-  cartonTypes                CartonType[]
   categories                 Category[]
   clientInvoices             ClientInvoice[]
+  invoices                   Invoice[]
   clients                    Client[]
-  cognitivePolicies          CognitivePolicy[]
+  replenishmentRules         ReplenishmentRule[]
+  replenishmentTasks         ReplenishmentTask[]
+  replenishmentFeatureFlag   ReplenishmentFeatureFlag?
+  replenishmentForecasts     ReplenishmentForecastCache[]
+  replenishmentIoTTriggers   ReplenishmentIoTTrigger[]
+  replenishmentWaveBinds     ReplenishmentWaveBind[]
+  replenishmentRobotJobs     ReplenishmentRobotJob[]
+  replenishmentCostLogs      ReplenishmentCostLog[]
+  replenishmentSimRuns       ReplenishmentSimRun[]
+  accessorialCodes           AccessorialChargeCode[]
+  accessorialLines           AccessorialChargeLine[]
+  customerContracts          CustomerContract[]
+  exceptions                 ExceptionRecord[]
+  cartonTypes                CartonType[]
+  outboundASNs               OutboundASN[]
   capas                      CorrectivePreventiveAction[]
   crossBorderReturns         CrossBorderReturn[]
-  customerContracts          CustomerContract[]
   customerReturnProfiles     CustomerReturnProfile[]
   customers                  Customer[]
   cycleCounts                CycleCount[]
   daily_activity_reports     daily_activity_reports[]
   dashboards                 Dashboard[]
-  decisionLogs               DecisionLog[]
   deliveryRoutes             DeliveryRoute[]
   dockAppointments           DockAppointment[]
   documents                  Document[]
   duties                     Duty[]
   dutyTypes                  DutyType[]
+  printers                   Printer[]
   employees                  Employee[]
   equipment                  equipment[]
-  exceptions                 ExceptionRecord[]
-  fleetVehicleTypes          FleetVehicleType[]
   fmeas                      FMEA[]
   gateDocuments              GateDocument[]
   gateEntries                GateEntry[]
@@ -243,13 +253,10 @@ model Organization {
   instantRefunds             InstantRefund[]
   integrations               Integration[]
   inventoryItems             InventoryItem[]
-  invoices                   Invoice[]
   iotAlerts                  IoTAlert[]
   iotDevices                 IoTDevice[]
-  IoTSensorEvent             IoTSensorEvent[]
   kpiMetrics                 KPIMetric[]
   loadPlans                  LoadPlan[]
-  loadSheets                 LoadSheet[]
   locations                  Location[]
   lotGenealogies             LotGenealogy[]
   lotMovements               LotMovement[]
@@ -257,13 +264,11 @@ model Organization {
   nonConformanceReports      NonConformanceReport[]
   members                    OrganizationMember[]
   createdBy                  User                         @relation("OrganizationCreator", fields: [createdById], references: [id])
-  outboundASNs               OutboundASN[]
   packs                      Pack[]
   panic_alerts               panic_alerts[]
   parkingSpots               ParkingSpot[]
   patrol_routes              patrol_routes[]
   pickLists                  PickList[]
-  printers                   Printer[]
   productReturnAnalyses      ProductReturnAnalysis[]
   productivityRecords        ProductivityRecord[]
   purchaseOrders             PurchaseOrder[]
@@ -278,15 +283,6 @@ model Organization {
   qualityReports             QualityReport[]
   refurbTemplates            RefurbTemplate[]
   reorderAlerts              ReorderAlert[]
-  replenishmentCostLogs      ReplenishmentCostLog[]
-  replenishmentFeatureFlag   ReplenishmentFeatureFlag?
-  replenishmentForecasts     ReplenishmentForecastCache[]
-  replenishmentIoTTriggers   ReplenishmentIoTTrigger[]
-  replenishmentRobotJobs     ReplenishmentRobotJob[]
-  replenishmentRules         ReplenishmentRule[]
-  replenishmentSimRuns       ReplenishmentSimRun[]
-  replenishmentTasks         ReplenishmentTask[]
-  replenishmentWaveBinds     ReplenishmentWaveBind[]
   reportExecutions           ReportExecution[]
   reports                    Report[]
   returnReasons              ReturnReason[]
@@ -295,6 +291,7 @@ model Organization {
   returnsForecasts           ReturnsForecast[]
   riskRegister               RiskRegister[]
   rmas                       RMA[]
+  refunds                    Refund[]
   rootCauseAnalyses          RootCauseAnalysis[]
   rtvRequests                RTVRequest[]
   rtvs                       RTV[]
@@ -317,7 +314,6 @@ model Organization {
   slottingRecommendations    SlottingRecommendation[]
   slottingRules              SlottingRule[]
   stockAdjustments           StockAdjustment[]
-  chargebacks                SupplierChargeback[]
   supplierPerformanceReviews SupplierPerformanceReview[]
   suppliers                  Supplier[]
   sustainabilityReports      SustainabilityReport[]
@@ -325,9 +321,6 @@ model Organization {
   timeAttendanceMappings     TimeAttendanceMapping[]
   timeEntries                TimeEntry[]
   training_courses           training_courses[]
-  transfersAsSource          TransferRequest[]            @relation("TransferSourceOrg")
-  transfersAsTarget          TransferRequest[]            @relation("TransferTargetOrg")
-  vasRequests                VASRequest[]
   vehicleBlacklist           VehicleBlacklist[]
   vehicleWhitelist           VehicleWhitelist[]
   vendorChargebacks          VendorChargeback[]
@@ -342,7 +335,16 @@ model Organization {
   warehouses                 Warehouse[]
   weather_logs               weather_logs[]
   yardLocations              YardLocation[]
-  yardMoves                  YardMove[]
+  fleetVehicleTypes          FleetVehicleType[]
+  IoTSensorEvent             IoTSensorEvent[]
+  bayDoors                   BayDoor[]
+  loadSheets                 LoadSheet[]
+  vasRequests                VASRequest[]
+  chargebacks                SupplierChargeback[]
+
+  // Inter-Org Transfers
+  transfersAsSource TransferRequest[] @relation("TransferSourceOrg")
+  transfersAsTarget TransferRequest[] @relation("TransferTargetOrg")
 
   @@index([slug])
   @@index([createdById])
@@ -379,24 +381,26 @@ model Warehouse {
   updatedAt              DateTime                @updatedAt
   pickingRoutes          PickingRoute[]
   pickingTasks           PickingTask[]
-  waveAutomationRules    WaveAutomationRule[]
   waves                  WavePick[]
+  waveAutomationRules    WaveAutomationRule[]
   assemblyOrders         AssemblyOrder[]
-  bayDoors               BayDoor[]
   grns                   GoodsReceiptNote[]
   inventoryItems         InventoryItem[]
-  iotSensorEvents        IoTSensorEvent[]        @relation("WarehouseIoT")
-  loadSheets             LoadSheet[]
   packs                  Pack[]
   pickLists              PickList[]
   qcReceivingInspections QCReceivingInspection[]
-  replenishmentRules     ReplenishmentRule[]     @relation("ReplenRuleWarehouse")
-  replenishmentTasks     ReplenishmentTask[]     @relation("ReplenTaskWarehouse")
   rtvs                   RTV[]
   salesOrders            SalesOrder[]
-  transfersAsSource      TransferRequest[]       @relation("TransferSourceWh")
-  transfersAsTarget      TransferRequest[]       @relation("TransferTargetWh")
   organization           Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  replenishmentRules     ReplenishmentRule[]     @relation("ReplenRuleWarehouse")
+  replenishmentTasks     ReplenishmentTask[]     @relation("ReplenTaskWarehouse")
+  iotSensorEvents        IoTSensorEvent[]        @relation("WarehouseIoT")
+  bayDoors               BayDoor[]
+  loadSheets             LoadSheet[]
+
+  // Transfers
+  transfersAsSource TransferRequest[] @relation("TransferSourceWh")
+  transfersAsTarget TransferRequest[] @relation("TransferTargetWh")
 
   @@unique([organizationId, code])
   @@index([organizationId])
@@ -454,7 +458,6 @@ model InventoryItem {
   createdAt               DateTime                     @default(now())
   updatedAt               DateTime                     @updatedAt
   createdById             String
-  locationId              String?
   PickingTask             PickingTask[]
   WavePickLine            WavePickLine[]
   assemblyComponents      AssemblyComponentIssue[]     @relation("AssemblyComponent")
@@ -463,17 +466,17 @@ model InventoryItem {
   bomsAsProduct           BillOfMaterials[]            @relation("BOMProduct")
   bomComponents           BOMComponent[]               @relation("BOMComponent")
   bookingItems            BookingItem[]
-  containerItems          ContainerItem[]
   cycleCountItems         CycleCountItem[]
   demandForecasts         DemandForecast[]
   digitalTwinStates       DigitalTwinState[]
   grnItems                GRNItem[]
   category                Category?                    @relation(fields: [categoryId], references: [id])
   createdBy               User                         @relation("InventoryCreator", fields: [createdById], references: [id])
-  location                Location?                    @relation(fields: [locationId], references: [id])
   organization            Organization                 @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   supplier                Supplier?                    @relation(fields: [supplierId], references: [id])
   warehouse               Warehouse                    @relation(fields: [warehouseId], references: [id])
+  locationId              String?
+  location                Location?                    @relation(fields: [locationId], references: [id])
   movements               InventoryMovement[]
   lots                    Lot[]
   packageItems            PackageItem[]
@@ -483,10 +486,6 @@ model InventoryItem {
   qcInspections           QCInspection[]
   refurbWorkOrders        RefurbWorkOrder[]            @relation("RefurbWorkOrderProduct")
   reorderAlerts           ReorderAlert[]
-  replenishmentForecasts  ReplenishmentForecastCache[] @relation("ReplenForecastItem")
-  replenIoTTriggers       ReplenishmentIoTTrigger[]    @relation("ReplenIoTItem")
-  replenishmentRules      ReplenishmentRule[]          @relation("ReplenRuleItem")
-  replenishmentTasks      ReplenishmentTask[]          @relation("ReplenTaskItem")
   rmaExchangeItems        RMAItem[]                    @relation("RMAExchangeItem")
   rmaItems                RMAItem[]                    @relation("RMAInventoryItem")
   salesOrderItems         SalesOrderItem[]
@@ -495,6 +494,12 @@ model InventoryItem {
   stockAdjustments        StockAdjustment[]
   velocityClassification  VelocityClassification?
   warehouseTransfers      WarehouseTransfer[]
+  replenishmentRules      ReplenishmentRule[]          @relation("ReplenRuleItem")
+  replenishmentTasks      ReplenishmentTask[]          @relation("ReplenTaskItem")
+  replenishmentForecasts  ReplenishmentForecastCache[] @relation("ReplenForecastItem")
+  replenIoTTriggers       ReplenishmentIoTTrigger[]    @relation("ReplenIoTItem")
+
+  containerItems ContainerItem[]
 
   @@unique([organizationId, sku])
   @@index([organizationId])
@@ -503,8 +508,8 @@ model InventoryItem {
   @@index([supplierId])
   @@index([sku])
   @@map("inventory_items")
-  @@index([locationId])
 }
+
 model InventoryMovement {
   id              String        @id @default(cuid())
   inventoryItemId String
@@ -628,11 +633,9 @@ model Supplier {
   ncrs                       NonConformanceReport[]      @relation("NCRs")
   purchaseOrders             PurchaseOrder[]
   qcReceivingInspections     QCReceivingInspection[]     @relation("SupplierInspections")
-  replenishmentRules         ReplenishmentRule[]         @relation("ReplenRuleSupplier")
   rootCauseAnalyses          RootCauseAnalysis[]
   rtvRequests                RTVRequest[]                @relation("RTVRequest")
   rtvs                       RTV[]                       @relation("SupplierRTVs")
-  supplierChargebacks        SupplierChargeback[]
   supplierPerformanceReviews SupplierPerformanceReview[]
   supplierUsers              SupplierUser[]
   organization               Organization                @relation(fields: [organizationId], references: [id], onDelete: Cascade)
@@ -642,6 +645,8 @@ model Supplier {
   debitMemos                 VendorDebitMemo[]           @relation("VendorDebitMemos")
   qualityScore               VendorQualityScore?         @relation("VendorQualityScore")
   vendorPolicies             VendorReturnPolicy[]        @relation("VendorReturnPolicy")
+  replenishmentRules         ReplenishmentRule[]         @relation("ReplenRuleSupplier")
+  supplierChargebacks        SupplierChargeback[]
 
   @@unique([organizationId, code])
   @@index([organizationId])
@@ -660,35 +665,37 @@ model Customer {
   country               String?
   notes                 String?
   isActive              Boolean                @default(true)
+  // ── Credit & payment terms ──────────────────────────────────────────────
   creditLimit           Decimal?               @db.Decimal(12, 2)
   creditUsed            Decimal                @default(0) @db.Decimal(12, 2)
   creditHold            Boolean                @default(false)
-  paymentTermsDays      Int?
-  taxId                 String?
+  paymentTermsDays      Int? // default payment terms (days)
+  taxId                 String? // VAT/GST registration
   currency              String                 @default("USD")
+  // ───────────────────────────────────────────────────────────────────────
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
   qrReturns             QRReturn[]
   bookings              Booking[]
   crossBorderReturns    CrossBorderReturn[]
-  contracts             CustomerContract[]
   customerReturnProfile CustomerReturnProfile?
   organization          Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   fraudAnalyses         FraudAnalysis[]
   instantRefunds        InstantRefund[]
-  invoices              Invoice[]
-  loadSheets            LoadSheet[]
   qr_returns            qr_returns[]
   returnRiskPredictions ReturnRiskPrediction[]
   rmas                  RMA[]
   salesOrders           SalesOrder[]
   serialNumbers         SerialNumber[]
+  invoices              Invoice[]
+  contracts             CustomerContract[]
+  loadSheets            LoadSheet[]
 
   @@unique([organizationId, code])
   @@index([organizationId])
   @@map("customers")
-  @@index([taxId])
 }
+
 model PurchaseOrder {
   id                  String                  @id @default(cuid())
   organizationId      String
@@ -726,8 +733,8 @@ model PurchaseOrder {
   organization        Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   supplier            Supplier                @relation(fields: [supplierId], references: [id])
   qcInspections       QCReceivingInspection[]
-  replenishmentTasks  ReplenishmentTask[]
   rtvs                RTV[]
+  replenishmentTasks  ReplenishmentTask[]
   chargebacks         SupplierChargeback[]
 
   @@index([organizationId])
@@ -736,8 +743,8 @@ model PurchaseOrder {
   @@index([status])
   @@index([createdAt])
   @@map("purchase_orders")
-  @@index([approvedById])
 }
+
 model PurchaseOrderItem {
   id               String         @id @default(cuid())
   purchaseOrderId  String
@@ -803,8 +810,8 @@ model GoodsReceiptNote {
   @@index([status])
   @@index([receivedDate])
   @@map("goods_receipt_notes")
-  @@index([qcById])
 }
+
 model GRNItem {
   id                  String             @id @default(cuid())
   grnId               String
@@ -884,16 +891,15 @@ model SalesOrder {
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   createdById     String
-  refunds         Refund[]
   WavePickLine    WavePickLine[]
   assemblyOrders  AssemblyOrder[]
-  containerItems  ContainerItem[]
-  invoices        Invoice[]
   loadPlanItems   LoadPlanItem[]
   packs           Pack[]
   pickLists       PickList[]
   qcInspections   QCInspection[]
   rmas            RMA[]
+  refunds         Refund[]
+  invoices        Invoice[]
   items           SalesOrderItem[]
   approvedBy      User?            @relation("SOApprover", fields: [approvedById], references: [id])
   createdBy       User             @relation("SOCreator", fields: [createdById], references: [id])
@@ -905,6 +911,8 @@ model SalesOrder {
   serialNumbers   SerialNumber[]
   shipments       Shipment[]
 
+  containerItems ContainerItem[]
+
   @@unique([organizationId, soNumber])
   @@index([organizationId])
   @@index([customerId])
@@ -912,12 +920,12 @@ model SalesOrder {
   @@index([status])
   @@index([orderDate])
   @@map("sales_orders")
-  @@index([approvedById])
-  @@index([releasedById])
-  @@index([pickedById])
-  @@index([packedById])
-  @@index([closedById])
 }
+
+model SalesOrderItem {
+  id              String         @id @default(cuid())
+  salesOrderId    String
+  inventoryItemId String
   quantity        Int
   quantityPicked  Int            @default(0)
   quantityPacked  Int            @default(0)
@@ -974,8 +982,8 @@ model PickList {
   @@index([warehouseId])
   @@index([status])
   @@map("pick_lists")
-  @@index([assignedToId])
 }
+
 model PickListItem {
   id               String         @id @default(cuid())
   pickListId       String
@@ -1031,8 +1039,8 @@ model Pack {
   @@index([warehouseId])
   @@index([status])
   @@map("packs")
-  @@index([packedById])
 }
+
 model Package {
   id             String        @id @default(cuid())
   packId         String
@@ -1204,18 +1212,18 @@ model Location {
   componentIssues AssemblyComponentIssue[]
   cycleCountItems CycleCountItem[]
   cycleCounts     CycleCount[]
-  inventoryItems  InventoryItem[]
   organization    Organization             @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   parent          Location?                @relation("LocationHierarchy", fields: [parentId], references: [id])
   children        Location[]               @relation("LocationHierarchy")
   lots            Lot[]
-  replenFromTasks ReplenishmentTask[]      @relation("ReplenFromLocation")
-  replenToTasks   ReplenishmentTask[]      @relation("ReplenToLocation")
   rmaRestockItems RMAItem[]
   serialNumbers   SerialNumber[]
   adjustments     StockAdjustment[]
   transfersFrom   WarehouseTransfer[]      @relation("TransferFromLocation")
   transfersTo     WarehouseTransfer[]      @relation("TransferToLocation")
+  replenFromTasks ReplenishmentTask[]      @relation("ReplenFromLocation")
+  replenToTasks   ReplenishmentTask[]      @relation("ReplenToLocation")
+  inventoryItems  InventoryItem[]
 
   @@unique([organizationId, locationCode])
   @@index([organizationId])
@@ -1225,33 +1233,36 @@ model Location {
   @@index([parentId])
   @@index([warehouseId])
   @@map("locations")
-  @@index([zoneId])
-  @@index([aisleId])
-  @@index([rackId])
-  @@index([shelfId])
 }
-  transferNumber      String               @unique
-  status              TransferStatus       @default(PENDING)
-  fromLocationId      String
-  toLocationId        String
-  inventoryId         String
-  quantity            Int
-  reason              String?
-  notes               String?
-  priority            String?
-  requestedById       String
-  approvedById        String?
-  completedById       String?
-  requestedDate       DateTime             @default(now())
-  scheduledDate       DateTime?
-  approvedDate        DateTime?
-  startedDate         DateTime?
-  completedDate       DateTime?
-  metadata            Json?
-  type                String               @default("STANDARD")
-  billingStatus       String               @default("NONE")
-  parentTransferId    String?
-  destinationOrgId    String?
+
+model WarehouseTransfer {
+  id             String         @id @default(cuid())
+  organizationId String
+  transferNumber String         @unique
+  status         TransferStatus @default(PENDING)
+  fromLocationId String
+  toLocationId   String
+  inventoryId    String
+  quantity       Int
+  reason         String?
+  notes          String?
+  priority       String?
+  requestedById  String
+  approvedById   String?
+  completedById  String?
+  requestedDate  DateTime       @default(now())
+  scheduledDate  DateTime?
+  approvedDate   DateTime?
+  startedDate    DateTime?
+  completedDate  DateTime?
+  metadata       Json?
+
+  // Advanced Orchestration Fields
+  type             String  @default("STANDARD") // STANDARD, INTER_ORG, RECTIFICATION, CROSS_DOCK
+  billingStatus    String  @default("NONE") // NONE, PENDING, INVOICED, CREDITED
+  parentTransferId String? // For chaining (e.g. Hub -> Branch)
+  destinationOrgId String? // For inter-org moves
+
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
   autonomousDecisions AutonomousDecision[]
@@ -1314,9 +1325,9 @@ model StockAdjustment {
   @@index([locationId])
   @@index([reason])
   @@map("stock_adjustments")
-  @@index([approvedById])
-  @@index([completedById])
 }
+
+model ApiKey {
   id             String       @id @default(cuid())
   organizationId String
   name           String
@@ -1395,8 +1406,8 @@ model CycleCount {
   @@index([assignedToId])
   @@index([scheduledDate])
   @@map("cycle_counts")
-  @@index([approvedById])
 }
+
 model CycleCountItem {
   id              String           @id @default(cuid())
   cycleCountId    String
@@ -1433,10 +1444,10 @@ model CycleCountItem {
   @@index([isCounted])
   @@index([isReconciled])
   @@map("cycle_count_items")
-  @@index([countedById])
-  @@index([reconciledById])
-  @@index([adjustmentId])
 }
+
+model ReturnReason {
+  id             String        @id @default(cuid())
   organizationId String
   code           String
   name           String
@@ -1489,13 +1500,13 @@ model RMA {
   metadata              Json?
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
-  refunds               Refund[]
   crossBorderReturn     CrossBorderReturn?
   fraudAnalyses         FraudAnalysis[]
   instantRefund         InstantRefund?
   qr_returns            qr_returns?
   returnLabels          ReturnLabel[]
   items                 RMAItem[]
+  refunds               Refund[]
   approvedBy            User?                  @relation("RMAApprovedBy", fields: [approvedById], references: [id])
   customer              Customer               @relation(fields: [customerId], references: [id])
   inspectedBy           User?                  @relation("RMAInspectedBy", fields: [inspectedById], references: [id])
@@ -1512,9 +1523,9 @@ model RMA {
   @@index([customerId])
   @@index([returnReasonId])
   @@map("rmas")
-  @@index([approvedById])
-  @@index([inspectedById])
 }
+
+model RMAItem {
   id                  String            @id @default(cuid())
   rmaId               String
   inventoryId         String
@@ -1618,10 +1629,10 @@ model Lot {
   @@index([isRecalled])
   @@index([grnId])
   @@map("lots")
-  @@index([purchaseOrderId])
-  @@index([supplierId])
-  @@index([locationId])
 }
+
+model SerialNumber {
+  id                 String            @id @default(cuid())
   organizationId     String
   inventoryId        String
   lotId              String?
@@ -1686,11 +1697,11 @@ model LotMovement {
   @@index([movementType])
   @@index([createdAt])
   @@map("lot_movements")
-  @@index([referenceId])
-  @@index([fromLocationId])
-  @@index([toLocationId])
-  @@index([performedById])
 }
+
+model SerialMovement {
+  id             String       @id @default(cuid())
+  organizationId String
   serialNumberId String
   movementType   MovementType
   referenceType  String?
@@ -1820,8 +1831,8 @@ model QCInspection {
   @@index([lotId])
   @@index([inspectedDate])
   @@map("qc_inspections")
-  @@index([referenceId])
 }
+
 model QCCheckpoint {
   id                String            @id @default(cuid())
   inspectionId      String
@@ -1852,8 +1863,8 @@ model QCCheckpoint {
   @@index([status])
   @@index([result])
   @@map("qc_checkpoints")
-  @@index([performedById])
 }
+
 model QCApproval {
   id              String            @id @default(cuid())
   inspectionId    String
@@ -1917,8 +1928,8 @@ model BillOfMaterials {
   @@index([status])
   @@index([isActive])
   @@map("bills_of_materials")
-  @@index([approvedById])
 }
+
 model BOMComponent {
   id              String          @id @default(cuid())
   bomId           String
@@ -2003,12 +2014,12 @@ model AssemblyOrder {
   @@index([status])
   @@index([scheduledStart])
   @@map("assembly_orders")
-  @@index([warehouseId])
-  @@index([workstationId])
-  @@index([assignedToId])
-  @@index([referenceId])
-  @@index([salesOrderId])
 }
+
+model AssemblyComponentIssue {
+  id               String        @id @default(cuid())
+  assemblyOrderId  String
+  bomComponentId   String?
   componentId      String
   requiredQuantity Decimal       @db.Decimal(10, 4)
   issuedQuantity   Decimal       @db.Decimal(10, 4)
@@ -2147,8 +2158,8 @@ model ReportExecution {
   @@index([status])
   @@index([startedAt])
   @@map("report_executions")
-  @@index([executedById])
 }
+
 model Dashboard {
   id              String        @id @default(cuid())
   organizationId  String
@@ -2208,8 +2219,8 @@ model AnalyticsEvent {
   @@index([userId])
   @@index([timestamp])
   @@map("analytics_events")
-  @@index([sessionId])
 }
+
 model KPIMetric {
   id             String          @id @default(cuid())
   organizationId String
@@ -2330,10 +2341,10 @@ model Notification {
   @@index([organizationId, createdAt])
   @@index([recipientId, readAt])
   @@index([scheduledFor])
-  @@index([templateId])
-  @@index([relatedEntityId])
-  @@index([createdById])
 }
+
+model NotificationDelivery {
+  id               String              @id @default(cuid())
   notificationId   String
   channel          NotificationChannel
   status           DeliveryStatus      @default(PENDING)
@@ -2399,8 +2410,8 @@ model AlertRule {
   @@unique([organizationId, code])
   @@index([organizationId, isActive])
   @@index([organizationId, category])
-  @@index([templateId])
 }
+
 model Alert {
   id                String                  @id @default(cuid())
   organizationId    String
@@ -2437,8 +2448,8 @@ model Alert {
   @@index([ruleId, triggeredAt])
   @@index([acknowledgedById])
   @@index([resolvedById])
-  @@index([relatedEntityId])
 }
+
 model NotificationPreference {
   id                  String           @id @default(cuid())
   userId              String           @unique
@@ -2464,8 +2475,8 @@ model NotificationPreference {
   createdAt           DateTime         @default(now())
   updatedAt           DateTime         @updatedAt
   user                User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  @@index([userId])
 }
+
 model ExternalIntegration {
   id                   String                  @id @default(cuid())
   organizationId       String
@@ -2611,9 +2622,9 @@ model IntegrationSync {
   @@index([status])
   @@index([scheduledFor])
   @@index([createdAt])
-  @@index([entityId])
-  @@index([triggeredByUserId])
 }
+
+model IntegrationMapping {
   id              String              @id @default(cuid())
   organizationId  String
   integrationId   String
@@ -2678,8 +2689,8 @@ model IntegrationLog {
   @@index([action])
   @@index([createdAt])
   @@index([entityType, entityId])
-  @@index([userId])
 }
+
 model IntegrationWebhook {
   id                 String              @id @default(cuid())
   organizationId     String
@@ -2840,12 +2851,12 @@ model WavePickLine {
   @@index([inventoryItemId])
   @@index([status])
   @@index([assignedToId])
-  @@index([pickListId])
-  @@index([locationId])
-  @@index([lotId])
-  @@index([pickedById])
-  @@index([verifiedById])
 }
+
+model PickingTask {
+  id              String         @id @default(cuid())
+  organizationId  String
+  warehouseId     String
   taskNumber      String
   taskType        TaskType
   priority        TaskPriority   @default(NORMAL)
@@ -2937,9 +2948,9 @@ model PickingRoute {
   @@index([wavePickId])
   @@index([status])
   @@index([assignedToId])
-  @@index([startLocationId])
-  @@index([endLocationId])
 }
+
+model TaskAutomation {
   id                   String          @id @default(cuid())
   organizationId       String
   name                 String
@@ -3012,8 +3023,8 @@ model TaskExecution {
   @@index([organizationId, automationId])
   @@index([status])
   @@index([createdAt])
-  @@index([taskId])
 }
+
 model Employee {
   id                     String                  @id @default(cuid())
   organizationId         String
@@ -3058,9 +3069,9 @@ model Employee {
   @@index([status])
   @@index([warehouseId])
   @@map("employees")
-  @@index([defaultZoneId])
-  @@index([createdById])
 }
+
+model Shift {
   id             String            @id @default(cuid())
   organizationId String
   shiftCode      String
@@ -3163,9 +3174,9 @@ model TimeEntry {
   @@index([entryType])
   @@index([externalId, provider])
   @@map("time_entries")
-  @@index([warehouseId])
-  @@index([zoneId])
 }
+
+model TimeAttendanceMapping {
   id                 String       @id @default(cuid())
   organizationId     String
   employeeId         String
@@ -3218,8 +3229,8 @@ model ProductivityRecord {
   @@index([recordDate])
   @@index([performanceScore])
   @@map("productivity_records")
-  @@index([shiftId])
 }
+
 model SlottingRule {
   id               String                   @id @default(cuid())
   organizationId   String
@@ -3253,8 +3264,8 @@ model SlottingRule {
   @@index([priority])
   @@index([isActive])
   @@map("slotting_rules")
-  @@index([createdById])
 }
+
 model SlottingRecommendation {
   id                      String               @id @default(cuid())
   organizationId          String
@@ -3287,8 +3298,8 @@ model SlottingRecommendation {
   @@index([status])
   @@index([priorityScore])
   @@map("slotting_recommendations")
-  @@index([currentLocationId])
 }
+
 model LoadPlan {
   id               String               @id @default(cuid())
   organizationId   String
@@ -3328,8 +3339,8 @@ model LoadPlan {
   @@index([status])
   @@index([warehouseId])
   @@map("load_plans")
-  @@index([createdById])
 }
+
 model LoadPlanItem {
   id              String      @id @default(cuid())
   loadPlanId      String
@@ -3364,8 +3375,8 @@ model LoadPlanItem {
   @@index([shipmentId])
   @@index([palletNumber])
   @@map("load_plan_items")
-  @@index([packId])
 }
+
 model DeliveryRoute {
   id                 String              @id @default(cuid())
   organizationId     String
@@ -3404,9 +3415,9 @@ model DeliveryRoute {
   @@index([status])
   @@index([warehouseId])
   @@map("delivery_routes")
-  @@index([vehicleId])
-  @@index([createdById])
 }
+
+model DeliveryStop {
   id                   String             @id @default(cuid())
   routeId              String
   stopSequence         Int
@@ -3482,16 +3493,16 @@ model Client {
   rateCards      BillingRateCard[]
   transactions   BillingTransaction[]
   invoices       ClientInvoice[]
-  organization   Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   vasRequests    VASRequest[]
+  organization   Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@unique([organizationId, clientCode])
   @@index([organizationId])
   @@index([status])
   @@map("clients")
-  @@index([taxId])
-  @@index([createdById])
 }
+
+model BillingRateCard {
   id                 String       @id @default(cuid())
   organizationId     String
   clientId           String
@@ -3557,8 +3568,12 @@ model BillingTransaction {
   @@index([transactionDate])
   @@index([billingStatus])
   @@map("billing_transactions")
-  @@index([referenceId])
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// VALUE-ADDED SERVICES (VAS)
+// ─────────────────────────────────────────────────────────────────────────────
+
 model VASRequest {
   id                   String       @id @default(cuid())
   organizationId       String
@@ -3568,30 +3583,34 @@ model VASRequest {
   description          String?
   status               VASStatus    @default(PENDING)
   quantity             Int          @default(1)
-  targetType           String?
+  targetType           String? // "InventoryItem", "Order", "Shipment"
   targetId             String?
   assignedToId         String?
   startedAt            DateTime?
   completedAt          DateTime?
   durationMinutes      Int?
-  materialsUsed        Json?
+  materialsUsed        Json? // List of materials consumed
   evidencePhotos       String[]
   billable             Boolean      @default(true)
   billingTransactionId String?
   createdAt            DateTime     @default(now())
   updatedAt            DateTime     @updatedAt
-  assignedTo           User?        @relation(fields: [assignedToId], references: [id])
-  client               Client?      @relation(fields: [clientId], references: [id])
   organization         Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  client               Client?      @relation(fields: [clientId], references: [id])
+  assignedTo           User?        @relation(fields: [assignedToId], references: [id])
 
   @@index([organizationId])
   @@index([status])
   @@index([targetId])
   @@map("vas_requests")
-  @@index([clientId])
-  @@index([assignedToId])
-  @@index([billingTransactionId])
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SUPPLIER CHARGEBACKS
+// ─────────────────────────────────────────────────────────────────────────────
+
+model SupplierChargeback {
+  id              String           @id @default(cuid())
   organizationId  String
   supplierId      String
   referenceNumber String           @unique
@@ -3607,8 +3626,8 @@ model VASRequest {
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  purchaseOrder   PurchaseOrder?   @relation(fields: [poId], references: [id])
   supplier        Supplier         @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  purchaseOrder   PurchaseOrder?   @relation(fields: [poId], references: [id])
 
   @@index([organizationId])
   @@index([supplierId])
@@ -3640,11 +3659,11 @@ model Invoice {
   metadata           Json?
   createdAt          DateTime          @default(now()) @map("created_at")
   updatedAt          DateTime          @updatedAt @map("updated_at")
-  lineItems          InvoiceLineItem[]
-  payments           InvoicePayment[]
   customer           Customer          @relation(fields: [customerId], references: [id])
   organization       Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   salesOrder         SalesOrder?       @relation(fields: [salesOrderId], references: [id])
+  lineItems          InvoiceLineItem[]
+  payments           InvoicePayment[]
 
   @@unique([organizationId, invoiceNumber])
   @@index([organizationId])
@@ -3720,8 +3739,8 @@ model ClientInvoice {
   @@index([dueDate])
   @@index([status])
   @@map("client_invoices")
-  @@index([createdById])
 }
+
 model YardLocation {
   id             String            @id @default(cuid())
   organizationId String
@@ -3739,9 +3758,9 @@ model YardLocation {
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
   appointments   DockAppointment[]
-  organization   Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   movesFrom      YardMove[]        @relation("MovesFrom")
   movesTo        YardMove[]        @relation("MovesTo")
+  organization   Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@unique([organizationId, locationCode])
   @@index([organizationId])
@@ -3798,9 +3817,9 @@ model DockAppointment {
   @@index([status])
   @@index([carrierName])
   @@map("dock_appointments")
-  @@index([warehouseId])
-  @@index([referenceId])
 }
+
+model IoTDevice {
   id                    String                    @id @default(cuid())
   organizationId        String
   deviceId              String                    @unique
@@ -3862,10 +3881,10 @@ model IoTSensorReading {
   @@index([timestamp])
   @@index([readingType])
   @@map("iot_sensor_readings")
-  @@index([warehouseId])
-  @@index([locationId])
-  @@index([inventoryId])
 }
+
+model IoTAlert {
+  id             String        @id @default(cuid())
   organizationId String
   deviceId       String
   alertType      IoTAlertType
@@ -3932,8 +3951,8 @@ model SecurityPersonnel {
   @@index([status])
   @@index([clearanceLevel])
   @@map("security_personnel")
-  @@index([employeeId])
 }
+
 model SecurityShift {
   id                String            @id @default(cuid())
   organizationId    String
@@ -4032,10 +4051,10 @@ model GateEntry {
   @@index([licensePlate])
   @@index([status])
   @@map("gate_entries")
-  @@index([visitorId])
-  @@index([referenceId])
-  @@index([securityPersonnelId])
 }
+
+model Visitor {
+  id                  String                  @id @default(cuid())
   organizationId      String
   firstName           String
   lastName            String
@@ -4131,10 +4150,10 @@ model SecurityIncident {
   @@index([severity])
   @@index([status])
   @@map("security_incidents")
-  @@index([zoneId])
-  @@index([investigatorId])
-  @@index([relatedEntityId])
 }
+
+model SecurityAccessLog {
+  id             String             @id @default(cuid())
   organizationId String
   accessTime     DateTime           @default(now())
   accessType     AccessType
@@ -4204,9 +4223,9 @@ model CameraSystem {
   @@index([status])
   @@index([isRecording])
   @@map("camera_systems")
-  @@index([cameraId])
-  @@index([zoneId])
 }
+
+model AccessControlZone {
   id              String                 @id @default(cuid())
   organizationId  String
   zoneName        String
@@ -4300,8 +4319,8 @@ model GateWeighBridge {
   @@index([gateEntryId])
   @@index([direction])
   @@map("gate_weigh_bridges")
-  @@index([operatorId])
 }
+
 model GatePhoto {
   id             String        @id @default(cuid())
   organizationId String
@@ -4320,8 +4339,8 @@ model GatePhoto {
   @@index([gateEntryId])
   @@index([photoType])
   @@map("gate_photos")
-  @@index([cameraId])
 }
+
 model GateDocument {
   id                String           @id @default(cuid())
   organizationId    String
@@ -4372,9 +4391,9 @@ model GateQueue {
   @@index([status])
   @@index([position])
   @@map("gate_queue")
-  @@index([gateId])
-  @@index([gateEntryId])
 }
+
+model Gate {
   id             String       @id @default(cuid())
   organizationId String
   gateName       String
@@ -4424,8 +4443,8 @@ model ParkingSpot {
   @@index([status])
   @@index([zone])
   @@map("parking_spots")
-  @@index([gateEntryId])
 }
+
 model TemperatureLog {
   id             String       @id @default(cuid())
   organizationId String
@@ -4446,8 +4465,8 @@ model TemperatureLog {
   @@index([gateEntryId])
   @@index([recordedAt])
   @@map("temperature_logs")
-  @@index([sensorId])
 }
+
 model HazmatRecord {
   id                  String       @id @default(cuid())
   organizationId      String
@@ -4507,8 +4526,8 @@ model SecurityNotification {
   @@index([type])
   @@index([createdAt])
   @@map("security_notifications")
-  @@index([relatedEntityId])
 }
+
 model VisitorPreRegistration {
   id                  String                @id @default(cuid())
   organizationId      String
@@ -4551,9 +4570,9 @@ model VisitorPreRegistration {
   @@index([status])
   @@index([qrCode])
   @@map("visitor_pre_registrations")
-  @@index([hostEmployeeId])
-  @@index([visitorId])
 }
+
+model SecurityAlert {
   id                String              @id @default(cuid())
   organizationId    String
   alertType         SecurityAlertType
@@ -4910,8 +4929,8 @@ model QCReceivingInspection {
   @@index([result])
   @@index([createdAt])
   @@map("qc_receiving_inspections")
-  @@index([grnId])
 }
+
 model QCInspectionItem {
   id             String                @id @default(cuid())
   inspectionId   String                @map("inspection_id")
@@ -5023,9 +5042,9 @@ model RTV {
   @@index([status])
   @@index([createdAt])
   @@map("rtvs")
-  @@index([defectId])
-  @@index([replacementPoId])
 }
+
+model RTVActivity {
   id           String   @id @default(cuid())
   rtvId        String   @map("rtv_id")
   activityType String   @map("activity_type")
@@ -5113,8 +5132,8 @@ model QCInspectionTemplate {
   @@index([templateType])
   @@index([active])
   @@map("qc_inspection_templates")
-  @@index([targetId])
 }
+
 model QCInspectionActivity {
   id           String                @id @default(cuid())
   inspectionId String                @map("inspection_id")
@@ -5215,9 +5234,9 @@ model InstantRefund {
   @@index([customerId])
   @@index([verificationStatus])
   @@map("instant_refunds")
-  @@index([rmaId])
-  @@index([transactionId])
 }
+
+model QRReturn {
   id                     String       @id @default(cuid())
   organizationId         String       @map("organization_id")
   customerId             String       @map("customer_id")
@@ -5272,9 +5291,9 @@ model SerialTracking {
   @@index([serialNumber])
   @@index([validationStatus])
   @@map("serial_tracking")
-  @@index([rmaId])
-  @@index([originalOrderId])
 }
+
+model SustainabilityReport {
   id                        String       @id @default(cuid())
   organizationId            String       @map("organization_id")
   rmaId                     String?      @map("rma_id")
@@ -5342,10 +5361,10 @@ model CrossBorderReturn {
   @@index([originCountry])
   @@index([customsStatus])
   @@map("cross_border_returns")
-  @@index([rmaId])
-  @@index([customerId])
-  @@index([localWarehouseId])
 }
+
+model ReturnRiskPrediction {
+  id                      String       @id @default(cuid())
   orderId                 String       @map("order_id")
   organizationId          String       @map("organization_id")
   rmaId                   String?      @map("rma_id")
@@ -5456,10 +5475,10 @@ model AutonomousDecision {
   @@index([result])
   @@index([createdAt])
   @@map("autonomous_decisions")
-  @@index([purchaseOrderId])
-  @@index([transferId])
-  @@index([adjustmentId])
 }
+
+model DemandForecast {
+  id             String        @id @default(cuid())
   productId      String        @map("product_id")
   horizonDays    Int           @map("horizon_days")
   predictions    Json          @map("predictions")
@@ -5505,8 +5524,8 @@ model VelocityClassification {
   @@index([velocityClass])
   @@index([lastCalculated])
   @@map("velocity_classifications")
-  @@index([productId])
 }
+
 model DigitalTwinState {
   id             String        @id @default(cuid())
   productId      String        @map("product_id")
@@ -5559,8 +5578,8 @@ model AutonomousConfig {
   organization            Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@map("autonomous_configs")
-  @@index([organizationId])
 }
+
 model BlogPost {
   id          String        @id @default(cuid())
   slug        String        @unique
@@ -5703,10 +5722,10 @@ model VendorDebitMemo {
   @@index([status])
   @@index([paymentDue])
   @@map("vendor_debit_memos")
-  @@index([purchaseOrderId])
-  @@index([grnId])
-  @@index([rtvId])
 }
+
+model VendorConcession {
+  id                    String       @id @default(cuid())
   concessionNumber      String       @unique @map("concession_number")
   organizationId        String       @map("organization_id")
   vendorId              String       @map("vendor_id")
@@ -5818,9 +5837,9 @@ model NonConformanceReport {
   @@index([claimStatus])
   @@index([reportDate])
   @@map("non_conformance_reports")
-  @@index([sourceId])
-  @@index([customerComplaintId])
 }
+
+model CorrectivePreventiveAction {
   id                       String                @id @default(cuid())
   capaNumber               String                @unique @map("capa_number")
   organizationId           String                @map("organization_id")
@@ -6004,11 +6023,11 @@ model QualityHold {
   @@index([productSku])
   @@index([lotNumber])
   @@map("quality_holds")
-  @@index([locationId])
-  @@index([orderId])
-  @@index([sourceId])
-  @@index([ncrId])
 }
+
+model SamplingPlan {
+  id                  String       @id @default(cuid())
+  planNumber          String       @unique @map("plan_number")
   organizationId      String       @map("organization_id")
   planName            String       @map("plan_name")
   planDescription     String?      @map("plan_description")
@@ -6113,9 +6132,9 @@ model QualityMeasurement {
   @@index([measurementDate])
   @@index([conformanceStatus])
   @@map("quality_measurements")
-  @@index([ncrId])
-  @@index([equipmentId])
 }
+
+model QualityReport {
   id                   String       @id @default(cuid())
   reportNumber         String       @unique @map("report_number")
   organizationId       String       @map("organization_id")
@@ -6219,8 +6238,8 @@ model VendorComplianceCheck {
   @@index([checkType])
   @@index([checkDate])
   @@map("vendor_compliance_checks")
-  @@index([inspectorId])
 }
+
 model SupplierPerformanceReview {
   id                  String       @id @default(cuid())
   reviewNumber        String       @unique @map("review_number")
@@ -6374,9 +6393,9 @@ model Audit {
   @@index([type])
   @@index([status])
   @@map("audits")
-  @@index([auditorId])
-  @@index([auditeeId])
 }
+
+model AuditFinding {
   id                String          @id @default(cuid())
   auditId           String          @map("audit_id")
   findingNumber     String          @map("finding_number")
@@ -6597,9 +6616,9 @@ model daily_activity_reports {
   @@index([organizationId])
   @@index([reportDate])
   @@index([status])
-  @@index([warehouseId])
-  @@index([supervisorId])
 }
+
+model equipment {
   id                    String                  @id
   organizationId        String
   equipmentType         EquipmentType
@@ -6944,8 +6963,8 @@ model shift_handovers {
   @@index([incomingGuardId])
   @@index([organizationId])
   @@index([outgoingGuardId])
-  @@index([warehouseId])
 }
+
 model training_completions {
   id               String           @id
   courseId         String
@@ -6966,8 +6985,8 @@ model training_completions {
   @@index([expiryDate])
   @@index([guardId])
   @@index([organizationId])
-  @@index([instructorId])
 }
+
 model training_courses {
   id                   String                 @id
   organizationId       String
@@ -7119,13 +7138,13 @@ model Duty {
   @@index([scheduledStart])
   @@index([slaBreached])
   @@map("duties")
-  @@index([dutyTypeId])
-  @@index([zoneId])
-  @@index([warehouseId])
-  @@index([ncrId])
-  @@index([voiceSessionId])
-  @@index([previousEmployeeId])
 }
+
+model DutyEvidence {
+  id           String       @id @default(cuid())
+  dutyId       String
+  evidenceType EvidenceType
+  label        String?
   value        String?
   fileKey      String?
   capturedBy   String?
@@ -7137,1001 +7156,7 @@ model Duty {
   @@map("duty_evidence")
 }
 
-model WaveAutomationRule {
-  id                    String                    @id @default(cuid())
-  organizationId        String
-  warehouseId           String
-  name                  String
-  description           String?
-  isActive              Boolean                   @default(true)
-  triggerType           WaveRuleTrigger
-  /// For THRESHOLD trigger: minimum number of pending orders before wave fires
-  pendingOrderThreshold Int?
-  /// For THRESHOLD trigger: minimum total order lines before wave fires
-  pendingLineThreshold  Int?
-  /// For SCHEDULE trigger: cron expression e.g. "0 8 * * 1-5"
-  cronExpression        String?
-  /// Default wave settings applied when auto-creating
-  defaultWaveType       WaveType                  @default(BATCH)
-  defaultPriority       WavePriority              @default(NORMAL)
-  defaultStrategy       WaveStrategy              @default(FIFO)
-  defaultMaxOrders      Int?
-  defaultMaxLines       Int?
-  /// Only include orders whose ship date is within this many hours
-  shipWindowHours       Int?
-  /// Carrier filter (optional)
-  carrierFilter         String[]
-  /// Minimum time between automatic firings (minutes)
-  cooldownMinutes       Int                       @default(30)
-  lastFiredAt           DateTime?
-  nextScheduledAt       DateTime?
-  fireCount             Int                       @default(0)
-  successCount          Int                       @default(0)
-  failureCount          Int                       @default(0)
-  status                WaveRuleStatus            @default(IDLE)
-  lastError             String?
-  tags                  String[]
-  metadata              Json?
-  createdAt             DateTime                  @default(now())
-  updatedAt             DateTime                  @updatedAt
-  createdById           String
-  executions            WaveAutomationExecution[]
-  createdBy             User                      @relation("WaveRuleCreator", fields: [createdById], references: [id])
-  organization          Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  warehouse             Warehouse                 @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
-
-  @@index([organizationId, warehouseId])
-  @@index([isActive, triggerType])
-  @@index([nextScheduledAt])
-}
-
-model WaveAutomationExecution {
-  id             String             @id @default(cuid())
-  organizationId String
-  ruleId         String
-  triggeredBy    String             @default("SYSTEM")
-  triggerData    Json
-  status         ExecutionStatus    @default(PENDING)
-  wavePickId     String?
-  waveNumber     String?
-  ordersIncluded Int                @default(0)
-  linesIncluded  Int                @default(0)
-  startedAt      DateTime?
-  completedAt    DateTime?
-  durationMs     Int?
-  error          String?
-  createdAt      DateTime           @default(now())
-  organization   Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  rule           WaveAutomationRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
-
-  @@index([organizationId, ruleId])
-  @@index([status])
-  @@index([createdAt])
-  @@index([wavePickId])
-}
-model ReplenishmentRule {
-  id                   String              @id @default(cuid())
-  organizationId       String
-  warehouseId          String?
-  inventoryItemId      String?
-  name                 String
-  strategy             ReplenishStrategy   @default(MIN_MAX)
-  minQty               Int                 @default(0)
-  maxQty               Int                 @default(0)
-  reorderPoint         Int                 @default(0)
-  reorderQty           Int                 @default(0)
-  demandDays           Int                 @default(30)
-  leadTimeDays         Int                 @default(3)
-  reviewFrequencyDays  Int                 @default(7)
-  nextReviewDate       DateTime?
-  replenUnit           ReplenUnit          @default(EACH)
-  triggerSource        ReplenTriggerSource @default(RULE_SCAN)
-  forecastHorizonDays  Int                 @default(14)
-  iotDeviceId          String?
-  wavePreFillHours     Int                 @default(2)
-  microTaskSplitQty    Int                 @default(0)
-  costOptTarget        String              @default("LABOUR")
-  maxCostPerUnit       Decimal?            @db.Decimal(10, 4)
-  featureFlagOverrides Json?
-  supplierId           String?
-  autoCreatePO         Boolean             @default(false)
-  isActive             Boolean             @default(true)
-  lastTriggeredAt      DateTime?
-  createdById          String
-  createdAt            DateTime            @default(now())
-  updatedAt            DateTime            @updatedAt
-  inventoryItem        InventoryItem?      @relation("ReplenRuleItem", fields: [inventoryItemId], references: [id])
-  organization         Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  supplier             Supplier?           @relation("ReplenRuleSupplier", fields: [supplierId], references: [id])
-  warehouse            Warehouse?          @relation("ReplenRuleWarehouse", fields: [warehouseId], references: [id])
-  tasks                ReplenishmentTask[]
-
-  @@index([organizationId])
-  @@index([warehouseId])
-  @@index([inventoryItemId])
-  @@index([isActive])
-  @@index([strategy])
-  @@map("replenishment_rules")
-  @@index([iotDeviceId])
-  @@index([supplierId])
-}
-  id                 String                    @id @default(cuid())
-  organizationId     String
-  ruleId             String?
-  warehouseId        String
-  inventoryItemId    String
-  fromLocationId     String?
-  toLocationId       String?
-  purchaseOrderId    String?
-  requiredQty        Int
-  pickedQty          Int                       @default(0)
-  orderedQty         Int                       @default(0)
-  replenUnit         ReplenUnit                @default(EACH)
-  status             ReplenishTaskStatus       @default(PENDING)
-  priority           Priority                  @default(MEDIUM)
-  triggerSource      ReplenTriggerSource       @default(RULE_SCAN)
-  assignedToId       String?
-  startedAt          DateTime?
-  completedAt        DateTime?
-  notes              String?
-  parentTaskId       String?
-  estimatedCostUsd   Decimal?                  @db.Decimal(10, 4)
-  actualCostUsd      Decimal?                  @db.Decimal(10, 4)
-  labourMinutes      Int?
-  forecastConfidence Float?
-  createdAt          DateTime                  @default(now())
-  updatedAt          DateTime                  @updatedAt
-  costLog            ReplenishmentCostLog?
-  iotTriggers        ReplenishmentIoTTrigger[]
-  robotJob           ReplenishmentRobotJob?
-  assignedTo         User?                     @relation("ReplenAssignedTo", fields: [assignedToId], references: [id])
-  fromLocation       Location?                 @relation("ReplenFromLocation", fields: [fromLocationId], references: [id])
-  inventoryItem      InventoryItem             @relation("ReplenTaskItem", fields: [inventoryItemId], references: [id])
-  organization       Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  parentTask         ReplenishmentTask?        @relation("ReplenMicroTask", fields: [parentTaskId], references: [id])
-  childTasks         ReplenishmentTask[]       @relation("ReplenMicroTask")
-  purchaseOrder      PurchaseOrder?            @relation(fields: [purchaseOrderId], references: [id])
-  rule               ReplenishmentRule?        @relation(fields: [ruleId], references: [id])
-  toLocation         Location?                 @relation("ReplenToLocation", fields: [toLocationId], references: [id])
-  warehouse          Warehouse                 @relation("ReplenTaskWarehouse", fields: [warehouseId], references: [id])
-  waveBinds          ReplenishmentWaveBind[]
-
-  @@index([organizationId])
-  @@index([warehouseId])
-  @@index([status])
-  @@index([assignedToId])
-  @@index([purchaseOrderId])
-  @@index([parentTaskId])
-  @@index([triggerSource])
-  @@map("replenishment_tasks")
-}
-
-/// Per-organisation feature flags that gate advanced replenishment capabilities.
-model ReplenishmentFeatureFlag {
-  id                   String       @id @default(cuid())
-  organizationId       String       @unique
-  predictiveAI         Boolean      @default(false)
-  aiModelVersion       String?
-  forecastRefreshHours Int          @default(24)
-  iotTriggers          Boolean      @default(false)
-  robotics             Boolean      @default(false)
-  waveAware            Boolean      @default(false)
-  microTasks           Boolean      @default(false)
-  costOptimisation     Boolean      @default(false)
-  digitalTwin          Boolean      @default(false)
-  billingIntegration   Boolean      @default(false)
-  autoApprovalLimitUsd Decimal      @default(0) @db.Decimal(10, 2)
-  createdAt            DateTime     @default(now())
-  updatedAt            DateTime     @updatedAt
-  organization         Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-
-  @@map("replenishment_feature_flags")
-  @@index([organizationId])
-}
-/// AI/ML demand forecast cache per SKU, used by PREDICTIVE strategy.
-model ReplenishmentForecastCache {
-  id                String        @id @default(cuid())
-  organizationId    String
-  inventoryItemId   String
-  horizonDays       Int
-  dailyDemand       Float
-  safetyStockQty    Int
-  recommendedQty    Int
-  confidence        Float
-  modelType         String        @default("EWMA")
-  seasonalityFactor Float         @default(1.0)
-  trendFactor       Float         @default(0.0)
-  rawPredictions    Json
-  metadata          Json?
-  generatedAt       DateTime      @default(now())
-  expiresAt         DateTime
-  inventoryItem     InventoryItem @relation("ReplenForecastItem", fields: [inventoryItemId], references: [id])
-  organization      Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-
-  @@index([organizationId, inventoryItemId])
-  @@index([expiresAt])
-  @@map("replenishment_forecast_cache")
-}
-
-/// IoT sensor event that triggered (or was evaluated for) replenishment.
-model ReplenishmentIoTTrigger {
-  id              String             @id @default(cuid())
-  organizationId  String
-  deviceId        String
-  inventoryItemId String?
-  locationId      String?
-  warehouseId     String
-  eventType       String
-  sensorValue     Float?
-  threshold       Float?
-  rawPayload      Json
-  processed       Boolean            @default(false)
-  taskId          String?
-  processedAt     DateTime?
-  failureReason   String?
-  createdAt       DateTime           @default(now())
-  device          IoTDevice          @relation(fields: [deviceId], references: [id])
-  inventoryItem   InventoryItem?     @relation("ReplenIoTItem", fields: [inventoryItemId], references: [id])
-  organization    Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  task            ReplenishmentTask? @relation(fields: [taskId], references: [id])
-
-  @@index([organizationId])
-  @@index([deviceId])
-  @@index([processed])
-  @@index([createdAt])
-  @@map("replenishment_iot_triggers")
-  @@index([inventoryItemId])
-  @@index([locationId])
-  @@index([taskId])
-}
-  id             String            @id @default(cuid())
-  organizationId String
-  waveId         String
-  taskId         String
-  bindReason     String?
-  requiredByTime DateTime?
-  resolved       Boolean           @default(false)
-  resolvedAt     DateTime?
-  createdAt      DateTime          @default(now())
-  organization   Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  task           ReplenishmentTask @relation(fields: [taskId], references: [id])
-  wave           WavePick          @relation(fields: [waveId], references: [id])
-
-  @@unique([waveId, taskId])
-  @@index([organizationId])
-  @@index([waveId])
-  @@index([resolved])
-  @@map("replenishment_wave_binds")
-}
-
-/// Robot (AMR/AS-RS) job dispatched for a replenishment task.
-model ReplenishmentRobotJob {
-  id             String            @id @default(cuid())
-  organizationId String
-  taskId         String            @unique
-  robotId        String
-  jobReference   String?
-  status         RobotJobStatus    @default(QUEUED)
-  fromLocationId String?
-  toLocationId   String?
-  qty            Int
-  startedAt      DateTime?
-  completedAt    DateTime?
-  failureReason  String?
-  telemetry      Json?
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
-  organization   Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  task           ReplenishmentTask @relation(fields: [taskId], references: [id])
-
-  @@index([organizationId])
-  @@index([robotId])
-  @@index([status])
-  @@map("replenishment_robot_jobs")
-  @@index([taskId])
-  @@index([fromLocationId])
-  @@index([toLocationId])
-}
-  id                String            @id @default(cuid())
-  organizationId    String
-  taskId            String            @unique
-  labourCostUsd     Decimal           @default(0) @db.Decimal(10, 4)
-  equipmentCostUsd  Decimal           @default(0) @db.Decimal(10, 4)
-  congestionCostUsd Decimal           @default(0) @db.Decimal(10, 4)
-  robotCostUsd      Decimal           @default(0) @db.Decimal(10, 4)
-  storageCostUsd    Decimal           @default(0) @db.Decimal(10, 4)
-  totalCostUsd      Decimal           @default(0) @db.Decimal(10, 4)
-  costPerUnit       Decimal?          @db.Decimal(10, 4)
-  labourMinutes     Int               @default(0)
-  distanceMetres    Float             @default(0)
-  notes             String?
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
-  organization      Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  task              ReplenishmentTask @relation(fields: [taskId], references: [id])
-
-  @@index([organizationId])
-  @@index([createdAt])
-  @@map("replenishment_cost_logs")
-}
-
-/// Digital-twin simulation run scoped to a warehouse.
-model ReplenishmentSimRun {
-  id             String                     @id @default(cuid())
-  organizationId String
-  warehouseId    String?
-  name           String
-  description    String?
-  horizonDays    Int                        @default(30)
-  parameters     Json
-  status         String                     @default("PENDING")
-  startedAt      DateTime?
-  completedAt    DateTime?
-  resultSummary  Json?
-  createdById    String
-  createdAt      DateTime                   @default(now())
-  updatedAt      DateTime                   @updatedAt
-  organization   Organization               @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  scenarios      ReplenishmentSimScenario[]
-
-  @@index([organizationId])
-  @@index([status])
-  @@map("replenishment_sim_runs")
-  @@index([warehouseId])
-}
-/// A single what-if scenario within a simulation run.
-model ReplenishmentSimScenario {
-  id         String              @id @default(cuid())
-  simRunId   String
-  label      String
-  parameters Json
-  results    Json?
-  simRun     ReplenishmentSimRun @relation(fields: [simRunId], references: [id], onDelete: Cascade)
-
-  @@index([simRunId])
-  @@map("replenishment_sim_scenarios")
-}
-
-model AccessorialChargeCode {
-  id             String                  @id @default(cuid())
-  organizationId String
-  code           String
-  name           String
-  description    String?
-  chargeType     AccessorialType         @default(PER_ORDER)
-  unitLabel      String                  @default("order")
-  defaultRate    Decimal                 @db.Decimal(10, 4)
-  currency       String                  @default("USD")
-  minCharge      Decimal?                @db.Decimal(10, 2)
-  maxCharge      Decimal?                @db.Decimal(10, 2)
-  markup         Decimal                 @default(0) @db.Decimal(5, 2)
-  isActive       Boolean                 @default(true)
-  glCode         String?
-  createdAt      DateTime                @default(now())
-  updatedAt      DateTime                @updatedAt
-  organization   Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  lines          AccessorialChargeLine[]
-
-  @@unique([organizationId, code])
-  @@index([organizationId])
-  @@index([isActive])
-  @@map("accessorial_charge_codes")
-}
-
-model AccessorialChargeLine {
-  id             String                @id @default(cuid())
-  organizationId String
-  chargeCodeId   String
-  invoiceId      String?
-  salesOrderId   String?
-  customerId     String?
-  periodStart    DateTime?
-  periodEnd      DateTime?
-  quantity       Decimal               @db.Decimal(10, 3)
-  unitRate       Decimal               @db.Decimal(10, 4)
-  subtotal       Decimal               @db.Decimal(10, 2)
-  markup         Decimal               @default(0) @db.Decimal(10, 2)
-  total          Decimal               @db.Decimal(10, 2)
-  currency       String                @default("USD")
-  description    String?
-  status         ChargeLineStatus      @default(DRAFT)
-  invoicedAt     DateTime?
-  metadata       Json?
-  createdAt      DateTime              @default(now())
-  chargeCode     AccessorialChargeCode @relation(fields: [chargeCodeId], references: [id])
-  organization   Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-
-  @@index([organizationId])
-  @@index([salesOrderId])
-  @@index([customerId])
-  @@index([status])
-  @@index([invoiceId])
-  @@map("accessorial_charge_lines")
-}
-
-model CustomerContract {
-  id               String         @id @default(cuid())
-  organizationId   String
-  customerId       String
-  contractNumber   String
-  name             String
-  description      String?
-  status           ContractStatus @default(DRAFT)
-  startDate        DateTime
-  endDate          DateTime?
-  autoRenew        Boolean        @default(false)
-  currency         String         @default("USD")
-  paymentTermsDays Int            @default(30)
-  creditLimit      Decimal?       @db.Decimal(12, 2)
-  discountPct      Decimal        @default(0) @db.Decimal(5, 2)
-  pricingTier      String?
-  slaHours         Int?
-  notes            String?
-  signedDate       DateTime?
-  signedById       String?
-  renewedAt        DateTime?
-  terminatedAt     DateTime?
-  pricingRules     Json?
-  metadata         Json?
-  createdById      String
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
-  customer         Customer       @relation(fields: [customerId], references: [id])
-  organization     Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-
-  @@unique([organizationId, contractNumber])
-  @@index([organizationId])
-  @@index([customerId])
-  @@index([status])
-  @@index([endDate])
-  @@map("customer_contracts")
-  @@index([signedById])
-}
-model ExceptionRecord {
-  id               String            @id @default(cuid())
-  organizationId   String
-  type             ExceptionType
-  severity         ExceptionSeverity @default(MEDIUM)
-  status           ExceptionStatus   @default(OPEN)
-  title            String
-  description      String?
-  resourceType     String?
-  resourceId       String?
-  resourceRef      String?
-  detectedAt       DateTime          @default(now())
-  acknowledgedAt   DateTime?
-  acknowledgedById String?
-  resolvedAt       DateTime?
-  resolvedById     String?
-  resolution       String?
-  autoResolved     Boolean           @default(false)
-  slaBreachAt      DateTime?
-  slaBreached      Boolean           @default(false)
-  metadata         Json?
-  escalatedAt      DateTime?
-  escalatedToId    String?
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  organization     Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-
-  @@index([organizationId])
-  @@index([type])
-  @@index([status])
-  @@index([severity])
-  @@index([resourceType, resourceId])
-  @@index([detectedAt])
-  @@map("exception_records")
-  @@index([acknowledgedById])
-  @@index([resolvedById])
-  @@index([escalatedToId])
-}
-  organizationId String
-  name           String
-  code           String
-  lengthCm       Decimal      @db.Decimal(8, 2)
-  widthCm        Decimal      @db.Decimal(8, 2)
-  heightCm       Decimal      @db.Decimal(8, 2)
-  maxWeightKg    Decimal      @db.Decimal(8, 3)
-  tarWeightKg    Decimal      @default(0) @db.Decimal(8, 3)
-  costPerUnit    Decimal?     @db.Decimal(8, 4)
-  isActive       Boolean      @default(true)
-  isDefault      Boolean      @default(false)
-  metadata       Json?
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-
-  @@unique([organizationId, code])
-  @@index([organizationId])
-  @@index([isActive])
-  @@map("carton_types")
-}
-
-model OutboundASN {
-  id               String            @id @default(cuid())
-  organizationId   String
-  asnNumber        String
-  salesOrderId     String?
-  shipmentId       String?
-  customerId       String?
-  warehouseId      String?
-  status           ASNStatus         @default(DRAFT)
-  shipDate         DateTime?
-  estimatedArrival DateTime?
-  carrier          String?
-  trackingNumber   String?
-  totalSkus        Int               @default(0)
-  totalUnits       Int               @default(0)
-  totalCartons     Int               @default(0)
-  totalWeightKg    Decimal?          @db.Decimal(10, 3)
-  totalVolumeCbm   Decimal?          @db.Decimal(10, 4)
-  notes            String?
-  ediSent          Boolean           @default(false)
-  ediSentAt        DateTime?
-  metadata         Json?
-  createdById      String
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  items            OutboundASNItem[]
-  organization     Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-
-  @@unique([organizationId, asnNumber])
-  @@index([organizationId])
-  @@index([salesOrderId])
-  @@index([status])
-  @@index([shipDate])
-  @@map("outbound_asns")
-  @@index([shipmentId])
-  @@index([customerId])
-  @@index([warehouseId])
-}
-  asnId           String
-  inventoryItemId String?
-  sku             String
-  description     String?
-  quantity        Int
-  unitOfMeasure   String      @default("EA")
-  lotNumber       String?
-  serialNumbers   Json?
-  expiryDate      DateTime?
-  cartonCount     Int         @default(1)
-  weightKg        Decimal?    @db.Decimal(10, 3)
-  createdAt       DateTime    @default(now())
-  asn             OutboundASN @relation(fields: [asnId], references: [id], onDelete: Cascade)
-
-  @@index([asnId])
-  @@index([sku])
-  @@map("outbound_asn_items")
-}
-
-model IoTSensorEvent {
-  id             String       @id @default(cuid())
-  organizationId String
-  warehouseId    String
-  locationId     String?
-  deviceId       String
-  sensorType     String
-  payload        Json
-  triggeredTask  Boolean      @default(false)
-  createdAt      DateTime     @default(now())
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  warehouse      Warehouse    @relation("WarehouseIoT", fields: [warehouseId], references: [id])
-
-  @@index([organizationId])
-  @@index([warehouseId])
-  @@index([deviceId])
-  @@map("iot_sensor_events")
-  @@index([locationId])
-}
-model VoiceSession {
-  id             String             @id @default(cuid())
-  userId         String
-  organizationId String?
-  transcript     String
-  intent         String?
-  entities       Json?
-  response       String?
-  audioUrl       String?
-  language       String             @default("en")
-  status         VoiceSessionStatus @default(PENDING)
-  errorMessage   String?
-  durationMs     Int?
-  createdAt      DateTime           @default(now())
-  updatedAt      DateTime           @updatedAt
-  user           User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([organizationId])
-  @@index([createdAt])
-  @@map("voice_sessions")
-}
-
-model SecurityProfile {
-  id                  String    @id @default(cuid())
-  userId              String    @unique
-  failedLoginAttempts Int       @default(0)
-  lastFailedLogin     DateTime?
-  lockedUntil         DateTime?
-  mfaEnabled          Boolean   @default(false)
-  mfaSecret           String?
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
-  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("security_profiles")
-  @@index([userId])
-}
-model SecurityLog {
-  id        String   @id @default(cuid())
-  userId    String
-  event     String
-  metadata  Json?
-  timestamp DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([event])
-  @@index([timestamp])
-  @@map("security_logs")
-}
-
-model BayDoor {
-  id             String       @id @default(cuid())
-  organizationId String
-  warehouseId    String?
-  doorNumber     String
-  doorType       String?
-  status         String       @default("AVAILABLE")
-  isActive       Boolean      @default(true)
-  notes          String?
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  warehouse      Warehouse?   @relation(fields: [warehouseId], references: [id])
-  loadSheets     LoadSheet[]
-
-  @@unique([organizationId, doorNumber])
-  @@index([organizationId])
-  @@index([warehouseId])
-  @@map("bay_doors")
-}
-
-model LoadSheet {
-  id                     String                  @id @default(cuid())
-  organizationId         String
-  warehouseId            String?
-  loadSheetNumber        String
-  status                 String                  @default("BUILDING")
-  generationMethod       String                  @default("MANUAL")
-  autoGenerated          Boolean                 @default(false)
-  shipmentDate           DateTime
-  customerId             String?
-  destinationAddress     String?
-  destinationBranch      String?
-  routeCode              String?
-  carrierName            String?
-  carrierCode            String?
-  driverName             String?
-  driverPhone            String?
-  trailerNumber          String?
-  bayDoorId              String?
-  totalContainers        Int                     @default(0)
-  totalWeight            Float                   @default(0)
-  totalVolume            Float                   @default(0)
-  totalPallets           Int                     @default(0)
-  totalBoxes             Int                     @default(0)
-  totalItems             Int                     @default(0)
-  totalOrders            Int                     @default(0)
-  approved               Boolean                 @default(false)
-  approvedBy             String?
-  approvedAt             DateTime?
-  approvalNotes          String?
-  distributed            Boolean                 @default(false)
-  distributedAt          DateTime?
-  scheduledDeparture     DateTime?
-  startedLoadingAt       DateTime?
-  finishedLoadingAt      DateTime?
-  actualDeparture        DateTime?
-  delayReason            String?
-  detentionMinutes       Int?                    @default(0)
-  notes                  String?
-  metadata               Json?
-  createdAt              DateTime                @default(now())
-  updatedAt              DateTime                @updatedAt
-  vehicleTypeId          String?
-  containers             Container[]
-  loadSheetDistributions LoadSheetDistribution[]
-  events                 LoadSheetEvent[]
-  bayDoor                BayDoor?                @relation(fields: [bayDoorId], references: [id])
-  customer               Customer?               @relation(fields: [customerId], references: [id])
-  organization           Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  vehicleType            FleetVehicleType?       @relation(fields: [vehicleTypeId], references: [id])
-  warehouse              Warehouse?              @relation(fields: [warehouseId], references: [id])
-
-  @@unique([organizationId, loadSheetNumber])
-  @@index([organizationId])
-  @@index([warehouseId])
-  @@index([customerId])
-  @@index([shipmentDate])
-  @@index([status])
-  @@map("load_sheets")
-  @@index([bayDoorId])
-  @@index([vehicleTypeId])
-}
-  id             String       @id @default(cuid())
-  organizationId String
-  name           String
-  description    String?
-  length         Float
-  width          Float
-  height         Float
-  maxWeight      Float
-  maxVolume      Float
-  metadata       Json?
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  loadSheets     LoadSheet[]
-
-  @@unique([organizationId, name])
-  @@index([organizationId])
-  @@map("fleet_vehicle_types")
-}
-
-model LoadSheetDistribution {
-  id             String    @id @default(cuid())
-  loadSheetId    String
-  recipientEmail String
-  recipientName  String?
-  sentAt         DateTime  @default(now())
-  sentBy         String?
-  organizationId String
-  loadSheet      LoadSheet @relation(fields: [loadSheetId], references: [id], onDelete: Cascade)
-
-  @@index([loadSheetId])
-  @@index([organizationId])
-  @@map("load_sheet_distributions")
-}
-
-model LoadSheetEvent {
-  id             String    @id @default(cuid())
-  loadSheetId    String
-  eventType      String
-  userId         String?
-  userName       String?
-  automated      Boolean   @default(false)
-  notes          String?
-  eventData      Json?
-  organizationId String
-  createdAt      DateTime  @default(now())
-  loadSheet      LoadSheet @relation(fields: [loadSheetId], references: [id], onDelete: Cascade)
-
-  @@index([loadSheetId])
-  @@index([organizationId])
-  @@index([eventType])
-  @@map("load_sheet_events")
-  @@index([userId])
-}
-model Container {
-  id              String          @id @default(cuid())
-  organizationId  String
-  loadSheetId     String?
-  containerNumber String?
-  containerType   String          @default("PALLET")
-  status          String          @default("BUILDING")
-  weight          Float?
-  volume          Float?
-  shippedAt       DateTime?
-  notes           String?
-  metadata        Json?
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-  containerItems  ContainerItem[]
-  loadSheet       LoadSheet?      @relation(fields: [loadSheetId], references: [id])
-
-  @@index([loadSheetId])
-  @@index([organizationId])
-  @@index([status])
-  @@map("containers")
-}
-
-model ContainerItem {
-  id              String         @id @default(cuid())
-  containerId     String
-  salesOrderId    String?
-  inventoryItemId String?
-  sku             String
-  description     String?
-  quantity        Int
-  weight          Float?
-  volume          Float?
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  container       Container      @relation(fields: [containerId], references: [id], onDelete: Cascade)
-  inventoryItem   InventoryItem? @relation(fields: [inventoryItemId], references: [id])
-  salesOrder      SalesOrder?    @relation(fields: [salesOrderId], references: [id])
-
-  @@index([containerId])
-  @@index([salesOrderId])
-  @@index([inventoryItemId])
-  @@map("container_items")
-}
-
-model YardMove {
-  id             String           @id @default(cuid())
-  organizationId String
-  warehouseId    String
-  trailerNumber  String
-  fromLocationId String
-  toLocationId   String
-  appointmentId  String?
-  status         YardMoveStatus   @default(PENDING)
-  priority       Int              @default(1)
-  assignedToId   String?
-  completedBy    String?
-  completedAt    DateTime?
-  startedAt      DateTime?
-  notes          String?
-  metadata       Json?
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  appointment    DockAppointment? @relation(fields: [appointmentId], references: [id])
-  assignedTo     User?            @relation("YardMoveAssignee", fields: [assignedToId], references: [id])
-  fromLocation   YardLocation     @relation("MovesFrom", fields: [fromLocationId], references: [id])
-  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  toLocation     YardLocation     @relation("MovesTo", fields: [toLocationId], references: [id])
-
-  @@index([organizationId])
-  @@index([warehouseId])
-  @@index([status])
-  @@index([assignedToId])
-  @@map("yard_moves")
-  @@index([appointmentId])
-}
-model CognitivePolicy {
-  id             String            @id @default(cuid())
-  organizationId String
-  name           String
-  description    String?
-  goalType       CognitiveGoalType @default(BALANCE_ALL)
-  priority       Int               @default(1)
-  isActive       Boolean           @default(true)
-  constraints    Json?
-  learningRate   Float             @default(0.1)
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
-  organization   Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  decisionLogs   DecisionLog[]
-
-  @@index([organizationId])
-  @@index([isActive])
-  @@map("cognitive_policies")
-}
-
-model DecisionLog {
-  id              String           @id @default(cuid())
-  organizationId  String
-  policyId        String?
-  scenarioId      String?
-  timestamp       DateTime         @default(now())
-  triggerEvent    String
-  category        ActionCategory
-  description     String
-  aiReasoning     String
-  confidenceScore Float
-  status          DecisionStatus
-  actionTaken     Json?
-  outcomeMetric   Json?
-  userOverrideId  String?
-  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  policy          CognitivePolicy? @relation(fields: [policyId], references: [id])
-
-  @@index([organizationId])
-  @@index([timestamp])
-  @@index([category])
-  @@map("decision_logs")
-  @@index([policyId])
-  @@index([scenarioId])
-  @@index([userOverrideId])
-}
-  transferNumber       String                @unique
-  sourceOrganizationId String
-  targetOrganizationId String
-  sourceWarehouseId    String?
-  targetWarehouseId    String?
-  status               TransferRequestStatus @default(DRAFT)
-  type                 TransferType          @default(INTERNAL)
-  requestedById        String
-  approvedById         String?
-  shippedById          String?
-  receivedById         String?
-  requestedAt          DateTime              @default(now())
-  approvedAt           DateTime?
-  shippedAt            DateTime?
-  receivedAt           DateTime?
-  shippingMethod       String?
-  trackingNumber       String?
-  invoiceId            String?
-  clearingStatus       ClearingStatus        @default(PENDING)
-  items                TransferRequestItem[]
-  requestedBy          User                  @relation("TransferRequestor", fields: [requestedById], references: [id])
-  sourceOrganization   Organization          @relation("TransferSourceOrg", fields: [sourceOrganizationId], references: [id])
-  sourceWarehouse      Warehouse?            @relation("TransferSourceWh", fields: [sourceWarehouseId], references: [id])
-  targetOrganization   Organization          @relation("TransferTargetOrg", fields: [targetOrganizationId], references: [id])
-  targetWarehouse      Warehouse?            @relation("TransferTargetWh", fields: [targetWarehouseId], references: [id])
-
-  @@index([sourceOrganizationId])
-  @@index([targetOrganizationId])
-  @@index([status])
-  @@map("transfer_requests")
-}
-
-model TransferRequestItem {
-  id                String             @id @default(cuid())
-  transferRequestId String
-  sku               String
-  productName       String
-  quantityRequested Int
-  quantityShipped   Int                @default(0)
-  quantityReceived  Int                @default(0)
-  unitCost          Decimal?           @db.Decimal(10, 2)
-  status            TransferItemStatus @default(PENDING)
-  transferRequest   TransferRequest    @relation(fields: [transferRequestId], references: [id], onDelete: Cascade)
-
-  @@index([transferRequestId])
-  @@index([sku])
-  @@map("transfer_request_items")
-}
-
-model Printer {
-  id             String       @id @default(cuid())
-  organizationId String
-  name           String
-  type           String       @default("LASER")
-  ipAddress      String?
-  port           Int?         @default(9100)
-  location       String?
-  description    String?
-  isActive       Boolean      @default(true)
-  metadata       Json?
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  users          User[]
-
-  @@index([organizationId])
-  @@map("printers")
-}
-
-model Refund {
-  id             String       @id @default(cuid())
-  organizationId String
-  salesOrderId   String?
-  rmaId          String?
-  amount         Decimal      @db.Decimal(10, 2)
-  reason         RefundReason
-  reasonDetails  String?
-  status         RefundStatus @default(PENDING)
-  processedAt    DateTime?
-  processedById  String?
-  transactionId  String?
-  currency       String       @default("USD")
-  method         String?
-  metadata       Json?
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  processedBy    User?        @relation("RefundProcessor", fields: [processedById], references: [id])
-  rma            RMA?         @relation(fields: [rmaId], references: [id])
-  salesOrder     SalesOrder?  @relation(fields: [salesOrderId], references: [id])
-
-  @@index([organizationId])
-  @@index([salesOrderId])
-  @@index([rmaId])
-  @@index([status])
-  @@index([processedById])
-  @@index([transactionId])
-}
+enum UserRole {
   SUPER_ADMIN
   ADMIN
   MANAGER
@@ -8242,25 +7267,25 @@ enum SalesOrderStatus {
   DRAFT
   PENDING_APPROVAL
   APPROVED
-  RELEASED
+  RELEASED // Released to warehouse / wave for fulfilment
   PICKING
   PICKED
   PACKING
   PACKED
   SHIPPED
   DELIVERED
-  INVOICED
-  CLOSED
+  INVOICED // Invoice generated and sent to customer
+  CLOSED // Payment confirmed, order fully closed
   CANCELLED
   ON_HOLD
   BACKORDERED
 }
 
 enum InvoiceTrigger {
-  ON_ORDER_CONFIRMATION
-  ON_SHIPMENT
-  ON_DELIVERY_CONFIRMATION
-  MANUAL
+  ON_ORDER_CONFIRMATION // Invoice immediately on approval
+  ON_SHIPMENT // Invoice when order ships
+  ON_DELIVERY_CONFIRMATION // Invoice when customer confirms receipt
+  MANUAL // Staff must manually trigger invoice
 }
 
 enum PaymentStatus {
@@ -9971,6 +8996,80 @@ enum EvidenceType {
   CHECKLIST
 }
 
+// ─── Autonomous Wave Generation ──────────────────────────────────────────────
+
+model WaveAutomationRule {
+  id                    String                    @id @default(cuid())
+  organizationId        String
+  warehouseId           String
+  name                  String
+  description           String?
+  isActive              Boolean                   @default(true)
+  triggerType           WaveRuleTrigger
+  /// For THRESHOLD trigger: minimum number of pending orders before wave fires
+  pendingOrderThreshold Int?
+  /// For THRESHOLD trigger: minimum total order lines before wave fires
+  pendingLineThreshold  Int?
+  /// For SCHEDULE trigger: cron expression e.g. "0 8 * * 1-5"
+  cronExpression        String?
+  /// Default wave settings applied when auto-creating
+  defaultWaveType       WaveType                  @default(BATCH)
+  defaultPriority       WavePriority              @default(NORMAL)
+  defaultStrategy       WaveStrategy              @default(FIFO)
+  defaultMaxOrders      Int?
+  defaultMaxLines       Int?
+  /// Only include orders whose ship date is within this many hours
+  shipWindowHours       Int?
+  /// Carrier filter (optional)
+  carrierFilter         String[]
+  /// Minimum time between automatic firings (minutes)
+  cooldownMinutes       Int                       @default(30)
+  lastFiredAt           DateTime?
+  nextScheduledAt       DateTime?
+  fireCount             Int                       @default(0)
+  successCount          Int                       @default(0)
+  failureCount          Int                       @default(0)
+  status                WaveRuleStatus            @default(IDLE)
+  lastError             String?
+  tags                  String[]
+  metadata              Json?
+  createdAt             DateTime                  @default(now())
+  updatedAt             DateTime                  @updatedAt
+  createdById           String
+  createdBy             User                      @relation("WaveRuleCreator", fields: [createdById], references: [id])
+  organization          Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  warehouse             Warehouse                 @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  executions            WaveAutomationExecution[]
+
+  @@index([organizationId, warehouseId])
+  @@index([isActive, triggerType])
+  @@index([nextScheduledAt])
+}
+
+model WaveAutomationExecution {
+  id             String             @id @default(cuid())
+  organizationId String
+  ruleId         String
+  triggeredBy    String             @default("SYSTEM")
+  triggerData    Json
+  status         ExecutionStatus    @default(PENDING)
+  wavePickId     String?
+  waveNumber     String?
+  ordersIncluded Int                @default(0)
+  linesIncluded  Int                @default(0)
+  startedAt      DateTime?
+  completedAt    DateTime?
+  durationMs     Int?
+  error          String?
+  createdAt      DateTime           @default(now())
+  rule           WaveAutomationRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  organization   Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, ruleId])
+  @@index([status])
+  @@index([createdAt])
+}
+
 enum WaveRuleTrigger {
   THRESHOLD
   SCHEDULE
@@ -9985,16 +9084,127 @@ enum WaveRuleStatus {
   PAUSED
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// REPLENISHMENT ENGINE
+// ─────────────────────────────────────────────────────────────────────────────
+
+model ReplenishmentRule {
+  id                   String              @id @default(cuid())
+  organizationId       String
+  warehouseId          String?
+  inventoryItemId      String? // null = apply to all items matching filter
+  name                 String
+  strategy             ReplenishStrategy   @default(MIN_MAX)
+  // ── Classic strategy params ───────────────────────────────────────────────
+  minQty               Int                 @default(0)
+  maxQty               Int                 @default(0)
+  reorderPoint         Int                 @default(0)
+  reorderQty           Int                 @default(0)
+  demandDays           Int                 @default(30)
+  leadTimeDays         Int                 @default(3)
+  reviewFrequencyDays  Int                 @default(7)
+  nextReviewDate       DateTime?
+  // ── Next-gen params ───────────────────────────────────────────────────────
+  replenUnit           ReplenUnit          @default(EACH)
+  triggerSource        ReplenTriggerSource @default(RULE_SCAN)
+  forecastHorizonDays  Int                 @default(14) // PREDICTIVE
+  iotDeviceId          String? // IOT_TRIGGERED – watching device
+  wavePreFillHours     Int                 @default(2) // WAVE_AWARE
+  microTaskSplitQty    Int                 @default(0) // CONTINUOUS_MICRO; 0 = no split
+  costOptTarget        String              @default("LABOUR") // LABOUR|ROBOT|COMBINED
+  maxCostPerUnit       Decimal?            @db.Decimal(10, 4)
+  featureFlagOverrides Json?
+  // ── Supplier / PO ─────────────────────────────────────────────────────────
+  supplierId           String?
+  autoCreatePO         Boolean             @default(false)
+  isActive             Boolean             @default(true)
+  lastTriggeredAt      DateTime?
+  createdById          String
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+  tasks                ReplenishmentTask[]
+  organization         Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  warehouse            Warehouse?          @relation("ReplenRuleWarehouse", fields: [warehouseId], references: [id])
+  inventoryItem        InventoryItem?      @relation("ReplenRuleItem", fields: [inventoryItemId], references: [id])
+  supplier             Supplier?           @relation("ReplenRuleSupplier", fields: [supplierId], references: [id])
+
+  @@index([organizationId])
+  @@index([warehouseId])
+  @@index([inventoryItemId])
+  @@index([isActive])
+  @@index([strategy])
+  @@map("replenishment_rules")
+}
+
+model ReplenishmentTask {
+  id                 String                    @id @default(cuid())
+  organizationId     String
+  ruleId             String?
+  warehouseId        String
+  inventoryItemId    String
+  fromLocationId     String?
+  toLocationId       String?
+  purchaseOrderId    String?
+  // ── Quantities ────────────────────────────────────────────────────────────
+  requiredQty        Int
+  pickedQty          Int                       @default(0)
+  orderedQty         Int                       @default(0)
+  replenUnit         ReplenUnit                @default(EACH)
+  // ── Status & metadata ─────────────────────────────────────────────────────
+  status             ReplenishTaskStatus       @default(PENDING)
+  priority           Priority                  @default(MEDIUM)
+  triggerSource      ReplenTriggerSource       @default(RULE_SCAN)
+  // ── Assignment ────────────────────────────────────────────────────────────
+  assignedToId       String?
+  startedAt          DateTime?
+  completedAt        DateTime?
+  notes              String?
+  // ── Micro-task hierarchy ──────────────────────────────────────────────────
+  parentTaskId       String? // null = root task
+  // ── Cost tracking ─────────────────────────────────────────────────────────
+  estimatedCostUsd   Decimal?                  @db.Decimal(10, 4)
+  actualCostUsd      Decimal?                  @db.Decimal(10, 4)
+  labourMinutes      Int?
+  // ── AI quality signal ─────────────────────────────────────────────────────
+  forecastConfidence Float?
+  createdAt          DateTime                  @default(now())
+  updatedAt          DateTime                  @updatedAt
+  // ── Relations ─────────────────────────────────────────────────────────────
+  rule               ReplenishmentRule?        @relation(fields: [ruleId], references: [id])
+  organization       Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  inventoryItem      InventoryItem             @relation("ReplenTaskItem", fields: [inventoryItemId], references: [id])
+  warehouse          Warehouse                 @relation("ReplenTaskWarehouse", fields: [warehouseId], references: [id])
+  fromLocation       Location?                 @relation("ReplenFromLocation", fields: [fromLocationId], references: [id])
+  toLocation         Location?                 @relation("ReplenToLocation", fields: [toLocationId], references: [id])
+  assignedTo         User?                     @relation("ReplenAssignedTo", fields: [assignedToId], references: [id])
+  purchaseOrder      PurchaseOrder?            @relation(fields: [purchaseOrderId], references: [id])
+  parentTask         ReplenishmentTask?        @relation("ReplenMicroTask", fields: [parentTaskId], references: [id])
+  childTasks         ReplenishmentTask[]       @relation("ReplenMicroTask")
+  iotTriggers        ReplenishmentIoTTrigger[]
+  waveBinds          ReplenishmentWaveBind[]
+  robotJob           ReplenishmentRobotJob?
+  costLog            ReplenishmentCostLog?
+
+  @@index([organizationId])
+  @@index([warehouseId])
+  @@index([status])
+  @@index([assignedToId])
+  @@index([purchaseOrderId])
+  @@index([parentTaskId])
+  @@index([triggerSource])
+  @@map("replenishment_tasks")
+}
+
 enum ReplenishStrategy {
   MIN_MAX
   REORDER_POINT
   DEMAND_BASED
   PERIODIC_REVIEW
-  PREDICTIVE
-  WAVE_AWARE
-  IOT_TRIGGERED
-  COST_OPTIMISED
-  CONTINUOUS_MICRO
+  PREDICTIVE // AI/ML demand-based forecast
+  WAVE_AWARE // pre-fill before an upcoming wave releases
+  IOT_TRIGGERED // sensor/RFID/vision event fires the task
+  COST_OPTIMISED // cheapest time/method to replenish
+  CONTINUOUS_MICRO // split into small opportunistic micro-tasks
 }
 
 enum ReplenishTaskStatus {
@@ -10033,6 +9243,257 @@ enum RobotJobStatus {
   ABORTED
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// REPLENISHMENT – NEXT-GEN ADVANCED MODELS
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Per-organisation feature flags that gate advanced replenishment capabilities.
+model ReplenishmentFeatureFlag {
+  id                   String       @id @default(cuid())
+  organizationId       String       @unique
+  predictiveAI         Boolean      @default(false)
+  aiModelVersion       String? // EWMA | ARIMA | PROPHET | NEURAL
+  forecastRefreshHours Int          @default(24)
+  iotTriggers          Boolean      @default(false)
+  robotics             Boolean      @default(false)
+  waveAware            Boolean      @default(false)
+  microTasks           Boolean      @default(false)
+  costOptimisation     Boolean      @default(false)
+  digitalTwin          Boolean      @default(false)
+  billingIntegration   Boolean      @default(false)
+  autoApprovalLimitUsd Decimal      @default(0) @db.Decimal(10, 2)
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+  organization         Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@map("replenishment_feature_flags")
+}
+
+/// AI/ML demand forecast cache per SKU, used by PREDICTIVE strategy.
+model ReplenishmentForecastCache {
+  id                String        @id @default(cuid())
+  organizationId    String
+  inventoryItemId   String
+  horizonDays       Int
+  dailyDemand       Float
+  safetyStockQty    Int
+  recommendedQty    Int
+  confidence        Float
+  modelType         String        @default("EWMA")
+  seasonalityFactor Float         @default(1.0)
+  trendFactor       Float         @default(0.0)
+  rawPredictions    Json // [{ date, qty, lower, upper }]
+  metadata          Json?
+  generatedAt       DateTime      @default(now())
+  expiresAt         DateTime
+  organization      Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  inventoryItem     InventoryItem @relation("ReplenForecastItem", fields: [inventoryItemId], references: [id])
+
+  @@index([organizationId, inventoryItemId])
+  @@index([expiresAt])
+  @@map("replenishment_forecast_cache")
+}
+
+/// IoT sensor event that triggered (or was evaluated for) replenishment.
+model ReplenishmentIoTTrigger {
+  id              String             @id @default(cuid())
+  organizationId  String
+  deviceId        String
+  inventoryItemId String?
+  locationId      String?
+  warehouseId     String
+  eventType       String // WEIGHT_LOW | PICK_FACE_EMPTY | RFID_DEPLETION | VISION_DETECT
+  sensorValue     Float?
+  threshold       Float?
+  rawPayload      Json
+  processed       Boolean            @default(false)
+  taskId          String?
+  processedAt     DateTime?
+  failureReason   String?
+  createdAt       DateTime           @default(now())
+  organization    Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  device          IoTDevice          @relation(fields: [deviceId], references: [id])
+  inventoryItem   InventoryItem?     @relation("ReplenIoTItem", fields: [inventoryItemId], references: [id])
+  task            ReplenishmentTask? @relation(fields: [taskId], references: [id])
+
+  @@index([organizationId])
+  @@index([deviceId])
+  @@index([processed])
+  @@index([createdAt])
+  @@map("replenishment_iot_triggers")
+}
+
+/// Binds a replenishment task to an upcoming wave pick for pre-fill scheduling.
+model ReplenishmentWaveBind {
+  id             String            @id @default(cuid())
+  organizationId String
+  waveId         String
+  taskId         String
+  bindReason     String? // pre-fill | shortage-prevention
+  requiredByTime DateTime?
+  resolved       Boolean           @default(false)
+  resolvedAt     DateTime?
+  createdAt      DateTime          @default(now())
+  organization   Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  wave           WavePick          @relation(fields: [waveId], references: [id])
+  task           ReplenishmentTask @relation(fields: [taskId], references: [id])
+
+  @@unique([waveId, taskId])
+  @@index([organizationId])
+  @@index([waveId])
+  @@index([resolved])
+  @@map("replenishment_wave_binds")
+}
+
+/// Robot (AMR/AS-RS) job dispatched for a replenishment task.
+model ReplenishmentRobotJob {
+  id             String            @id @default(cuid())
+  organizationId String
+  taskId         String            @unique
+  robotId        String
+  jobReference   String?
+  status         RobotJobStatus    @default(QUEUED)
+  fromLocationId String?
+  toLocationId   String?
+  qty            Int
+  startedAt      DateTime?
+  completedAt    DateTime?
+  failureReason  String?
+  telemetry      Json? // { position, batteryPct, speedMps }
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  task           ReplenishmentTask @relation(fields: [taskId], references: [id])
+  organization   Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([robotId])
+  @@index([status])
+  @@map("replenishment_robot_jobs")
+}
+
+/// Detailed cost breakdown logged after a replenishment task completes.
+model ReplenishmentCostLog {
+  id                String            @id @default(cuid())
+  organizationId    String
+  taskId            String            @unique
+  labourCostUsd     Decimal           @default(0) @db.Decimal(10, 4)
+  equipmentCostUsd  Decimal           @default(0) @db.Decimal(10, 4)
+  congestionCostUsd Decimal           @default(0) @db.Decimal(10, 4)
+  robotCostUsd      Decimal           @default(0) @db.Decimal(10, 4)
+  storageCostUsd    Decimal           @default(0) @db.Decimal(10, 4)
+  totalCostUsd      Decimal           @default(0) @db.Decimal(10, 4)
+  costPerUnit       Decimal?          @db.Decimal(10, 4)
+  labourMinutes     Int               @default(0)
+  distanceMetres    Float             @default(0)
+  notes             String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  task              ReplenishmentTask @relation(fields: [taskId], references: [id])
+  organization      Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([createdAt])
+  @@map("replenishment_cost_logs")
+}
+
+/// Digital-twin simulation run scoped to a warehouse.
+model ReplenishmentSimRun {
+  id             String                     @id @default(cuid())
+  organizationId String
+  warehouseId    String?
+  name           String
+  description    String?
+  horizonDays    Int                        @default(30)
+  parameters     Json
+  status         String                     @default("PENDING")
+  startedAt      DateTime?
+  completedAt    DateTime?
+  resultSummary  Json?
+  createdById    String
+  createdAt      DateTime                   @default(now())
+  updatedAt      DateTime                   @updatedAt
+  scenarios      ReplenishmentSimScenario[]
+  organization   Organization               @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([status])
+  @@map("replenishment_sim_runs")
+}
+
+/// A single what-if scenario within a simulation run.
+model ReplenishmentSimScenario {
+  id         String              @id @default(cuid())
+  simRunId   String
+  label      String
+  parameters Json
+  results    Json?
+  simRun     ReplenishmentSimRun @relation(fields: [simRunId], references: [id], onDelete: Cascade)
+
+  @@index([simRunId])
+  @@map("replenishment_sim_scenarios")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ACCESSORIAL / 3PL BILLING ENGINE
+// ─────────────────────────────────────────────────────────────────────────────
+
+model AccessorialChargeCode {
+  id             String                  @id @default(cuid())
+  organizationId String
+  code           String
+  name           String
+  description    String?
+  chargeType     AccessorialType         @default(PER_ORDER)
+  unitLabel      String                  @default("order") // "pallet", "kg", "hour"
+  defaultRate    Decimal                 @db.Decimal(10, 4)
+  currency       String                  @default("USD")
+  minCharge      Decimal?                @db.Decimal(10, 2)
+  maxCharge      Decimal?                @db.Decimal(10, 2)
+  markup         Decimal                 @default(0) @db.Decimal(5, 2) // %
+  isActive       Boolean                 @default(true)
+  glCode         String?
+  createdAt      DateTime                @default(now())
+  updatedAt      DateTime                @updatedAt
+  lines          AccessorialChargeLine[]
+  organization   Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, code])
+  @@index([organizationId])
+  @@index([isActive])
+  @@map("accessorial_charge_codes")
+}
+
+model AccessorialChargeLine {
+  id             String                @id @default(cuid())
+  organizationId String
+  chargeCodeId   String
+  invoiceId      String?
+  salesOrderId   String?
+  customerId     String?
+  periodStart    DateTime?
+  periodEnd      DateTime?
+  quantity       Decimal               @db.Decimal(10, 3)
+  unitRate       Decimal               @db.Decimal(10, 4)
+  subtotal       Decimal               @db.Decimal(10, 2)
+  markup         Decimal               @default(0) @db.Decimal(10, 2)
+  total          Decimal               @db.Decimal(10, 2)
+  currency       String                @default("USD")
+  description    String?
+  status         ChargeLineStatus      @default(DRAFT)
+  invoicedAt     DateTime?
+  metadata       Json?
+  createdAt      DateTime              @default(now())
+  chargeCode     AccessorialChargeCode @relation(fields: [chargeCodeId], references: [id])
+  organization   Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([salesOrderId])
+  @@index([customerId])
+  @@index([status])
+  @@index([invoiceId])
+  @@map("accessorial_charge_lines")
+}
+
 enum AccessorialType {
   PER_ORDER
   PER_LINE
@@ -10054,6 +9515,48 @@ enum ChargeLineStatus {
   VOID
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// CUSTOMER CONTRACTS
+// ─────────────────────────────────────────────────────────────────────────────
+
+model CustomerContract {
+  id               String         @id @default(cuid())
+  organizationId   String
+  customerId       String
+  contractNumber   String
+  name             String
+  description      String?
+  status           ContractStatus @default(DRAFT)
+  startDate        DateTime
+  endDate          DateTime?
+  autoRenew        Boolean        @default(false)
+  currency         String         @default("USD")
+  paymentTermsDays Int            @default(30)
+  creditLimit      Decimal?       @db.Decimal(12, 2)
+  discountPct      Decimal        @default(0) @db.Decimal(5, 2)
+  pricingTier      String? // "STANDARD" | "PREMIUM" | "VIP" | custom
+  slaHours         Int? // order-to-ship SLA hours
+  notes            String?
+  signedDate       DateTime?
+  signedById       String?
+  renewedAt        DateTime?
+  terminatedAt     DateTime?
+  pricingRules     Json? // [{sku, price}, ...] or [{category, discount}]
+  metadata         Json?
+  createdById      String
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  customer         Customer       @relation(fields: [customerId], references: [id])
+  organization     Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, contractNumber])
+  @@index([organizationId])
+  @@index([customerId])
+  @@index([status])
+  @@index([endDate])
+  @@map("customer_contracts")
+}
+
 enum ContractStatus {
   DRAFT
   ACTIVE
@@ -10061,6 +9564,46 @@ enum ContractStatus {
   SUSPENDED
   TERMINATED
   PENDING_RENEWAL
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EXCEPTION MANAGEMENT
+// ─────────────────────────────────────────────────────────────────────────────
+
+model ExceptionRecord {
+  id               String            @id @default(cuid())
+  organizationId   String
+  type             ExceptionType
+  severity         ExceptionSeverity @default(MEDIUM)
+  status           ExceptionStatus   @default(OPEN)
+  title            String
+  description      String?
+  resourceType     String? // "SalesOrder", "Shipment", "InventoryItem" etc.
+  resourceId       String?
+  resourceRef      String? // human-readable reference (SO-0001)
+  detectedAt       DateTime          @default(now())
+  acknowledgedAt   DateTime?
+  acknowledgedById String?
+  resolvedAt       DateTime?
+  resolvedById     String?
+  resolution       String?
+  autoResolved     Boolean           @default(false)
+  slaBreachAt      DateTime? // when SLA will/did breach
+  slaBreached      Boolean           @default(false)
+  metadata         Json?
+  escalatedAt      DateTime?
+  escalatedToId    String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  organization     Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([type])
+  @@index([status])
+  @@index([severity])
+  @@index([resourceType, resourceId])
+  @@index([detectedAt])
+  @@map("exception_records")
 }
 
 enum ExceptionType {
@@ -10095,6 +9638,95 @@ enum ExceptionStatus {
   SUPPRESSED
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// CARTONISATION ENGINE
+// ─────────────────────────────────────────────────────────────────────────────
+
+model CartonType {
+  id             String       @id @default(cuid())
+  organizationId String
+  name           String
+  code           String
+  lengthCm       Decimal      @db.Decimal(8, 2)
+  widthCm        Decimal      @db.Decimal(8, 2)
+  heightCm       Decimal      @db.Decimal(8, 2)
+  maxWeightKg    Decimal      @db.Decimal(8, 3)
+  tarWeightKg    Decimal      @default(0) @db.Decimal(8, 3)
+  costPerUnit    Decimal?     @db.Decimal(8, 4)
+  isActive       Boolean      @default(true)
+  isDefault      Boolean      @default(false)
+  metadata       Json?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, code])
+  @@index([organizationId])
+  @@index([isActive])
+  @@map("carton_types")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// OUTBOUND ASN (Advanced Shipment Notice)
+// ─────────────────────────────────────────────────────────────────────────────
+
+model OutboundASN {
+  id               String            @id @default(cuid())
+  organizationId   String
+  asnNumber        String
+  salesOrderId     String?
+  shipmentId       String?
+  customerId       String?
+  warehouseId      String?
+  status           ASNStatus         @default(DRAFT)
+  shipDate         DateTime?
+  estimatedArrival DateTime?
+  carrier          String?
+  trackingNumber   String?
+  totalSkus        Int               @default(0)
+  totalUnits       Int               @default(0)
+  totalCartons     Int               @default(0)
+  totalWeightKg    Decimal?          @db.Decimal(10, 3)
+  totalVolumeCbm   Decimal?          @db.Decimal(10, 4)
+  notes            String?
+  ediSent          Boolean           @default(false)
+  ediSentAt        DateTime?
+  metadata         Json?
+  createdById      String
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  items            OutboundASNItem[]
+  organization     Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, asnNumber])
+  @@index([organizationId])
+  @@index([salesOrderId])
+  @@index([status])
+  @@index([shipDate])
+  @@map("outbound_asns")
+}
+
+model OutboundASNItem {
+  id              String      @id @default(cuid())
+  asnId           String
+  inventoryItemId String?
+  sku             String
+  description     String?
+  quantity        Int
+  unitOfMeasure   String      @default("EA")
+  lotNumber       String?
+  serialNumbers   Json? // array of strings
+  expiryDate      DateTime?
+  cartonCount     Int         @default(1)
+  weightKg        Decimal?    @db.Decimal(10, 3)
+  createdAt       DateTime    @default(now())
+  asn             OutboundASN @relation(fields: [asnId], references: [id], onDelete: Cascade)
+
+  @@index([asnId])
+  @@index([sku])
+  @@map("outbound_asn_items")
+}
+
 enum ASNStatus {
   DRAFT
   CONFIRMED
@@ -10104,11 +9736,313 @@ enum ASNStatus {
   CANCELLED
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// NEXT-GEN ROBOTICS & IoT SENSORS (V2)
+// ─────────────────────────────────────────────────────────────────────────────
+
+model IoTSensorEvent {
+  id             String   @id @default(cuid())
+  organizationId String
+  warehouseId    String
+  locationId     String?
+  deviceId       String
+  sensorType     String // e.g. "WEIGHT_SCALE", "VISION_CAMERA"
+  payload        Json // { weight: 0.5, unit: "kg" } or { emptySpacePct: 85 }
+  triggeredTask  Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  warehouse    Warehouse    @relation("WarehouseIoT", fields: [warehouseId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([warehouseId])
+  @@index([deviceId])
+  @@map("iot_sensor_events")
+}
+
+// ─── Voice System (V-2) ────────────────────────────────────────────────────────
+
+model VoiceSession {
+  id             String             @id @default(cuid())
+  userId         String
+  organizationId String?
+  transcript     String // raw text sent to the engine
+  intent         String? // parsed intent label, e.g. "PICK"
+  entities       Json? // extracted entities (sku, qty, location …)
+  response       String? // text response returned to the user
+  audioUrl       String? // optional URL to stored audio file
+  language       String             @default("en")
+  status         VoiceSessionStatus @default(PENDING)
+  errorMessage   String?
+  durationMs     Int? // processing time in milliseconds
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([organizationId])
+  @@index([createdAt])
+  @@map("voice_sessions")
+}
+
 enum VoiceSessionStatus {
   PENDING
   PROCESSED
   FAILED
   CANCELLED
+}
+
+// ─── Auth Security (required by apps/web/src/lib/auth.ts) ─────────────────────
+
+model SecurityProfile {
+  id                  String    @id @default(cuid())
+  userId              String    @unique
+  failedLoginAttempts Int       @default(0)
+  lastFailedLogin     DateTime?
+  lockedUntil         DateTime?
+  mfaEnabled          Boolean   @default(false)
+  mfaSecret           String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("security_profiles")
+}
+
+model SecurityLog {
+  id        String   @id @default(cuid())
+  userId    String
+  event     String // e.g. "LOGIN_ATTEMPT", "LOGIN_FAILED", "LOGIN_SUCCESS"
+  metadata  Json?
+  timestamp DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([event])
+  @@index([timestamp])
+  @@map("security_logs")
+}
+
+// ─── LoadSheet & related models ─────────────────────────────────────────────
+
+model BayDoor {
+  id             String       @id @default(cuid())
+  organizationId String
+  warehouseId    String?
+  doorNumber     String
+  doorType       String? // INBOUND | OUTBOUND | CROSS_DOCK
+  status         String       @default("AVAILABLE") // AVAILABLE | OCCUPIED | MAINTENANCE | CLOSED
+  isActive       Boolean      @default(true)
+  notes          String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  warehouse      Warehouse?   @relation(fields: [warehouseId], references: [id])
+  loadSheets     LoadSheet[]
+
+  @@unique([organizationId, doorNumber])
+  @@index([organizationId])
+  @@index([warehouseId])
+  @@map("bay_doors")
+}
+
+model LoadSheet {
+  id                 String    @id @default(cuid())
+  organizationId     String
+  warehouseId        String?
+  loadSheetNumber    String
+  status             String    @default("BUILDING") // BUILDING | CONFIRMED | APPROVED | DISTRIBUTED | DEPARTED | CANCELLED
+  generationMethod   String    @default("MANUAL") // REALTIME | MANUAL
+  autoGenerated      Boolean   @default(false)
+  shipmentDate       DateTime
+  customerId         String?
+  destinationAddress String?
+  destinationBranch  String?
+  routeCode          String?
+  carrierName        String?
+  carrierCode        String?
+  driverName         String?
+  driverPhone        String?
+  trailerNumber      String?
+  bayDoorId          String?
+  totalContainers    Int       @default(0)
+  totalWeight        Float     @default(0)
+  totalVolume        Float     @default(0)
+  totalPallets       Int       @default(0)
+  totalBoxes         Int       @default(0)
+  totalItems         Int       @default(0)
+  totalOrders        Int       @default(0)
+  approved           Boolean   @default(false)
+  approvedBy         String?
+  approvedAt         DateTime?
+  approvalNotes      String?
+  distributed        Boolean   @default(false)
+  distributedAt      DateTime?
+
+  // Timing & KPI Fields
+  scheduledDeparture DateTime? // Target departure time
+  startedLoadingAt   DateTime? // When the first item was scanned/loaded
+  finishedLoadingAt  DateTime? // When the last item was loaded
+  actualDeparture    DateTime? // When the truck left the geofence/gate
+  delayReason        String? // "Traffic", "Warehouse Delay", "Paperwork", etc.
+  detentionMinutes   Int?      @default(0) // Billable detention time
+
+  notes                  String?
+  metadata               Json?
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  loadSheetDistributions LoadSheetDistribution[]
+  events                 LoadSheetEvent[]
+  containers             Container[]
+  bayDoor                BayDoor?                @relation(fields: [bayDoorId], references: [id])
+  customer               Customer?               @relation(fields: [customerId], references: [id])
+  organization           Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  warehouse              Warehouse?              @relation(fields: [warehouseId], references: [id])
+  vehicleType            FleetVehicleType?       @relation(fields: [vehicleTypeId], references: [id])
+  vehicleTypeId          String?
+
+  @@unique([organizationId, loadSheetNumber])
+  @@index([organizationId])
+  @@index([warehouseId])
+  @@index([customerId])
+  @@index([shipmentDate])
+  @@index([status])
+  @@map("load_sheets")
+}
+
+model FleetVehicleType {
+  id             String       @id @default(cuid())
+  organizationId String
+  name           String // e.g. "53ft Dry Van", "26ft Box Truck"
+  description    String?
+  length         Float // in meters or feet
+  width          Float
+  height         Float
+  maxWeight      Float // kg
+  maxVolume      Float // cubic meters
+  metadata       Json?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  loadSheets     LoadSheet[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+  @@map("fleet_vehicle_types")
+}
+
+model LoadSheetDistribution {
+  id             String    @id @default(cuid())
+  loadSheetId    String
+  recipientEmail String
+  recipientName  String?
+  sentAt         DateTime  @default(now())
+  sentBy         String?
+  organizationId String
+  loadSheet      LoadSheet @relation(fields: [loadSheetId], references: [id], onDelete: Cascade)
+
+  @@index([loadSheetId])
+  @@index([organizationId])
+  @@map("load_sheet_distributions")
+}
+
+model LoadSheetEvent {
+  id             String    @id @default(cuid())
+  loadSheetId    String
+  eventType      String // CREATED | APPROVED | DISTRIBUTED | DEPARTED | MODIFIED
+  userId         String?
+  userName       String?
+  automated      Boolean   @default(false)
+  notes          String?
+  eventData      Json?
+  organizationId String
+  createdAt      DateTime  @default(now())
+  loadSheet      LoadSheet @relation(fields: [loadSheetId], references: [id], onDelete: Cascade)
+
+  @@index([loadSheetId])
+  @@index([organizationId])
+  @@index([eventType])
+  @@map("load_sheet_events")
+}
+
+model Container {
+  id              String          @id @default(cuid())
+  organizationId  String
+  loadSheetId     String?
+  containerNumber String?
+  containerType   String          @default("PALLET") // PALLET | BOX | OTHER
+  status          String          @default("BUILDING") // BUILDING | READY | SHIPPED | CANCELLED
+  weight          Float?
+  volume          Float?
+  shippedAt       DateTime?
+  notes           String?
+  metadata        Json?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  containerItems  ContainerItem[]
+  loadSheet       LoadSheet?      @relation(fields: [loadSheetId], references: [id])
+
+  @@index([loadSheetId])
+  @@index([organizationId])
+  @@index([status])
+  @@map("containers")
+}
+
+model ContainerItem {
+  id              String         @id @default(cuid())
+  containerId     String
+  salesOrderId    String?
+  inventoryItemId String?
+  sku             String
+  description     String?
+  quantity        Int
+  weight          Float?
+  volume          Float?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  container       Container      @relation(fields: [containerId], references: [id], onDelete: Cascade)
+  inventoryItem   InventoryItem? @relation(fields: [inventoryItemId], references: [id])
+  salesOrder      SalesOrder?    @relation(fields: [salesOrderId], references: [id])
+
+  @@index([containerId])
+  @@index([salesOrderId])
+  @@index([inventoryItemId])
+  @@map("container_items")
+}
+
+model YardMove {
+  id             String         @id @default(cuid())
+  organizationId String
+  warehouseId    String
+  trailerNumber  String
+  fromLocationId String
+  toLocationId   String
+  appointmentId  String?
+  status         YardMoveStatus @default(PENDING)
+  priority       Int            @default(1)
+  assignedToId   String? // Yard jockey user ID
+  completedBy    String?
+  completedAt    DateTime?
+  startedAt      DateTime?
+  notes          String?
+  metadata       Json?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  fromLocation YardLocation     @relation("MovesFrom", fields: [fromLocationId], references: [id])
+  toLocation   YardLocation     @relation("MovesTo", fields: [toLocationId], references: [id])
+  appointment  DockAppointment? @relation(fields: [appointmentId], references: [id])
+  organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  assignedTo   User?            @relation("YardMoveAssignee", fields: [assignedToId], references: [id])
+
+  @@index([organizationId])
+  @@index([warehouseId])
+  @@index([status])
+  @@index([assignedToId])
+  @@map("yard_moves")
 }
 
 enum YardMoveStatus {
@@ -10119,11 +10053,15 @@ enum YardMoveStatus {
   CANCELLED
 }
 
+// --------------------------------------------------------
+// AUTOMATION & ROBOTICS ORCHESTRATION MODULE
+// --------------------------------------------------------
+
 enum RobotType {
-  AMR
-  AGV
+  AMR // Autonomous Mobile Robot
+  AGV // Automated Guided Vehicle
   CONVEYOR
-  ASRS
+  ASRS // Automated Storage & Retrieval
   COBOT
   PICKING_ARM
   SORTER
@@ -10189,6 +10127,10 @@ enum ChargebackStatus {
   CANCELLED
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// COGNITIVE ORCHESTRATION & AUTONOMOUS DECISION ENGINE
+// ─────────────────────────────────────────────────────────────────────────────
+
 enum CognitiveGoalType {
   MINIMIZE_COST
   MAXIMIZE_SPEED
@@ -10213,6 +10155,117 @@ enum ActionCategory {
   BILLING_ADJUSTMENT
 }
 
+model CognitivePolicy {
+  id             String            @id @default(cuid())
+  organizationId String
+  name           String
+  description    String?
+  goalType       CognitiveGoalType @default(BALANCE_ALL)
+  priority       Int               @default(1) // 1 = High, 10 = Low
+  isActive       Boolean           @default(true)
+  constraints    Json? // e.g., { "maxCost": 50, "minSLA": 98 }
+  learningRate   Float             @default(0.1) // For RL models
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  organization   Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  decisionLogs   DecisionLog[]
+
+  @@index([organizationId])
+  @@index([isActive])
+  @@map("cognitive_policies")
+}
+
+model DecisionLog {
+  id              String           @id @default(cuid())
+  organizationId  String
+  policyId        String?
+  scenarioId      String? // Link to a simulation if applicable
+  timestamp       DateTime         @default(now())
+  triggerEvent    String // e.g., "CongestionDetected", "SLA_Breach_Predicted"
+  category        ActionCategory
+  description     String
+  aiReasoning     String // Explanation of why this decision was made
+  confidenceScore Float
+  status          DecisionStatus
+  actionTaken     Json? // Details of the server action executed
+  outcomeMetric   Json? // The literal result (time saved, cost incurred)
+  userOverrideId  String? // If a human stopped it
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  policy          CognitivePolicy? @relation(fields: [policyId], references: [id])
+
+  @@index([organizationId])
+  @@index([timestamp])
+  @@index([category])
+  @@map("decision_logs")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// COGNITIVE ORCHESTRATION & MULTI-ECHELON TRANSFER MODULE
+// ─────────────────────────────────────────────────────────────────────────────
+
+model TransferRequest {
+  id                   String  @id @default(cuid())
+  transferNumber       String  @unique
+  sourceOrganizationId String
+  targetOrganizationId String
+  sourceWarehouseId    String?
+  targetWarehouseId    String?
+
+  status TransferRequestStatus @default(DRAFT)
+  type   TransferType          @default(INTERNAL) // INTERNAL, INTER_ORG, RECALL, RECTIFICATION
+
+  requestedById String
+  approvedById  String?
+  shippedById   String?
+  receivedById  String?
+
+  requestedAt DateTime  @default(now())
+  approvedAt  DateTime?
+  shippedAt   DateTime?
+  receivedAt  DateTime?
+
+  shippingMethod String?
+  trackingNumber String?
+
+  // Financial clearing for Inter-Org
+  invoiceId      String? // Generated Inter-Company Invoice
+  clearingStatus ClearingStatus @default(PENDING) // PENDING, INVOICED, SETTLED
+
+  items TransferRequestItem[]
+
+  sourceOrganization Organization @relation("TransferSourceOrg", fields: [sourceOrganizationId], references: [id])
+  targetOrganization Organization @relation("TransferTargetOrg", fields: [targetOrganizationId], references: [id])
+  sourceWarehouse    Warehouse?   @relation("TransferSourceWh", fields: [sourceWarehouseId], references: [id])
+  targetWarehouse    Warehouse?   @relation("TransferTargetWh", fields: [targetWarehouseId], references: [id])
+
+  requestedBy User @relation("TransferRequestor", fields: [requestedById], references: [id])
+
+  @@index([sourceOrganizationId])
+  @@index([targetOrganizationId])
+  @@index([status])
+  @@map("transfer_requests")
+}
+
+model TransferRequestItem {
+  id                String @id @default(cuid())
+  transferRequestId String
+  sku               String
+  productName       String
+  quantityRequested Int
+  quantityShipped   Int    @default(0)
+  quantityReceived  Int    @default(0)
+
+  unitCost Decimal? @db.Decimal(10, 2) // For valuation
+
+  status TransferItemStatus @default(PENDING)
+
+  transferRequest TransferRequest @relation(fields: [transferRequestId], references: [id], onDelete: Cascade)
+
+  @@index([transferRequestId])
+  @@index([sku])
+  @@map("transfer_request_items")
+}
+
 enum TransferRequestStatus {
   DRAFT
   REQUESTED
@@ -10225,10 +10278,10 @@ enum TransferRequestStatus {
 }
 
 enum TransferType {
-  INTERNAL
-  INTER_ORG
-  RECALL
-  RECTIFICATION
+  INTERNAL // Branch to Branch (Same Org)
+  INTER_ORG // Cross-Entity
+  RECALL // DC Recall from Branch
+  RECTIFICATION // Virtual correction
 }
 
 enum ClearingStatus {
@@ -10247,6 +10300,58 @@ enum TransferItemStatus {
   DAMAGED
 }
 
+model Printer {
+  id             String  @id @default(cuid())
+  organizationId String
+  name           String
+  type           String  @default("LASER") // ZEBRA, LASER, PDF_DOWNLOAD
+  ipAddress      String?
+  port           Int?    @default(9100) // Standard HP JetDirect port
+  location       String?
+  description    String?
+  isActive       Boolean @default(true)
+  metadata       Json?
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  users        User[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([organizationId])
+  @@map("printers")
+}
+
+model Refund {
+  id              String       @id @default(cuid())
+  organizationId  String
+  salesOrderId    String?
+  rmaId           String?
+  amount          Decimal      @db.Decimal(10, 2)
+  reason          RefundReason
+  reasonDetails   String?
+  status          RefundStatus @default(PENDING)
+  processedAt     DateTime?
+  processedById   String?
+  transactionId   String?
+  currency        String       @default("USD")
+  method          String? // Credit Card, Store Credit, Check
+  metadata        Json?
+  
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  salesOrder      SalesOrder?  @relation(fields: [salesOrderId], references: [id])
+  rma             RMA?         @relation(fields: [rmaId], references: [id])
+  processedBy     User?        @relation("RefundProcessor", fields: [processedById], references: [id])
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([organizationId])
+  @@index([salesOrderId])
+  @@index([rmaId])
+  @@index([status])
+}
+
 enum RefundReason {
   ITEM_NOT_ARRIVED
   DAMAGED_ITEM
@@ -10260,82 +10365,4 @@ enum RefundStatus {
   PROCESSED
   FAILED
   REJECTED
-}
-
-model AuditLog {
-  id            String   @id @default(cuid())
-  eventType     String   
-  severity      String   @default("INFO") 
-  userId        String?
-  user          User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  userName      String?
-  userEmail     String?
-  ipAddress     String?
-  userAgent     String?
-  resource      String?  
-  resourceId    String?  
-  action        String?  
-  changes       Json?    
-  metadata      Json?    
-  success       Boolean  @default(true)
-  errorMessage  String?
-  timestamp     DateTime @default(now())
-  hash          String?
-  previousHash  String?
-
-  @@index([userId])
-  @@index([eventType])
-  @@index([timestamp])
-  @@index([resource, resourceId])
-  @@map("audit_logs")
-}
-
-model OutboxEvent {
-  id            String   @id @default(cuid())
-  eventType     String
-  payload       Json
-  aggregateId   String?
-  aggregateType String?
-  status        String   @default("PENDING")
-  error         String?
-  attempts      Int      @default(0)
-  createdAt     DateTime @default(now())
-  processedAt   DateTime?
-
-  @@index([status, createdAt])
-  @@index([aggregateId, aggregateType])
-  @@map("outbox_events")
-}
-
-
-// --- Phase 1: Event-Driven & Core Workflow Integrity additions ---
-
-model IdempotencyKey {
-  key              String    @id
-  eventType        String
-  status           String    @default("IN_PROGRESS") // IN_PROGRESS, COMPLETED, FAILED
-  lockedAt         DateTime  @default(now())
-  completedAt      DateTime?
-  responseContext  Json?     // In case a downstream service retries a completed request, we reply with this
-  errorMessage     String?
-  ttl              DateTime  // TTL for automated cleanup
-
-  @@index([status, lockedAt])
-  @@map("idempotency_keys")
-}
-
-model DeadLetterEvent {
-  id              String   @id @default(cuid())
-  originalEventId String   @unique // References OutboxEvent or other incoming webhook IDs
-  source          String
-  payload         Json
-  failedReason    String
-  lastAttemptAt   DateTime
-  resolved        Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  resolvedAt      DateTime?
-
-  @@index([resolved, createdAt])
-  @@index([source])
-  @@map("dead_letter_events")
 }
