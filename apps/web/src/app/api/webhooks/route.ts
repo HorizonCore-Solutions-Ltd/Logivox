@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: { organizations: { take: 1 } },
+      include: { organization: { take: 1 } },
     });
 
     if (!user || user.organizations.length === 0) {
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: { organizations: { take: 1 } },
+      include: { organization: { take: 1 } },
     });
 
     if (!user || user.organizations.length === 0) {

@@ -26,7 +26,7 @@ export async function PATCH(
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
       include: {
-        organizations: {
+        organization: {
           take: 1,
         },
       },
@@ -124,7 +124,7 @@ export async function DELETE(
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
       include: {
-        organizations: {
+        organization: {
           take: 1,
         },
       },

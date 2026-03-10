@@ -42,7 +42,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
       const userInOrg = await prisma.user.findFirst({
         where: {
           id: userId,
-          organizations: {
+          organization: {
             some: {
               id: tenant.organizationId,
             },

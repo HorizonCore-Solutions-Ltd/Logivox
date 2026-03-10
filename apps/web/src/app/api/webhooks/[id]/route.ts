@@ -25,7 +25,7 @@ export async function GET(
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: { organizations: { take: 1 } },
+      include: { organization: { take: 1 } },
     });
 
     if (!user || user.organizations.length === 0) {
@@ -77,7 +77,7 @@ export async function PATCH(
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: { organizations: { take: 1 } },
+      include: { organization: { take: 1 } },
     });
 
     if (!user || user.organizations.length === 0) {
@@ -156,7 +156,7 @@ export async function DELETE(
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: { organizations: { take: 1 } },
+      include: { organization: { take: 1 } },
     });
 
     if (!user || user.organizations.length === 0) {

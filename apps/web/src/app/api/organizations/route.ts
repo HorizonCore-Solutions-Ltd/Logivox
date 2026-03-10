@@ -15,16 +15,20 @@ export async function GET(request: NextRequest) {
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
       include: {
-        organizations: {
+        organizationMemberships: {
           include: {
-            _count: {
-              select: {
-                members: true,
-                inventoryItems: true,
-                bookings: true,
+            organization: {
+              include: {
+                _count: {
+                  select: {
+                    members: true,
+                    inventoryItems: true,
+                    bookings: true,
+                  },
+                },
               },
-            },
-          },
+            }
+          }
         },
       },
     });
@@ -33,7 +37,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    return NextResponse.json(user.organizations);
+    return NextResponse.json(user.organizationMemberships.map(m => m.organization));
   } catch (error) {
     console.error("Organizations fetch error:", error);
     return NextResponse.json(

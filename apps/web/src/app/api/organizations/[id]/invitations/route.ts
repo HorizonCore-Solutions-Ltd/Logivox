@@ -92,7 +92,7 @@ export async function POST(
     const existingUser = await prisma.user.findUnique({
       where: { email },
       include: {
-        organizations: {
+        organization: {
           where: { id: params.id },
         },
       },

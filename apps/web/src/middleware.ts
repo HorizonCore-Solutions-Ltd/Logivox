@@ -4,7 +4,8 @@ import { generateSessionFingerprint } from "../../../lib/session-hijack";
 
 // Define strict enterprise security headers for Zero-Trust boundaries
 const securityHeaders = {
-  "Content-Security-Policy": "default-src 'self' https: http: wss: ws: 'unsafe-inline' 'unsafe-eval'; img-src 'self' blob: data: https: http:; font-src 'self' data: https: http:; connect-src 'self' wss: ws: https: http:;",
+  "Content-Security-Policy":
+    "default-src 'self' https: http: wss: ws: 'unsafe-inline' 'unsafe-eval'; img-src 'self' blob: data: https: http:; font-src 'self' data: https: http:; connect-src 'self' wss: ws: https: http:;",
   "X-DNS-Prefetch-Control": "on",
   "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
   "X-Frame-Options": "DENY",
@@ -112,7 +113,7 @@ export default withAuth(
     callbacks: {
       authorized: ({ req, token }) => {
         const path = req.nextUrl.pathname;
-        
+
         // Let marketing, public routes, and next-auth API paths through
         if (
           !path.startsWith("/dashboard") &&
@@ -120,10 +121,10 @@ export default withAuth(
         ) {
           return true;
         }
-        
+
         // Always allow Next Auth infrastructure
         if (path.startsWith("/api/auth")) {
-          return true; 
+          return true;
         }
 
         // Require token for anything strictly locked like /dashboard

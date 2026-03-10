@@ -102,3 +102,45 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+export async function GET(request: NextRequest) {
+  const auth = await requireApiAuth();
+  if ("error" in auth) return auth.error;
+  const { organizationId } = auth;
+
+  try {
+    const { searchParams } = new URL(request.url);
+    const status = searchParams.get("status") || "all";
+    const search = searchParams.get("search") || "";
+    // Note: simple implementation for demo
+    
+    let whereClause: any = { organizationId };
+    
+    if (status !== "all") {
+      whereClause.status = status;
+    }
+    
+    if (search) {
+      whereClause.OR = [
+        { invoiceNumber: { contains: search, mode: "insensitive" } },
+      ];
+    }
+
+    const invoices = await prisma.invoice.findMany({
+      where: whereClause,
+      include: {
+        customer: true,
+      },
+      orderBy: { createdAt: "desc" },
+      take: 20
+    });
+
+    return NextResponse.json({
+      success: true,
+      invoices,
+      pagination: { total: invoices.length, pages: 1 }
+    });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}

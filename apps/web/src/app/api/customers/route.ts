@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     // Get user's organization
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: { organizations: true },
+      include: { organization: true },
     });
 
     if (!user?.organizations?.[0]?.id) {
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     // Get user's organization
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: { organizations: true },
+      include: { organization: true },
     });
 
     if (!user?.organizations?.[0]?.id) {

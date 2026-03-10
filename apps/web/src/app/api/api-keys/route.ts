@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
       include: {
-        organizations: {
+        organization: {
           take: 1,
         },
       },
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
       include: {
-        organizations: {
+        organization: {
           take: 1,
         },
       },
