@@ -98,6 +98,7 @@ model User {
   receivedGRNs                 GoodsReceiptNote[]       @relation("GRNReceivedBy")
   createdInventoryItems        InventoryItem[]          @relation("InventoryCreator")
   organizationMemberships      OrganizationMember[]
+  auditLogs                    AuditLog[]
   createdOrganizations         Organization[]           @relation("OrganizationCreator")
   initiatedPacks               Pack[]                   @relation("PackInitiator")
   createdPacks                 Pack[]                   @relation("PackCreator")
@@ -10259,4 +10260,82 @@ enum RefundStatus {
   PROCESSED
   FAILED
   REJECTED
+}
+
+model AuditLog {
+  id            String   @id @default(cuid())
+  eventType     String   
+  severity      String   @default("INFO") 
+  userId        String?
+  user          User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userName      String?
+  userEmail     String?
+  ipAddress     String?
+  userAgent     String?
+  resource      String?  
+  resourceId    String?  
+  action        String?  
+  changes       Json?    
+  metadata      Json?    
+  success       Boolean  @default(true)
+  errorMessage  String?
+  timestamp     DateTime @default(now())
+  hash          String?
+  previousHash  String?
+
+  @@index([userId])
+  @@index([eventType])
+  @@index([timestamp])
+  @@index([resource, resourceId])
+  @@map("audit_logs")
+}
+
+model OutboxEvent {
+  id            String   @id @default(cuid())
+  eventType     String
+  payload       Json
+  aggregateId   String?
+  aggregateType String?
+  status        String   @default("PENDING")
+  error         String?
+  attempts      Int      @default(0)
+  createdAt     DateTime @default(now())
+  processedAt   DateTime?
+
+  @@index([status, createdAt])
+  @@index([aggregateId, aggregateType])
+  @@map("outbox_events")
+}
+
+
+// --- Phase 1: Event-Driven & Core Workflow Integrity additions ---
+
+model IdempotencyKey {
+  key              String    @id
+  eventType        String
+  status           String    @default("IN_PROGRESS") // IN_PROGRESS, COMPLETED, FAILED
+  lockedAt         DateTime  @default(now())
+  completedAt      DateTime?
+  responseContext  Json?     // In case a downstream service retries a completed request, we reply with this
+  errorMessage     String?
+  ttl              DateTime  // TTL for automated cleanup
+
+  @@index([status, lockedAt])
+  @@map("idempotency_keys")
+}
+
+model DeadLetterEvent {
+  id              String   @id @default(cuid())
+  originalEventId String   @unique // References OutboxEvent or other incoming webhook IDs
+  source          String
+  payload         Json
+  failedReason    String
+  lastAttemptAt   DateTime
+  resolved        Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  resolvedAt      DateTime?
+
+  @@index([resolved, createdAt])
+  @@index([source])
+  @@map("dead_letter_events")
 }
