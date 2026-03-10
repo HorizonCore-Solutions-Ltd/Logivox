@@ -4,8 +4,7 @@ import { generateSessionFingerprint } from "../../../lib/session-hijack";
 
 // Define strict enterprise security headers for Zero-Trust boundaries
 const securityHeaders = {
-  "Content-Security-Policy":
-    "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests;",
+  "Content-Security-Policy": "default-src 'self' https: http: wss: ws: 'unsafe-inline' 'unsafe-eval'; img-src 'self' blob: data: https: http:; font-src 'self' data: https: http:; connect-src 'self' wss: ws: https: http:;",
   "X-DNS-Prefetch-Control": "on",
   "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
   "X-Frame-Options": "DENY",
@@ -112,16 +111,23 @@ export default withAuth(
   {
     callbacks: {
       authorized: ({ req, token }) => {
-        // Zero-Trust Enforced: Default-deny all requests, whitelist auth flows only.
         const path = req.nextUrl.pathname;
-        const isPublicPath =
-          path === "/" ||
-          path.startsWith("/sign-in") ||
-          path.startsWith("/sign-up") ||
-          path.startsWith("/api/auth"); // Must allow next-auth APIs
+        
+        // Let marketing, public routes, and next-auth API paths through
+        if (
+          !path.startsWith("/dashboard") &&
+          !path.startsWith("/api/") // Allow custom APIs to handle their own Auth
+        ) {
+          return true;
+        }
+        
+        // Always allow Next Auth infrastructure
+        if (path.startsWith("/api/auth")) {
+          return true; 
+        }
 
-        if (isPublicPath) return true; // Forward to public/auth routes
-        return !!token; // Deny anything else without a valid token
+        // Require token for anything strictly locked like /dashboard
+        return !!token;
       },
     },
   },

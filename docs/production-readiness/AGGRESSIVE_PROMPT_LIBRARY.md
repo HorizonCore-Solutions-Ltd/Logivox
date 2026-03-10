@@ -1,4 +1,4 @@
-# Master Aggressive Prompt Library
+npm run dev# Master Aggressive Prompt Library
 
 This library contains aggressive, zero-tolerance audit prompts designed for rigorous quality assurance, security checking, and production readiness verification across the Logivox ecosystem.
 
