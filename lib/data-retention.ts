@@ -17,11 +17,10 @@ export async function executeDataRetentionPolicy() {
       severity: "INFO",
       success: true,
     });
-    
+
     return deletedLogs.count;
   } catch (error) {
     console.error("Failed to execute data retention policy:", error);
     throw error;
   }
 }
-

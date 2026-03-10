@@ -3,7 +3,7 @@ import crypto from "crypto";
 
 export async function validateWebhookSignature(
   request: NextRequest,
-  secret: string
+  secret: string,
 ): Promise<{ isValid: boolean; payload: string }> {
   try {
     const signature = request.headers.get("x-webhook-signature");
@@ -18,12 +18,11 @@ export async function validateWebhookSignature(
     return {
       isValid: crypto.timingSafeEqual(
         Buffer.from(signature),
-        Buffer.from(expectedSignature)
+        Buffer.from(expectedSignature),
       ),
-      payload
+      payload,
     };
   } catch (error) {
     return { isValid: false, payload: "" };
   }
 }
-

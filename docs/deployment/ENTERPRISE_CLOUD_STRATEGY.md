@@ -5,6 +5,7 @@ Both Amazon Web Services (AWS) and Microsoft Azure offer excellent enterprise-gr
 For a startup looking to deploy a heavy B2B SaaS architecture while minimizing initial costs, here is the breakdown of their startup programs and free tiers:
 
 ## Microsoft Azure: "Founders Hub" & Free Tier
+
 Microsoft heavily targets B2B SaaS companies. If you are building LogiVox as a formal startup, **Azure is arguably the better financial starting point.**
 
 1. **Azure for Startups (Founders Hub):**
@@ -18,6 +19,7 @@ Microsoft heavily targets B2B SaaS companies. If you are building LogiVox as a f
    - Many of your massive EU/UK supply chain and logistics clients are heavily invested in the Microsoft Ecosystem (Active Directory, Office 365, Teams). Deploying on Azure makes passing corporate IT security reviews ($B2B) significantly easier because you exist natively within their trusted cloud ecosystem.
 
 ## AWS: "Activate" & Free Tier
+
 AWS is the industry standard for DevOps and highly scalable tech startups.
 
 1. **AWS Activate for Startups:**
@@ -29,9 +31,11 @@ AWS is the industry standard for DevOps and highly scalable tech startups.
    - AWS Elastic Container Service (ECS) with Fargate is perfectly built for dropping in our `docker-compose.prod.yml` and instantly spinning up Always-On containers globally.
 
 ## Summary Recommendation for LogiVox
-Because LogiVox targets physical logistics and enterprise supply chains, **we strongly recommend pursuing Azure (via Founders Hub) or AWS (via Activate) credits** rather than relying on strictly the base "Free Tiers." Free tiers use micro-servers that struggle to compile/run heavy Next.js Docker images in production. 
+
+Because LogiVox targets physical logistics and enterprise supply chains, **we strongly recommend pursuing Azure (via Founders Hub) or AWS (via Activate) credits** rather than relying on strictly the base "Free Tiers." Free tiers use micro-servers that struggle to compile/run heavy Next.js Docker images in production.
 
 To deploy LogiVox effectively, you need a robust setup:
+
 - 1 App Server (Always On, ~2GB RAM minimum for Next.js NextAuth/Prisma)
 - 1 Managed PostgreSQL Database
 - 1 Redis Server (for rate-limiting, session, and webhooks)
