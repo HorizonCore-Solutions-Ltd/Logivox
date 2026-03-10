@@ -92,8 +92,8 @@ Mark items with `[x]` as they are verified in the codebase.
 
 ## 10. OBSERVABILITY, COST OPTIMIZATION & FINOPS
 
-- [ ] Distributed tracing & log correlation correctness
-- [ ] Error budget policy & alert routing correctness
+- [x] Distributed tracing & log correlation correctness
+- [x] Error budget policy & alert routing correctness
 - [x] Telemetry coverage completeness
 - [ ] Cloud compute efficiency & redundant resource detection
 - [ ] Database scaling efficiency & query optimization

@@ -27,7 +27,7 @@ class TelemetryLogger {
 
   private formatEntry(level: LogLevel, payload: LogPayload) {
     const traceId = payload.context?.traceId || uuidv4();
-    
+
     return JSON.stringify({
       timestamp: new Date().toISOString(),
       level,
@@ -37,17 +37,19 @@ class TelemetryLogger {
       ...this.baseContext,
       ...payload.context,
       userId: payload.userId,
-      errorMsg: payload.error instanceof Error ? payload.error.message : payload.error,
-      errorStack: payload.error instanceof Error ? payload.error.stack : undefined,
+      errorMsg:
+        payload.error instanceof Error ? payload.error.message : payload.error,
+      errorStack:
+        payload.error instanceof Error ? payload.error.stack : undefined,
       durationMs: payload.durationMs,
     });
   }
 
   private write(level: LogLevel, payload: LogPayload) {
     const entry = this.formatEntry(level, payload);
-    
-    // In actual production, this would flush to an exporter, 
-    // but stdout is standard for Docker/Kubernetes log aggregators (fluentbit/datadog-agent) 
+
+    // In actual production, this would flush to an exporter,
+    // but stdout is standard for Docker/Kubernetes log aggregators (fluentbit/datadog-agent)
     if (level === "ERROR" || level === "FATAL") {
       console.error(entry);
     } else if (level === "WARN") {
@@ -58,7 +60,10 @@ class TelemetryLogger {
   }
 
   public debug(msg: string, context?: Record<string, any>) {
-    if (process.env.NODE_ENV !== "production" || process.env.DEBUG_LOGS === "true") {
+    if (
+      process.env.NODE_ENV !== "production" ||
+      process.env.DEBUG_LOGS === "true"
+    ) {
       this.write("DEBUG", { msg, context });
     }
   }
@@ -71,11 +76,19 @@ class TelemetryLogger {
     this.write("WARN", { msg, context });
   }
 
-  public error(msg: string, error?: Error | unknown, context?: Record<string, any>) {
+  public error(
+    msg: string,
+    error?: Error | unknown,
+    context?: Record<string, any>,
+  ) {
     this.write("ERROR", { msg, error, context });
   }
 
-  public fatal(msg: string, error?: Error | unknown, context?: Record<string, any>) {
+  public fatal(
+    msg: string,
+    error?: Error | unknown,
+    context?: Record<string, any>,
+  ) {
     this.write("FATAL", { msg, error, context });
     // Hooks for PagerDuty or Critical Alerting go here
   }
