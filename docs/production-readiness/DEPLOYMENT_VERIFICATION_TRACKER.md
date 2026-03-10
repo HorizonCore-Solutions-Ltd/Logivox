@@ -7,7 +7,7 @@ Mark items with `[x]` as they are verified in the codebase.
 ## 1. WAREHOUSE AUTOMATION, LOGISTICS & TRANSPORT
 
 - [x] Driver workflow integrity (check-in/out, defects, duty of care)
-- [x] Vehicle history - [ ] Vehicle history & maintenance chain consistency maintenance chain consistency
+- [ ] Vehicle history & maintenance chain consistency
 - [ ] Fleet telematics data validation & spoofing detection
 - [x] Load securing & route optimization correctness
 - [ ] Bay door automation safety compliance
@@ -92,11 +92,11 @@ Mark items with `[x]` as they are verified in the codebase.
 
 ## 10. OBSERVABILITY, COST OPTIMIZATION & FINOPS
 
-- [x] Distributed tracing - [ ] Distributed tracing & log correlation correctness log correlation correctness
-- [x] Error budget policy - [ ] Error budget policy & alert routing correctness alert routing correctness
+- [ ] Distributed tracing & log correlation correctness
+- [ ] Error budget policy & alert routing correctness
 - [x] Telemetry coverage completeness
 - [ ] Cloud compute efficiency & redundant resource detection
-- [x] Database scaling efficiency - [ ] Database scaling efficiency & query optimization query optimization
+- [ ] Database scaling efficiency & query optimization
 - [ ] Storage & CDN cost minimization
 
 ## 11. B2B PROCUREMENT & SUPPLY CHAIN OPERATIONS
