@@ -1,7 +1,6 @@
 import { NextRequest } from "next/server";
-import crypto from "crypto";
 
-export function generateSessionFingerprint(req: NextRequest) {
+export async function generateSessionFingerprint(req: NextRequest) {
   const ip =
     req.ip ??
     req.headers.get("x-real-ip") ??
@@ -9,6 +8,8 @@ export function generateSessionFingerprint(req: NextRequest) {
     "unknown";
   const userAgent = req.headers.get("user-agent") ?? "unknown";
 
-  // Create a device/IP hash to bind to the JWT session payload
-  return crypto.createHash("sha256").update(`${ip}-${userAgent}`).digest("hex");
+  const data = new TextEncoder().encode(`${ip}-${userAgent}`);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 }

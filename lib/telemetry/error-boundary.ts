@@ -7,7 +7,7 @@ import { logger } from "./logger";
 export async function withErrorBoundary<T>(
   operationName: string,
   operation: () => Promise<T>,
-  context?: Record<string, any>
+  context?: Record<string, any>,
 ): Promise<{ success: true; data: T } | { success: false; error: any }> {
   const startTime = Date.now();
   try {

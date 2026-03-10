@@ -17,7 +17,7 @@ const securityHeaders = {
 };
 
 export default withAuth(
-  function middleware(req) {
+  async function middleware(req) {
     const token = req.nextauth?.token;
     const isAuth = !!token;
     const isAuthPage =
@@ -89,7 +89,7 @@ export default withAuth(
 
     // Session Hijacking / Device Trust Validation
     if (isAuth && token) {
-      const currentFingerprint = generateSessionFingerprint(req);
+      const currentFingerprint = await generateSessionFingerprint(req);
       if (token.fingerprint && token.fingerprint !== currentFingerprint) {
         // IP/User-Agent changed violently - Possible Hijacking Detected
         console.error(
