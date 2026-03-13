@@ -1,4 +1,4 @@
-# Multi-stage build for optimal image size
+# Multi-stage build for optimal image size (LogiVox Turnkey Solution)
 FROM node:20-alpine AS base
 
 # Install dependencies only when needed
@@ -6,42 +6,42 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
-# Install pnpm
+# Enable corepack for pnpm support
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# Copy package files
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+# Copy root configurations
+COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml ./
+# Copy app and package files
 COPY apps/web/package.json ./apps/web/
-COPY packages/database/package.json ./packages/database/
-COPY packages/ui/package.json ./packages/ui/
-COPY packages/auth/package.json ./packages/auth/
+# Note: Root package.json indicates workspaces apps/* and packages/*
+# We skip missing packages/ folders identified during audit
+# COPY packages/database/package.json ./packages/database/
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile
+RUN if [ -f pnpm-lock.yaml ]; then pnpm install --frozen-lockfile; else pnpm install; fi
 
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
 
-# Install pnpm
+# Enable corepack for pnpm support
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
-COPY --from=deps /app/packages/database/node_modules ./packages/database/node_modules
-COPY --from=deps /app/packages/ui/node_modules ./packages/ui/node_modules
-COPY --from=deps /app/packages/auth/node_modules ./packages/auth/node_modules
 
 # Copy source files
 COPY . .
 
-# Generate Prisma Client
-RUN pnpm --filter @flowstock/database prisma generate
-
-# Build the application
+# Environment variables for build
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
+
+# Generate Prisma Client (Root prisma folder)
+RUN npx prisma generate --schema=/app/prisma/schema.prisma
+
+# Build the application
 RUN pnpm build
 
 # Production image, copy all the files and run next
@@ -50,6 +50,8 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
 # Create a non-root user
 RUN addgroup --system --gid 1001 nodejs
@@ -59,11 +61,12 @@ RUN adduser --system --uid 1001 nextjs
 COPY --from=builder /app/apps/web/public ./apps/web/public
 
 # Automatically leverage output traces to reduce image size
+# Standalone mode must be enabled in next.config.js
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
 
-# Copy Prisma schema and migrations for runtime
-COPY --from=builder --chown=nextjs:nodejs /app/packages/database/prisma ./packages/database/prisma
+# Copy Prisma for runtime (Required for database access)
+COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
 
@@ -75,12 +78,9 @@ USER nextjs
 
 EXPOSE 3000
 
-ENV PORT=3000
-ENV HOSTNAME="0.0.0.0"
-
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3000/api/health/live', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
 ENTRYPOINT ["./docker-entrypoint.sh"]
-CMD ["node", "apps/web/server.js"]
+CMD ["node", "server.js"]
