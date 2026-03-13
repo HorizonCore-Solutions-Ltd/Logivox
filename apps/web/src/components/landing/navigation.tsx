@@ -39,6 +39,9 @@ import {
   LayoutGrid,
   Leaf,
   GitMerge,
+  Map,
+  Snowflake,
+  ShoppingCart,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -172,6 +175,42 @@ export function Navigation() {
       description: "Predictive insights and demand forecasting",
       icon: LineChart,
       href: "/solutions/analytics",
+    },
+    {
+      title: "Floor & Wave Management",
+      description: "Smart marshalling and wave picking organization",
+      icon: Map,
+      href: "/solutions/floor-management",
+    },
+    {
+      title: "Cold Chain Logistics",
+      description: "IoT temperature tracking and compliance logging",
+      icon: Snowflake,
+      href: "/solutions/cold-chain",
+    },
+    {
+      title: "Hazmat & Compliance",
+      description: "Regulatory tracking and quality control standards",
+      icon: AlertTriangle,
+      href: "/solutions/hazmat-compliance",
+    },
+    {
+      title: "Load Planning & Loadsheets",
+      description: "Automated container optimization and loading schedules",
+      icon: FileText,
+      href: "/solutions/load-planning",
+    },
+    {
+      title: "Procurement & Supplier B2B",
+      description: "End-to-end purchasing and supplier integration portals",
+      icon: ShoppingCart,
+      href: "/solutions/procurement",
+    },
+    {
+      title: "IoT Telematics",
+      description: "Fleet tracking and active equipment monitoring",
+      icon: Radio,
+      href: "/solutions/iot-telematics",
     },
   ];
 
