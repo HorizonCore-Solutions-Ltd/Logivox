@@ -6,6 +6,8 @@ import { logAudit } from "../../../../../../../../lib/audit-service";
 import { publishEvent } from "../../../../../../../../lib/event-service";
 import { logAudit } from "../../../../../../../../lib/audit-service";
 import { publishEvent } from "../../../../../../../../lib/event-service";
+import { logAudit } from "../../../../../../../../lib/audit-service";
+import { publishEvent } from "../../../../../../../../lib/event-service";
 
 // GET /api/picking-tasks/[id] - Get task details
 export async function GET(
@@ -122,6 +124,8 @@ export async function PATCH(
       switch (action) {
         case "assign":
           return handleAssignTask(
+            request,
+            
             request,
 
             request,

@@ -10,6 +10,10 @@ import { logAudit } from "../../../../../../../lib/audit-service";
 import { publishEvent } from "../../../../../../../lib/event-service";
 import { z } from "zod";
 import { validateContract } from "../../../../../../../lib/api-middleware";
+import { logAudit } from "../../../../../../../lib/audit-service";
+import { publishEvent } from "../../../../../../../lib/event-service";
+import { z } from "zod";
+import { validateContract } from "../../../../../../../lib/api-middleware";
 
 const gateEntrySchema = z.object({
   entryType: z.string(),
@@ -28,6 +32,25 @@ const gateEntrySchema = z.object({
   securityCheckPassed: z.boolean().optional(),
   notes: z.string().optional(),
 });
+
+const gateEntrySchema = z.object({
+  entryType: z.string(),
+  direction: z.string(),
+  vehicleType: z.string().optional(),
+  vehicleNumber: z.string().optional(),
+  licensePlate: z.string().optional(),
+  trailerNumber: z.string().optional(),
+  driverName: z.string().optional(),
+  driverLicense: z.string().optional(),
+  driverPhone: z.string().optional(),
+  carrierName: z.string().optional(),
+  appointmentId: z.string().optional(),
+  referenceNumber: z.string().optional(),
+  gateNumber: z.string().optional(),
+  securityCheckPassed: z.boolean().optional(),
+  notes: z.string().optional(),
+});
+
 
 const gateEntrySchema = z.object({
   entryType: z.string(),

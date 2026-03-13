@@ -36,6 +36,7 @@
     "db:reset": "turbo run db:reset",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,mdx}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,mdx}\"",
+    "postinstall": "prisma generate",
     "prepare": "husky install",
     "changeset": "changeset",
     "version-packages": "changeset version",
