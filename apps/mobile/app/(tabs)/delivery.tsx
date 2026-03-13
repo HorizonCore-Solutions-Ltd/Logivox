@@ -192,7 +192,7 @@ export default function DeliveryScreen() {
   const renderStop = ({ item }: { item: DeliveryStop }) => {
     const isNext =
       item.status === "PENDING" &&
-      stops.find((s) => s.status === "PENDING")?.id === item.id;
+      stops.find((s: any) => s.status === "PENDING")?.id === item.id;
     const color = STOP_COLORS[item.status] ?? "#666";
 
     return (

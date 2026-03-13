@@ -141,7 +141,7 @@ const TAB_DEFS: TabDef[] = [
   {
     name: "cognitive",
     title: "Cognitive",
-    icon: "brain-outline",
+    icon: "hardware-chip-outline",
   },
   {
     name: "transfers",
@@ -188,7 +188,7 @@ export default function TabLayout() {
           name={name}
           options={{
             title,
-            href: tabHref(name),
+            href: tabHref(name) as any,
             tabBarIcon: ({ color, size, focused }) => (
               <Ionicons
                 name={focused && activeIcon ? activeIcon : icon}

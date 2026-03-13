@@ -101,7 +101,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       if (!token || !user) throw new Error("Invalid response from server");
 
-      await tokenStorage.setAccessToken(token);
+      await tokenStorage.saveTokens(token, "");
       // Emergency logins might not have refresh tokens or use samesite cookies
       // We'll set a dummy refresh token if needed or handle expiration gracefully
 

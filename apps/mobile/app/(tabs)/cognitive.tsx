@@ -87,7 +87,7 @@ export default function CognitiveScreen() {
           disabled={loading}
         >
           <Ionicons
-            name="brain-outline"
+            name="hardware-chip-outline"
             size={20}
             color="#FFF"
             style={styles.icon}

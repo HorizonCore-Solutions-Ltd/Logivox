@@ -274,7 +274,7 @@ function BayBoard() {
                               updateMut.mutate({
                                 id: selectedBay.id,
                                 status: s,
-                                notes: reason,
+                                
                               });
                           }
                         },
@@ -351,7 +351,7 @@ function BayBoard() {
                             })).concat([
                               {
                                 text: "Cancel",
-                                style: "cancel",
+                                /* style */
                                 onPress: () => {},
                               },
                             ]),

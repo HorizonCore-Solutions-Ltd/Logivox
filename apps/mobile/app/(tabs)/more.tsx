@@ -171,7 +171,7 @@ const ALL_FEATURES: FeatureTile[] = [
   },
   {
     label: "Cognitive",
-    icon: "brain-outline",
+    icon: "hardware-chip-outline",
     route: "/(tabs)/cognitive",
     color: "#2563EB",
     feature: "cognitive",
