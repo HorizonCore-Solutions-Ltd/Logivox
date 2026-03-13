@@ -113,13 +113,13 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get("status") || "all";
     const search = searchParams.get("search") || "";
     // Note: simple implementation for demo
-    
+
     let whereClause: any = { organizationId };
-    
+
     if (status !== "all") {
       whereClause.status = status;
     }
-    
+
     if (search) {
       whereClause.OR = [
         { invoiceNumber: { contains: search, mode: "insensitive" } },
@@ -132,13 +132,13 @@ export async function GET(request: NextRequest) {
         customer: true,
       },
       orderBy: { createdAt: "desc" },
-      take: 20
+      take: 20,
     });
 
     return NextResponse.json({
       success: true,
       invoices,
-      pagination: { total: invoices.length, pages: 1 }
+      pagination: { total: invoices.length, pages: 1 },
     });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

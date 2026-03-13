@@ -51,7 +51,6 @@ const gateEntrySchema = z.object({
   notes: z.string().optional(),
 });
 
-
 const gateEntrySchema = z.object({
   entryType: z.string(),
   direction: z.string(),

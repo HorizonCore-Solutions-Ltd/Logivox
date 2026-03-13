@@ -97,7 +97,7 @@ export async function POST(
     return NextResponse.json(refund);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return new NextResponse(JSON.stringify({ errors: error.errors }), {
+      return new NextResponse(JSON.stringify({ errors: error.issues }), {
         status: 400,
       });
     }

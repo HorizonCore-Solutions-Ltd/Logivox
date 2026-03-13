@@ -9,10 +9,95 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import crypto from "crypto";
 
+const DEFAULT_TIMEOUT_MS = 12000;
+const MAX_RETRY_ATTEMPTS = 3;
+
 const WEBHOOK_DEPRECATION = {
   message: "Webhook management moved to /api/integrations/webhooks",
   hint: "Use the dedicated webhook endpoint for create, test, and delivery logs.",
 };
+
+function wait(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function shouldRetryStatus(status: number) {
+  return status === 408 || status === 429 || (status >= 500 && status <= 599);
+}
+
+async function fetchWithResilience(
+  url: string,
+  init: RequestInit,
+  options: {
+    timeoutMs?: number;
+    maxAttempts?: number;
+    operation: string;
+    traceId: string;
+  },
+) {
+  const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+  const maxAttempts = options.maxAttempts ?? MAX_RETRY_ATTEMPTS;
+  const start = Date.now();
+  let lastError: unknown;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+    try {
+      const response = await fetch(url, {
+        ...init,
+        signal: controller.signal,
+      });
+
+      if (
+        !response.ok &&
+        shouldRetryStatus(response.status) &&
+        attempt < maxAttempts
+      ) {
+        const retryAfterHeader = response.headers.get("retry-after");
+        const retryAfterSec = retryAfterHeader ? Number(retryAfterHeader) : NaN;
+        const delayMs = Number.isFinite(retryAfterSec)
+          ? Math.max(250, retryAfterSec * 1000)
+          : Math.min(4000, 250 * 2 ** (attempt - 1));
+        clearTimeout(timeout);
+        await wait(delayMs);
+        continue;
+      }
+
+      clearTimeout(timeout);
+      return {
+        response,
+        attempts: attempt,
+        durationMs: Date.now() - start,
+      };
+    } catch (error) {
+      clearTimeout(timeout);
+      lastError = error;
+
+      if (attempt < maxAttempts) {
+        await wait(Math.min(4000, 250 * 2 ** (attempt - 1)));
+        continue;
+      }
+    }
+  }
+
+  const totalDurationMs = Date.now() - start;
+  console.error("Integration outbound request exhausted retries", {
+    operation: options.operation,
+    traceId: options.traceId,
+    maxAttempts,
+    totalDurationMs,
+    error: lastError instanceof Error ? lastError.message : String(lastError),
+  });
+
+  throw (
+    lastError ??
+    new Error(
+      `Request failed after ${maxAttempts} attempts for ${options.operation}`,
+    )
+  );
+}
 
 // GET - deprecated webhook listing
 export async function GET(_req: NextRequest) {
@@ -202,6 +287,7 @@ export async function DELETE(req: NextRequest) {
  * Helper: Sync load sheet to ERP system
  */
 async function syncToERP(loadSheet: any, erpSystem: string) {
+  const traceId = crypto.randomUUID();
   try {
     const payload = {
       deliveryNumber: loadSheet.loadSheetNumber,
@@ -232,17 +318,32 @@ async function syncToERP(loadSheet: any, erpSystem: string) {
     }
 
     const authToken = process.env.ERP_API_TOKEN;
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+    const { response, attempts, durationMs } = await fetchWithResilience(
+      endpoint,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Trace-Id": traceId,
+          ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+        },
+        body: JSON.stringify(payload),
       },
-      body: JSON.stringify(payload),
-    });
+      {
+        operation: "syncToERP",
+        traceId,
+      },
+    );
 
     const responseBody = await response.text();
     if (!response.ok) {
+      console.error("ERP sync responded with an error status", {
+        traceId,
+        erpSystem,
+        status: response.status,
+        attempts,
+        durationMs,
+      });
       return {
         success: false,
         message: `ERP sync failed (${response.status}): ${responseBody}`,
@@ -258,14 +359,18 @@ async function syncToERP(loadSheet: any, erpSystem: string) {
 
     return {
       success: true,
-      message: `Synced to ${erpSystem} successfully`,
+      message: `Synced to ${erpSystem} successfully (${attempts} attempt${attempts > 1 ? "s" : ""}, ${durationMs}ms)`,
       erpReference:
         parsed?.reference ||
         parsed?.id ||
         `${erpSystem}-${loadSheet.loadSheetNumber}-${Date.now()}`,
     };
   } catch (error) {
-    console.error("ERP sync error:", error);
+    console.error("ERP sync error", {
+      traceId,
+      erpSystem,
+      error: error instanceof Error ? error.message : String(error),
+    });
     return {
       success: false,
       message: "Failed to sync to ERP",
@@ -334,6 +439,7 @@ async function dispatchToCarrier(loadSheet: any, carrierCode: string) {
  * Helper: Trigger webhook
  */
 export async function triggerWebhook(event: string, data: any) {
+  const traceId = crypto.randomUUID();
   try {
     // Find active webhooks subscribed to this event
     const webhooks = await prisma.webhook.findMany({
@@ -360,28 +466,61 @@ export async function triggerWebhook(event: string, data: any) {
           ? crypto.createHmac("sha256", secret).update(rawPayload).digest("hex")
           : "";
 
-        await fetch(webhook.url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Webhook-Event": event,
-            ...(signature ? { "X-Webhook-Signature": signature } : {}),
+        const { response, attempts, durationMs } = await fetchWithResilience(
+          webhook.url,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Webhook-Event": event,
+              "X-Trace-Id": traceId,
+              ...(signature ? { "X-Webhook-Signature": signature } : {}),
+            },
+            body: rawPayload,
           },
-          body: rawPayload,
-        });
+          {
+            operation: `triggerWebhook:${event}`,
+            traceId,
+          },
+        );
+
+        if (!response.ok) {
+          const responseText = await response.text();
+          throw new Error(
+            `Webhook responded ${response.status}: ${responseText.slice(0, 500)}`,
+          );
+        }
 
         // Update last triggered timestamp
         await prisma.webhook.update({
           where: { id: webhook.id },
           data: { lastTriggered: new Date() },
         });
+
+        console.info("Webhook delivered", {
+          traceId,
+          webhookId: webhook.id,
+          event,
+          attempts,
+          durationMs,
+        });
       } catch (error) {
-        console.error(`Webhook failed for ${webhook.url}:`, error);
+        console.error("Webhook delivery failed", {
+          traceId,
+          webhookId: webhook.id,
+          webhookUrl: webhook.url,
+          event,
+          error: error instanceof Error ? error.message : String(error),
+        });
       }
     });
 
     await Promise.allSettled(promises);
   } catch (error) {
-    console.error("Trigger webhook error:", error);
+    console.error("Trigger webhook error", {
+      traceId,
+      event,
+      error: error instanceof Error ? error.message : String(error),
+    });
   }
 }

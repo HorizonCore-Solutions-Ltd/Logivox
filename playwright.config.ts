@@ -61,37 +61,50 @@ export default defineConfig({
   // Configure projects for major browsers
   projects: [
     {
+      name: "setup",
+      testMatch: /.*\.setup\.ts/,
+      teardown: undefined,
+    },
+    {
       name: "chromium",
+      dependencies: ["setup"],
+      testIgnore: /.*\.setup\.ts/,
       use: { ...devices["Desktop Chrome"] },
     },
 
     {
       name: "firefox",
+      testIgnore: /.*\.setup\.ts/,
       use: { ...devices["Desktop Firefox"] },
     },
 
     {
       name: "webkit",
+      testIgnore: /.*\.setup\.ts/,
       use: { ...devices["Desktop Safari"] },
     },
 
     // Test against mobile viewports
     {
       name: "Mobile Chrome",
+      testIgnore: /.*\.setup\.ts/,
       use: { ...devices["Pixel 5"] },
     },
     {
       name: "Mobile Safari",
+      testIgnore: /.*\.setup\.ts/,
       use: { ...devices["iPhone 12"] },
     },
 
     // Test against branded browsers
     {
       name: "Microsoft Edge",
+      testIgnore: /.*\.setup\.ts/,
       use: { ...devices["Desktop Edge"], channel: "msedge" },
     },
     {
       name: "Google Chrome",
+      testIgnore: /.*\.setup\.ts/,
       use: { ...devices["Desktop Chrome"], channel: "chrome" },
     },
   ],

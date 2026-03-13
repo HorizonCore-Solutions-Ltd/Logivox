@@ -76,7 +76,7 @@ export function VoiceControl() {
 
   const [showHelp, setShowHelp] = useState(false);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-  const [isMinimized, setIsMinimized] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(true);
 
   // Check microphone permission on mount
   useEffect(() => {

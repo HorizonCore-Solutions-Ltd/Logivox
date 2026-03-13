@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title:
     "LogiVox - Enterprise Voice-Native Warehouse Management System | Production Ready",
   description:
-    "Production-ready enterprise WMS with 489 API endpoints, 42 specialized dashboards, and complete Next-Gen capabilities. Voice-directed operations, AI optimization, IoT integration, and robotics orchestration.",
+    "Industry-leading capability: optimize labor, reduce logistics spend, and scale fulfillment with our comprehensive management software, and complete Next-Gen capabilities. Voice-directed operations, AI optimization, IoT integration, and robotics orchestration.",
   keywords: [
     "enterprise warehouse management",
     "voice-native WMS",
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "LogiVox - Enterprise Voice-Native Warehouse Management",
     description:
-      "Production-ready WMS with 489 APIs, voice operations, AI optimization, and complete Next-Gen features.",
+      "Production-ready WMS with intelligent workflows, voice operations, AI optimization, and complete Next-Gen features.",
     url: "https://logivox.com",
     siteName: "LogiVox",
     locale: "en_US",
@@ -58,7 +58,7 @@ const jsonLd = {
   name: "LogiVox",
   applicationCategory: "BusinessApplication",
   description:
-    "Enterprise voice-native warehouse management system with 489 production API endpoints and complete Next-Gen capabilities",
+    "Enterprise voice-native warehouse management system with seamless enterprise integrations and complete Next-Gen capabilities",
   operatingSystem: "Web, Cloud",
   offers: {
     "@type": "Offer",
@@ -71,7 +71,7 @@ const jsonLd = {
   },
   featureList: [
     "Voice-directed warehouse operations",
-    "489 production API endpoints",
+    "seamless enterprise integrations",
     "42 specialized dashboards",
     "Real-time IoT sensor integration",
     "AI-powered optimization",

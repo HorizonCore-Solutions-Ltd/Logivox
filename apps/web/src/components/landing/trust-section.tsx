@@ -54,7 +54,7 @@ export function TrustSection() {
       icon: Shield,
     },
     {
-      title: "30-Day Free Trial",
+      title: "Rapid Deployment",
       description:
         "Try everything with no commitments. No credit card required. Get full access to all features from day one.",
       icon: CheckCircle,

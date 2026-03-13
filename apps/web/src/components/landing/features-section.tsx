@@ -149,9 +149,9 @@ export function FeaturesSection() {
     {
       title: "Zero-Trust Everywhere",
       description:
-        "Per-warehouse and per-integration scopes, auditable access, and hardened webhooks with retries and dead-letter capture.",
+        "Strict role-based permissions across sites, unalterable activity logs, and reliable automated alerts to guarantee compliance and operational security.",
       icon: Shield,
-      highlights: ["Fine-grain scopes", "Audit trails", "Reliable webhooks"],
+      highlights: ["Fine-grain scopes", "Audit trails", "Automated compliance"],
     },
   ];
 

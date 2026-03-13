@@ -503,7 +503,7 @@ export function Navigation() {
               <Link href="/demo">Book Demo</Link>
             </Button>
             <Button size="sm" asChild>
-              <Link href="/sign-up">Start Free Trial</Link>
+              <Link href="/contact">Contact Sales</Link>
             </Button>
           </div>
 
@@ -650,8 +650,8 @@ export function Navigation() {
                     </Link>
                   </Button>
                   <Button className="w-full" asChild>
-                    <Link href="/sign-up" onClick={() => setMobileOpen(false)}>
-                      Start Free Trial
+                    <Link href="/contact" onClick={() => setMobileOpen(false)}>
+                      Contact Sales
                     </Link>
                   </Button>
                 </div>

@@ -19,22 +19,18 @@ import {
 
 export function HeroSection() {
   const benefits = [
-    { label: "489 Production API Endpoints" },
-    { label: "42 Specialized Dashboards" },
-    { label: "201 Database Tables" },
-    { label: "Replenishment v2.0 Beta Live" },
-    { label: "AI · IoT · Robotics · Digital Twin" },
+    { label: "Seamless Enterprise Integration" },
+    { label: "Real-Time End-to-End Visibility" },
+    { label: "Ready for High-Volume Operations" },
+    { label: "Adaptive Inventory Control" },
+    { label: "Automated Fulfillment Engine" },
   ];
 
   const stats = [
-    { value: "489", label: "API Endpoints", sublabel: "Production Ready" },
-    {
-      value: "42",
-      label: "Dashboards",
-      sublabel: "Enterprise Features",
-    },
+    { value: "489+", label: "Integrations", sublabel: "Enterprise Ready" },
+    { value: "50%", label: "Throughput Boost", sublabel: "Proven Results" },
     { value: "99.99%", label: "Uptime SLA", sublabel: "Enterprise Grade" },
-    { value: "201", label: "Database Tables", sublabel: "Complete Data Model" },
+    { value: "99.9%", label: "Inventory Accuracy", sublabel: "Industry Leading" },
   ];
 
   return (
@@ -72,7 +68,7 @@ export function HeroSection() {
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-foreground/80 max-w-3xl mx-auto leading-relaxed font-medium">
-              Production-ready WMS with 489 API endpoints, 42 specialized
+              Production-grade execution tailored for global operations
               dashboards, and complete Next-Gen capabilities. Voice-directed
               operations, AI optimization, IoT integration, and robotics
               orchestration — all fully implemented.
@@ -104,7 +100,7 @@ export function HeroSection() {
           </div>
 
           {/* ROI benefits */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full max-w-4xl">
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 w-full max-w-5xl">
             {benefits.map((benefit) => (
               <div
                 key={benefit.label}

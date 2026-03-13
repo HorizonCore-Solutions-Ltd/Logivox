@@ -418,7 +418,7 @@ async function generatePickingEfficiency(
       stats.orders > 0 ? (stats.totalTime / stats.orders).toFixed(1) : "0",
     accuracy_rate:
       stats.orders > 0
-        ? (((stats.orders - stats.errors) / stats.orders) * 100).toFixed(1)
+        ? (((stats.orders - stats.issues) / stats.orders) * 100).toFixed(1)
         : "100",
   }));
 }

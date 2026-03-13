@@ -46,12 +46,23 @@ export default function NewPurchaseOrderPage() {
   useEffect(() => {
     const load = async () => {
       try {
-        const [suppRes, invRes] = await Promise.all([
+        const [orgRes, suppRes] = await Promise.all([
+          fetch("/api/organizations"),
           fetch("/api/suppliers?limit=200"),
-          fetch("/api/inventory?limit=500"),
         ]);
+
+        const orgData = await orgRes.json();
+        const organizations = Array.isArray(orgData) ? orgData : [];
+        const organizationId = organizations[0]?.id;
+
+        const invRes = organizationId
+          ? await fetch(
+              `/api/inventory?limit=500&organizationId=${organizationId}`,
+            )
+          : null;
+
         const suppData = await suppRes.json();
-        const invData = await invRes.json();
+        const invData = invRes ? await invRes.json() : { data: [] };
         setSuppliers(suppData.suppliers ?? suppData.data ?? []);
         setInventoryItems(invData.items ?? invData.data ?? []);
       } catch (e) {

@@ -28,7 +28,7 @@ import {
   Database,
 } from "lucide-react";
 
-export default function AnalyticsPage() {
+export default function HazmatCompliancePage() {
   const features = [
     {
       icon: BarChart3,
@@ -44,7 +44,7 @@ export default function AnalyticsPage() {
     },
     {
       icon: TrendingUp,
-      title: "Demand Forecasting",
+      title: "Demand Optimization",
       description:
         "Predict future demand with 95% accuracy using historical data and market trends.",
     },
@@ -161,12 +161,10 @@ export default function AnalyticsPage() {
           <div className="max-w-3xl mx-auto text-center">
             <Badge className="mb-4">Solutions</Badge>
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl mb-6">
-              Advanced Analytics
+              Hazmat & Regulatory Compliance
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
-              Transform raw data into actionable insights. Make data-driven
-              decisions with AI-powered analytics, real-time dashboards, and
-              predictive intelligence.
+              Fail-Safe Regulatory Control. Protect your people and operations. Enforce strict spatial separation rules for hazardous materials instantly. LogiVox checks inbound manifests against DOT/IATA regulations and forces compliant putaway logic automatically.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
@@ -176,7 +174,7 @@ export default function AnalyticsPage() {
                 </Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
-                <Link href="/contact">See Analytics Demo</Link>
+                <Link href="/contact">See Hazmat Compliance Demo</Link>
               </Button>
             </div>
           </div>
@@ -214,12 +212,12 @@ export default function AnalyticsPage() {
         </div>
       </section>
 
-      {/* Analytics Modules */}
+      {/* Hazmat Compliance Modules */}
       <section className="py-20 lg:py-28 bg-muted/30">
         <div className="container-enterprise">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">
-              Comprehensive Analytics Modules
+              Comprehensive Hazmat Compliance Modules
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Deep insights across every aspect of your business
@@ -303,7 +301,7 @@ export default function AnalyticsPage() {
                 Data-Driven Decision Making
               </h2>
               <p className="text-lg text-muted-foreground mb-6">
-                Our analytics platform delivers measurable improvements across
+                Our Hazmat Compliance platform delivers measurable improvements across
                 your business.
               </p>
               <div className="space-y-3">
@@ -396,7 +394,7 @@ export default function AnalyticsPage() {
             Ready to Unlock Your Data's Potential?
           </h2>
           <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
-            Join leading companies using LogiVox Analytics to drive growth
+            Join leading companies using LogiVox Hazmat Compliance to drive growth
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" asChild>

@@ -68,6 +68,7 @@ interface Recommendation {
   productId: string;
   sku: string;
   supplierId: string;
+  supplierName?: string;
   recommendedQty: number;
   urgency: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
   reason: string;
@@ -156,7 +157,6 @@ export default function SupplierIntegrationPage() {
             deliveryDate: new Date(
               Date.now() + 14 * 24 * 60 * 60 * 1000,
             ).toISOString(),
-            warehouseId: "WH-001",
             notes: rec.reason,
           },
         }),
@@ -577,7 +577,7 @@ export default function SupplierIntegrationPage() {
                         </Badge>
                         <span className="font-medium">{rec.sku}</span>
                         <span className="text-sm text-gray-600">
-                          • {rec.supplierId}
+                          • {rec.supplierName || rec.supplierId}
                         </span>
                       </div>
                       <p className="text-sm text-gray-600 mb-2">{rec.reason}</p>

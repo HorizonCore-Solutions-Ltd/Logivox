@@ -29,9 +29,7 @@ export function CTASection() {
               Ready for Enterprise-Grade WMS?
             </h2>
             <p className="text-xl text-muted-foreground">
-              Production-ready platform with 489 APIs, 42 dashboards, and
-              complete Next-Gen capabilities. Voice operations, AI optimization,
-              and IoT integration fully deployed.
+              Empower your workforce, streamline fulfillment processes, and cut operational costs with our unified logistics execution platform.
             </p>
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-2xl mx-auto mt-6">
               <p className="text-sm font-semibold text-blue-800 flex items-center gap-2">

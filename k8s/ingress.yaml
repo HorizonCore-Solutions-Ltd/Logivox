@@ -18,6 +18,15 @@ metadata:
     nginx.ingress.kubernetes.io/limit-rps: "100"
     nginx.ingress.kubernetes.io/limit-connections: "50"
     
+    # CDN & Caching Optimizatons
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      location ~* \.(js|css|gif|jpe?g|png|woff2?|ico|svg)$ {
+        expires 365d;
+        add_header Cache-Control "public, no-transform";
+      }
+      add_header X-Content-Type-Options "nosniff" always;
+      add_header X-Frame-Options "SAMEORIGIN" always;
+    
     # Timeouts
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "60"

@@ -203,7 +203,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          error: { code: "INVALID_INPUT", details: error.errors },
+          error: { code: "INVALID_INPUT", details: error.issues },
         },
         { status: 400 },
       );

@@ -142,7 +142,6 @@ export default function AIAssistantPage() {
         </div>
       </section>
 
-
       {/* Main Features */}
       <section className="py-20 lg:py-28">
         <div className="container-enterprise">

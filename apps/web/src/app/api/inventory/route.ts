@@ -792,7 +792,7 @@ export async function POST(request: NextRequest) {
             {
               error: "Input validation failed",
               code: "VALIDATION_FAILED",
-              details: validationError.errors || validationError.message,
+              details: validationError.issues || validationError.message,
               securityLevel: "HIGH",
             },
             { status: 400 },

@@ -506,7 +506,7 @@ export async function POST(req: NextRequest) {
 
       if (!fdaResult.success) {
         return NextResponse.json(
-          { error: "FDA submission failed", details: fdaResult.errors },
+          { error: "FDA submission failed", details: fdaResult.issues },
           { status: 500 },
         );
       }
@@ -601,7 +601,7 @@ export async function POST(req: NextRequest) {
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Validation failed", details: error.errors },
+        { error: "Validation failed", details: error.issues },
         { status: 400 },
       );
     }

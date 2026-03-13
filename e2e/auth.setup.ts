@@ -1,19 +1,19 @@
-import { test as setup } from "@playwright/test";
+import { test as setup, expect } from "@playwright/test";
+import fs from "fs";
 
 const authFile = "playwright/.auth/user.json";
 
 setup("authenticate", async ({ page }) => {
-  // Go to login page
-  await page.goto("http://localhost:3000/sign-in");
+  fs.mkdirSync("playwright/.auth", { recursive: true });
 
-  // Perform authentication steps
+  await page.goto("/sign-in");
+
   await page.fill('[name="email"]', "admin@logivox.ai");
   await page.fill('[name="password"]', "Admin@Logivox1!");
-  await page.click('button[type="submit"]');
+  await page.waitForTimeout(500);
+  await page.click('button[type="submit"]', { force: true });
 
-  // Wait for redirect to dashboard
-  await page.waitForURL("**/dashboard");
+  await expect(page).toHaveURL(/\/dashboard$/, { timeout: 60000 });
 
-  // Save authentication state
   await page.context().storageState({ path: authFile });
 });

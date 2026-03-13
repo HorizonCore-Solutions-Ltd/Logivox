@@ -600,7 +600,7 @@ export async function POST(request: NextRequest) {
           results.succeeded++;
         } catch (error) {
           results.failed++;
-          results.errors.push({
+          results.issues.push({
             change,
             error: error instanceof Error ? error.message : "Unknown error",
           });
@@ -618,7 +618,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Validation error", details: error.errors },
+        { error: "Validation error", details: error.issues },
         { status: 400 },
       );
     }

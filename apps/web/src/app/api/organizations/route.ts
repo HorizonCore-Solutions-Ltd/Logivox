@@ -27,8 +27,8 @@ export async function GET(request: NextRequest) {
                   },
                 },
               },
-            }
-          }
+            },
+          },
         },
       },
     });
@@ -37,7 +37,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    return NextResponse.json(user.organizationMemberships.map(m => m.organization));
+    return NextResponse.json(
+      user.organizationMemberships.map((m) => m.organization),
+    );
   } catch (error) {
     console.error("Organizations fetch error:", error);
     return NextResponse.json(

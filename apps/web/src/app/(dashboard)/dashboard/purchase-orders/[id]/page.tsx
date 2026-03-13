@@ -32,6 +32,11 @@ const STATUS_CONFIG: Record<
     color: "bg-gray-100 text-gray-700",
     icon: <FileText className="h-3 w-3" />,
   },
+  PENDING: {
+    label: "Pending Approval",
+    color: "bg-yellow-100 text-yellow-700",
+    icon: <AlertTriangle className="h-3 w-3" />,
+  },
   PENDING_APPROVAL: {
     label: "Pending Approval",
     color: "bg-yellow-100 text-yellow-700",
@@ -102,6 +107,13 @@ export default function PurchaseOrderDetailPage() {
     try {
       const res = await fetch(`/api/purchase-orders/${params.id}/${endpoint}`, {
         method,
+        headers: { "Content-Type": "application/json" },
+        body:
+          endpoint === "cancel"
+            ? JSON.stringify({
+                reason: "Cancelled from purchase order detail page",
+              })
+            : undefined,
       });
       if (!res.ok) {
         const d = await res.json();

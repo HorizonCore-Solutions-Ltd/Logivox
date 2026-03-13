@@ -9,7 +9,7 @@ const faqs = [
   },
   {
     q: "How do you secure data?",
-    a: "Zero-trust scopes per warehouse and integration, HMAC-signed webhooks, audit streaming, and SOC 2/ISO controls. Voice stays in-browser.",
+    a: "Role-based access across facilities, secure data synchronization, comprehensive audit trails, and strict SOC 2/ISO compliance. Voice stays in-browser.",
   },
   {
     q: "What if Wi-Fi drops on the floor?",
@@ -17,11 +17,11 @@ const faqs = [
   },
   {
     q: "Do you integrate with our stack?",
-    a: "Yes. ERP, carriers, ecommerce, and webhooks are supported. Delivery logs and retries help validate each integration.",
+    a: "Yes. Our platform seamlessly synchronizes with leading ERPs, carriers, and ecommerce systems, ensuring order accuracy and continuous updates.",
   },
   {
     q: "How fast is time-to-value?",
-    a: "Day 1 trial access; week-one ROI checks with burn-rate alerts and SLO dashboards to prove reliability and savings.",
+    a: "Expedited onboarding programs are available for global sites, ensuring rapid integration and immediate ROI demonstration within the first operational cycle.",
   },
   {
     q: "Do I need special hardware (Vocollect, etc)?",

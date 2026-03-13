@@ -9,6 +9,66 @@ import { z } from "zod";
  * Handles automated procurement logic and stats
  */
 
+const createPORequestSchema = z.object({
+  action: z.literal("createPO"),
+  data: z.object({
+    supplierId: z.string().cuid(),
+    items: z
+      .array(
+        z.object({
+          productId: z.string().cuid(),
+          sku: z.string().min(1),
+          quantity: z.number().int().positive(),
+          unitPrice: z.number().nonnegative(),
+        }),
+      )
+      .min(1),
+    deliveryDate: z.string().datetime().optional(),
+    warehouseId: z.string().optional(),
+    notes: z.string().optional(),
+  }),
+});
+
+function toNumber(value: unknown): number {
+  if (value == null) return 0;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function clampPercent(value: number): number {
+  return Math.max(0, Math.min(100, Math.round(value)));
+}
+
+function deriveTier(score: number): string {
+  if (score >= 95) return "PLATINUM";
+  if (score >= 85) return "GOLD";
+  if (score >= 75) return "SILVER";
+  if (score >= 60) return "BRONZE";
+  return "PROBATION";
+}
+
+async function resolveOrganizationId(
+  userId: string,
+  sessionOrgId?: string | null,
+) {
+  if (sessionOrgId) {
+    return sessionOrgId;
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: {
+      organizationMemberships: {
+        where: { isActive: true },
+        take: 1,
+        orderBy: { joinedAt: "asc" },
+      },
+    },
+  });
+
+  return user?.organizationMemberships?.[0]?.organizationId ?? null;
+}
+
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -17,14 +77,12 @@ export async function GET(req: NextRequest) {
 
     const searchParams = req.nextUrl.searchParams;
     const action = searchParams.get("action");
-    const orgId =
-      session.user.orgId ||
-      (await prisma.user.findUnique({ where: { id: session.user.id } }))
-        .organizationMemberships[0]?.organizationId; // Fallback
+    const orgId = await resolveOrganizationId(
+      session.user.id,
+      session.user.orgId,
+    );
 
     if (!orgId) {
-      // Just grab first org user belongs to if session doesn't have it direct
-      // In robust app, this would be cleaner
       return NextResponse.json(
         { error: "Organization not found" },
         { status: 400 },
@@ -32,73 +90,195 @@ export async function GET(req: NextRequest) {
     }
 
     if (action === "stats") {
-      // 1. Stats logic
-      // Count Active Orders (Open POs)
-      const activeCtx = await prisma.purchaseOrder.count({
-        where: {
-          organizationId: orgId,
-          status: { notIn: ["CANCELLED", "CLOSED", "RECEIVED"] },
-        },
-      });
-      // Pending
-      const pendingCtx = await prisma.purchaseOrder.count({
-        where: { organizationId: orgId, status: "PENDING" },
-      });
-
-      const totalOrdersCtx = await prisma.purchaseOrder.count({
-        where: { organizationId: orgId },
-      });
+      const [
+        activeOrders,
+        pendingApproval,
+        totalOrders,
+        spendAggregate,
+        activeSuppliers,
+      ] = await Promise.all([
+        prisma.purchaseOrder.count({
+          where: {
+            organizationId: orgId,
+            status: { notIn: ["CANCELLED", "CLOSED", "RECEIVED"] },
+          },
+        }),
+        prisma.purchaseOrder.count({
+          where: {
+            organizationId: orgId,
+            status: { in: ["DRAFT", "PENDING"] },
+          },
+        }),
+        prisma.purchaseOrder.count({
+          where: { organizationId: orgId },
+        }),
+        prisma.purchaseOrder.aggregate({
+          where: {
+            organizationId: orgId,
+            status: { notIn: ["CANCELLED"] },
+          },
+          _sum: { totalAmount: true },
+          _avg: { totalAmount: true },
+        }),
+        prisma.supplier.count({
+          where: { organizationId: orgId, isActive: true },
+        }),
+      ]);
 
       return NextResponse.json({
         stats: {
-          activeOrders: activeCtx,
-          pendingApproval: pendingCtx,
-          totalOrders: totalOrdersCtx,
-          totalSpend: 154000, // Mock for now or aggregate
-          avgOrderValue: 3200,
-          activeSuppliers: await prisma.supplier.count({
-            where: { organizationId: orgId, status: "ACTIVE" },
-          }),
+          activeOrders,
+          pendingApproval,
+          totalOrders,
+          totalSpend: toNumber(spendAggregate._sum.totalAmount),
+          avgOrderValue: toNumber(spendAggregate._avg.totalAmount),
+          activeSuppliers,
         },
       });
     } else if (action === "suppliers") {
-      // 2. Suppliers logic
+      const now = new Date();
+      const last30Days = new Date(now);
+      last30Days.setDate(last30Days.getDate() - 30);
+      const last90Days = new Date(now);
+      last90Days.setDate(last90Days.getDate() - 90);
+      const yearStart = new Date(now.getFullYear(), 0, 1);
+
       const suppliers = await prisma.supplier.findMany({
         where: { organizationId: orgId },
-        take: 20,
+        take: 50,
+        include: {
+          qualityScore: true,
+          supplierPerformanceReviews: {
+            orderBy: { periodEnd: "desc" },
+            take: 1,
+          },
+          supplierUsers: {
+            select: { id: true },
+            take: 1,
+          },
+          purchaseOrders: {
+            where: {
+              organizationId: orgId,
+              orderDate: { gte: yearStart },
+            },
+            select: {
+              status: true,
+              totalAmount: true,
+              orderDate: true,
+            },
+          },
+        },
       });
 
-      // Transform to frontend shape
-      const profile = suppliers.map((s) => ({
-        supplierId: s.id,
-        supplierName: s.name,
-        tier: "GOLD", // Mock logic or add field
-        metrics: { onTimeDelivery: 98, qualityScore: 99 }, // Mock logic
-      }));
+      const profile = suppliers
+        .map((supplier) => {
+          const quality = supplier.qualityScore;
+          const latestReview = supplier.supplierPerformanceReviews[0];
+          const orders = supplier.purchaseOrders;
+
+          const totalOrders = orders.length;
+          const activeOrders = orders.filter((order) =>
+            [
+              "DRAFT",
+              "PENDING",
+              "APPROVED",
+              "SENT",
+              "CONFIRMED",
+              "PARTIALLY_RECEIVED",
+            ].includes(order.status),
+          ).length;
+          const completedOrders = orders.filter((order) =>
+            ["RECEIVED", "CLOSED"].includes(order.status),
+          ).length;
+          const disputedOrders = orders.filter(
+            (order) => order.status === "CANCELLED",
+          ).length;
+
+          const performanceScore = clampPercent(
+            quality?.overallScore ?? latestReview?.overallScore ?? 0,
+          );
+          const qualityPercent = clampPercent(
+            latestReview?.qualityScore ??
+              quality?.qualityScore ??
+              performanceScore,
+          );
+          const onTimeDelivery = clampPercent(
+            latestReview?.deliveryScore ??
+              quality?.reliabilityScore ??
+              performanceScore,
+          );
+          const defectRate = Math.max(
+            toNumber(quality?.recent90DefectRate),
+            toNumber(quality?.lifetimeDefectRate),
+          );
+          const orderAccuracy = clampPercent(
+            defectRate > 0 ? 100 - defectRate * 100 : qualityPercent,
+          );
+          const responsivenessScore = clampPercent(
+            latestReview?.responsivenessScore ?? quality?.responseScore ?? 70,
+          );
+          const avgResponseTime = Math.max(
+            1,
+            Math.round((100 - responsivenessScore) / 8),
+          );
+
+          return {
+            supplierId: supplier.id,
+            supplierName: supplier.name,
+            integrationType:
+              supplier.supplierUsers.length > 0
+                ? "PORTAL"
+                : supplier.email
+                  ? "EMAIL"
+                  : "MANUAL",
+            isActive: supplier.isActive,
+            performanceScore,
+            tier: quality?.tier || deriveTier(performanceScore),
+            metrics: {
+              onTimeDelivery,
+              qualityScore: qualityPercent,
+              orderAccuracy,
+              avgResponseTime,
+            },
+            orders: {
+              total: totalOrders,
+              active: activeOrders,
+              completed: completedOrders,
+              disputed: disputedOrders,
+            },
+            spend: {
+              last30Days: orders
+                .filter((order) => order.orderDate >= last30Days)
+                .reduce((sum, order) => sum + toNumber(order.totalAmount), 0),
+              last90Days: orders
+                .filter((order) => order.orderDate >= last90Days)
+                .reduce((sum, order) => sum + toNumber(order.totalAmount), 0),
+              yearToDate: orders.reduce(
+                (sum, order) => sum + toNumber(order.totalAmount),
+                0,
+              ),
+            },
+          };
+        })
+        .sort((left, right) => right.performanceScore - left.performanceScore);
 
       return NextResponse.json({ suppliers: profile });
     } else if (action === "recommendations") {
-      // 3. Smart Replenishment Logic
-      // Find items below min stock
       const lowStockItems = await prisma.inventoryItem.findMany({
         where: {
           organizationId: orgId,
           isActive: true,
-          // Prisma currently doesn't support direct field comparison in where easily,
-          // so we fetch ones with minStockLevel > 0 and filter in memory for complex logic if needed.
-          // Or user raw query. For safety, let's fetch active items with minStock defined.
           minStockLevel: { gt: 0 },
+          supplierId: { not: null },
         },
         include: {
           supplier: true,
         },
       });
 
-      const recommendations = [];
-
-      for (const item of lowStockItems) {
-        if (item.availableQty <= item.minStockLevel) {
-          // Calculate replenishment
+      const recommendations = lowStockItems
+        .filter((item) => item.availableQty <= item.minStockLevel)
+        .map((item) => {
           let qtyToOrder =
             item.reorderQuantity && item.reorderQuantity > 0
               ? item.reorderQuantity
@@ -106,27 +286,40 @@ export async function GET(req: NextRequest) {
                 ? item.maxStockLevel - item.availableQty
                 : item.minStockLevel * 2;
 
-          if (qtyToOrder <= 0) qtyToOrder = 10; // Fallback safety
+          if (qtyToOrder <= 0) {
+            qtyToOrder = item.minStockLevel - item.availableQty;
+          }
 
-          recommendations.push({
+          if (qtyToOrder <= 0 || !item.supplierId) {
+            return null;
+          }
+
+          return {
             productId: item.id,
             sku: item.sku,
-            supplierId: item.supplierId || "SUP-UNKNOWN",
-            supplierName: item.supplier?.name || "Assign Supplier",
+            supplierId: item.supplierId,
+            supplierName: item.supplier?.name || "Unassigned Supplier",
             recommendedQty: qtyToOrder,
             currentStock: item.availableQty,
             minStock: item.minStockLevel,
             urgency: item.availableQty === 0 ? "CRITICAL" : "HIGH",
             reason: `Stock (${item.availableQty}) below minimum (${item.minStockLevel})`,
-            estimatedCost: (Number(item.costPrice) || 0) * qtyToOrder,
-          });
-        }
-      }
+            estimatedCost: toNumber(item.costPrice) * qtyToOrder,
+          };
+        })
+        .filter((item): item is NonNullable<typeof item> => item !== null)
+        .sort((left, right) => {
+          const urgencyRank = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 };
+          const urgencyDelta =
+            urgencyRank[left.urgency] - urgencyRank[right.urgency];
 
-      // Limit to top 20 urgent
+          if (urgencyDelta !== 0) {
+            return urgencyDelta;
+          }
+
+          return right.estimatedCost - left.estimatedCost;
+        });
       const finalRecs = recommendations.slice(0, 20);
-
-      // Calculate Summary
       const summary = {
         total: recommendations.length,
         critical: recommendations.filter((r) => r.urgency === "CRITICAL")
@@ -160,55 +353,104 @@ export async function POST(req: NextRequest) {
     if (!session?.user)
       return new NextResponse("Unauthorized", { status: 401 });
 
-    const json = await req.json();
-    const { action, data } = json;
+    const parsed = createPORequestSchema.parse(await req.json());
 
-    if (action === "createPO") {
-      // Create Purchase Order Logic
-      const { supplierId, items, deliveryDate, warehouseId, notes } = data;
+    if (parsed.action === "createPO") {
+      const orgId = await resolveOrganizationId(
+        session.user.id,
+        session.user.orgId,
+      );
+      if (!orgId) throw new Error("No active organization found");
 
-      // Resolve Organization
-      const user = await prisma.user.findUnique({
-        where: { id: session.user.id },
-        include: { organizationMemberships: true },
+      const supplier = await prisma.supplier.findFirst({
+        where: {
+          id: parsed.data.supplierId,
+          organizationId: orgId,
+          isActive: true,
+        },
       });
-      const orgId = user?.organizationMemberships[0]?.organizationId;
-      if (!orgId) throw new Error("No Org");
 
-      const poNumber = "PO-" + Date.now().toString().slice(-6);
+      if (!supplier) {
+        return NextResponse.json(
+          { error: "Supplier not found or inactive" },
+          { status: 400 },
+        );
+      }
 
-      // Fetch items details for description
-      const productIds = items.map((i: any) => i.productId);
+      const productIds = parsed.data.items.map((item) => item.productId);
       const products = await prisma.inventoryItem.findMany({
-        where: { id: { in: productIds } },
+        where: {
+          id: { in: productIds },
+          organizationId: orgId,
+        },
       });
-      const productMap = new Map(products.map((p) => [p.id, p]));
+      const productMap = new Map(
+        products.map((product) => [product.id, product]),
+      );
+
+      if (products.length !== productIds.length) {
+        return NextResponse.json(
+          { error: "One or more inventory items were not found" },
+          { status: 400 },
+        );
+      }
+
+      const poCount = await prisma.purchaseOrder.count({
+        where: { organizationId: orgId },
+      });
+      const poNumber = `PO-${Date.now()}-${String(poCount + 1).padStart(4, "0")}`;
+
+      const lineItems = parsed.data.items.map((item) => {
+        const product = productMap.get(item.productId);
+        const quantity = item.quantity;
+        const unitPrice = item.unitPrice;
+
+        return {
+          inventoryItemId: item.productId,
+          sku: item.sku || product?.sku || "UNKNOWN",
+          description: product?.name || `Item ${item.sku}`,
+          quantityOrdered: quantity,
+          unitPrice,
+          totalPrice: quantity * unitPrice,
+        };
+      });
+
+      const subtotal = lineItems.reduce(
+        (sum, item) => sum + item.totalPrice,
+        0,
+      );
 
       const result = await prisma.purchaseOrder.create({
         data: {
           organizationId: orgId,
-          supplierId,
+          supplierId: parsed.data.supplierId,
           poNumber,
           status: "DRAFT",
-          expectedDate: deliveryDate ? new Date(deliveryDate) : undefined,
-          deliveryNotes: notes,
+          expectedDate: parsed.data.deliveryDate
+            ? new Date(parsed.data.deliveryDate)
+            : undefined,
+          deliveryNotes: parsed.data.notes,
+          notes: "Generated from Smart Replenishment recommendation",
+          subtotal,
+          totalAmount: subtotal,
           items: {
-            create: items.map((i: any) => {
-              const product = productMap.get(i.productId);
-              const qty = Number(i.quantity) || 0;
-              const price = Number(i.unitPrice) || 0;
-
-              return {
-                inventoryItemId: i.productId,
-                sku: i.sku || product?.sku || "UNKNOWN",
-                description: product?.name || "Item " + i.sku,
-                quantityOrdered: qty,
-                unitPrice: price,
-                totalPrice: qty * price,
-              };
-            }),
+            create: lineItems,
           },
           createdById: session.user.id,
+        },
+      });
+
+      await prisma.activityLog.create({
+        data: {
+          organizationId: orgId,
+          userId: session.user.id,
+          action: "CREATE",
+          entityType: "PurchaseOrder",
+          entityId: result.id,
+          metadata: {
+            poNumber,
+            source: "SMART_REPLENISHMENT",
+          },
         },
       });
 
@@ -218,6 +460,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
     console.error("Create PO Error:", error);
+
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: "Validation error", details: error.issues },
+        { status: 400 },
+      );
+    }
+
     return NextResponse.json(
       { error: "Failed to process request" },
       { status: 500 },

@@ -59,7 +59,7 @@ export function PricingSection() {
         "Email support",
         "Basic reporting",
       ],
-      cta: "Start Free 30-Day Trial",
+      cta: "Request Custom Quote",
       ctaVariant: "outline" as const,
       popular: false,
     },
@@ -81,7 +81,7 @@ export function PricingSection() {
         "24/7 priority support",
         "API access",
       ],
-      cta: "Start Free 30-Day Trial",
+      cta: "Request Custom Quote",
       ctaVariant: "default" as const,
       popular: true,
     },
@@ -339,9 +339,9 @@ export function PricingSection() {
         "Yes, you can upgrade or downgrade your plan at any time. Changes will be prorated and reflected in your next billing cycle.",
     },
     {
-      question: "Is there a free trial?",
+      question: "What is the deployment timeline?",
       answer:
-        "We offer a 14-day free trial for all plans. No credit card required to get started.",
+        "Our enterprise deployments typically launch within 30-90 days, depending on facility complexity, with dedicated solutions architects guiding every integration phase.",
     },
     {
       question: "What payment methods do you accept?",
@@ -371,7 +371,7 @@ export function PricingSection() {
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Choose the perfect plan for your organization. Start with our 14-day
-            free trial and scale as you grow. No hidden fees, cancel anytime.
+            enterprise pilot program to prove ROI. Comprehensive operational SLA included.
           </p>
 
           {/* Billing cycle toggle */}
