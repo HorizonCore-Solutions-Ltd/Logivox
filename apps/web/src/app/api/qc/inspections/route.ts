@@ -3,10 +3,6 @@ import { requireApiAuth } from "@/lib/api-guard";
 import { withObservability } from "@/lib/middleware/observability";
 import { prisma } from "@/lib/prisma";
 
-// Mock QCInspectionService for turnkey demo/production if actual service is missing or unstable
-// In a real scenario, we'd ensure the service handles organization scoping correctly.
-const MOCK_ENABLE = false;
-
 export async function GET(request: NextRequest) {
   return withObservability(async () => {
     const auth = await requireApiAuth();
@@ -90,15 +86,20 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    // Generate logic for inspection number
-    const dateStr = new Date()
-      .toISOString()
-      .replace(/[^0-9]/g, "")
-      .slice(0, 14);
-    const randomSuffix = Math.floor(Math.random() * 1000)
-      .toString()
-      .padStart(3, "0");
-    const inspectionNumber = `INS-${dateStr}-${randomSuffix}`;
+    // Generate deterministic inspection number (daily sequence per org)
+    const now = new Date();
+    const dayStart = new Date(now);
+    dayStart.setHours(0, 0, 0, 0);
+    const dayEnd = new Date(now);
+    dayEnd.setHours(23, 59, 59, 999);
+    const dateStr = now.toISOString().slice(0, 10).replace(/-/g, "");
+    const todaysCount = await prisma.qCInspection.count({
+      where: {
+        organizationId,
+        createdAt: { gte: dayStart, lte: dayEnd },
+      },
+    });
+    const inspectionNumber = `INS-${dateStr}-${String(todaysCount + 1).padStart(4, "0")}`;
 
     // Prepare checkpoints creation data
     // Assuming JSON structure matches what QCCheckpoint needs or is adaptable

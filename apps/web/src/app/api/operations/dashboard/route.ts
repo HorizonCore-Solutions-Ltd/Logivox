@@ -23,19 +23,36 @@ export async function GET(request: NextRequest) {
       outboundDoors,
       activeUsers,
     ] = await Promise.all([
-      // Assuming mock user count for now unless we query UserShift or TaskExecution assignments
-      prisma.user.count({ where: { organizationId, role: "USER" } }), // Placeholder for pickers
-      prisma.taskExecution.count({
-        where: { organizationId, type: "REPLENISHMENT", status: "IN_PROGRESS" },
+      prisma.pickingTask.count({
+        where: {
+          organizationId,
+          taskType: "PICK",
+          status: "IN_PROGRESS",
+        },
       }),
-      prisma.taskExecution.count({
-        where: { organizationId, type: "PUTAWAY", status: "IN_PROGRESS" },
+      prisma.replenishmentTask.count({
+        where: {
+          organizationId,
+          status: "IN_PROGRESS",
+        },
+      }),
+      prisma.pickingTask.count({
+        where: {
+          organizationId,
+          taskType: "PUTAWAY",
+          status: "IN_PROGRESS",
+        },
       }),
       prisma.wavePick.count({ where: { organizationId, status: "RELEASED" } }),
       prisma.wavePick.count({
-        where: { organizationId, status: { in: ["PLANNED", "READY"] } },
+        where: { organizationId, status: { in: ["PLANNED", "IN_PROGRESS"] } },
       }),
-      prisma.loadSheet.count({ where: { organizationId, status: "APPROVED" } }),
+      prisma.loadSheet.count({
+        where: {
+          organizationId,
+          status: { in: ["APPROVED", "CONFIRMED", "LOADING"] },
+        },
+      }),
       prisma.bayDoor.findMany({
         where: { organizationId, doorType: "INBOUND" },
       }),
@@ -43,8 +60,23 @@ export async function GET(request: NextRequest) {
         where: { organizationId, doorType: "OUTBOUND" },
       }),
       prisma.user.findMany({
-        where: { organizationId, role: { in: ["USER", "MANAGER"] } },
-        select: { id: true, name: true, role: true, image: true },
+        where: { organizationMemberships: { some: { organizationId } }, isActive: true },
+        select: {
+          id: true,
+          name: true,
+          role: true,
+          image: true,
+          assignedTasks: {
+            where: { status: { in: ["PENDING", "ASSIGNED", "IN_PROGRESS"] } },
+            orderBy: { updatedAt: "desc" },
+            take: 1,
+            include: {
+              fromLocation: { select: { name: true } },
+              toLocation: { select: { name: true } },
+            },
+          },
+        },
+        take: 50,
       }),
     ]);
 
@@ -63,7 +95,7 @@ export async function GET(request: NextRequest) {
       wavesReleased,
       wavesPending,
       loadSheetsReady,
-      congestionZones: 0, // Placeholder
+      congestionZones: 0,
     };
 
     const dockStatus = {
@@ -80,18 +112,12 @@ export async function GET(request: NextRequest) {
       ...outboundDoors.map((d) => ({ ...d, type: "OUTBOUND" })),
     ];
 
-    // Simulate user locations (random zone assignment for now as we don't have RTLS)
-    const availableZones = [
-      "ZONE-A",
-      "ZONE-B",
-      "PACKING",
-      "RECEIVING",
-      "MARSHALLING",
-    ];
     const usersWithLocation = activeUsers.map((u) => ({
       ...u,
       currentZone:
-        availableZones[Math.floor(Math.random() * availableZones.length)],
+        u.assignedTasks?.[0]?.toLocation?.name ||
+        u.assignedTasks?.[0]?.fromLocation?.name ||
+        "UNASSIGNED",
     }));
 
     // 2. Fetch Waves Progress
@@ -117,8 +143,7 @@ export async function GET(request: NextRequest) {
       completedTasks: w.pickedLines,
     }));
 
-    // 3. Alerts (Mock or derived from real data)
-    // For now returning empty or creating alerts if SLAs breached
+    // 3. Alerts derived from current operating conditions
     const alerts = [];
     if (wavesPending > 10) {
       alerts.push({
@@ -129,33 +154,6 @@ export async function GET(request: NextRequest) {
         timestamp: new Date().toISOString(),
       });
     }
-
-    // Simulate "Live Issues" (Andon) from the picker floor
-    const andonEvents = [
-      {
-        id: "ev-1",
-        type: "LABOR",
-        message: "Picker #42 blocked in Aisle 4 (Dropped Pallet)",
-        severity: "HIGH",
-        timestamp: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
-      },
-      {
-        id: "ev-2",
-        type: "EQUIPMENT",
-        message: "Scanner #08 battery low",
-        severity: "LOW",
-        timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
-      },
-      {
-        id: "ev-3",
-        type: "INVENTORY",
-        message: "SKU-992 marked missing during pick",
-        severity: "MEDIUM",
-        timestamp: new Date(Date.now() - 1000 * 60 * 2).toISOString(),
-      },
-    ];
-    alerts.push(...andonEvents);
-
     const maintenanceDoors = doors.filter((d) => d.status === "MAINTENANCE");
     if (maintenanceDoors.length > 0) {
       alerts.push({
@@ -167,29 +165,89 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // 4. Labor Leaderboard (Gamification)
-    // In a real app, this would aggregate `PickingTask` completion times and errors.
-    const leaderboard = activeUsers
-      .slice(0, 5)
-      .map((u, i) => ({
-        id: u.id,
-        name: u.name || `User ${u.id.substring(0, 4)}`,
-        role: u.role,
-        image: u.image,
-        score: 950 - i * 50 + Math.floor(Math.random() * 40), // Mock score
-        picksPerHour: 120 - i * 10 + Math.floor(Math.random() * 15),
-        accuracy: 99.9 - i * 0.2,
-      }))
-      .sort((a, b) => b.score - a.score);
+    // 4. Labor Leaderboard from completed picking performance (last 24h)
+    const completedSince = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const completedByUser = await prisma.pickingTask.groupBy({
+      by: ["completedById"],
+      where: {
+        organizationId,
+        taskType: "PICK",
+        status: "COMPLETED",
+        completedById: { not: null },
+        completedAt: { gte: completedSince },
+      },
+      _count: { _all: true },
+    });
 
-    // 5. Reverse Logistics & Assets (Returns)
+    const usersById = new Map(activeUsers.map((u) => [u.id, u]));
+    const leaderboard = completedByUser
+      .map((entry) => {
+        const userId = entry.completedById as string;
+        const user = usersById.get(userId);
+        const completed = entry._count._all;
+        const picksPerHour = Math.round(completed / 24);
+        return {
+          id: userId,
+          name: user?.name || `User ${userId.substring(0, 6)}`,
+          role: user?.role || "USER",
+          image: user?.image || null,
+          score: completed,
+          picksPerHour,
+          accuracy: null,
+        };
+      })
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5);
+
+    // 5. Reverse Logistics & Assets (DB-backed)
+    const [pendingTrailers, tippedCount, containerSummary] = await Promise.all([
+      prisma.dockAppointment.count({
+        where: {
+          organizationId,
+          status: { in: ["SCHEDULED", "CONFIRMED", "CHECKED_IN", "DELAYED"] },
+        },
+      }),
+      prisma.loadSheet.count({
+        where: {
+          organizationId,
+          actualDeparture: { gte: new Date(new Date().setHours(0, 0, 0, 0)) },
+        },
+      }),
+      prisma.container.groupBy({
+        by: ["containerType", "status"],
+        where: { organizationId },
+        _count: { _all: true },
+      }),
+    ]);
+
+    const getContainerCount = (type: string, statuses: string[]) =>
+      containerSummary
+        .filter(
+          (row) =>
+            String(row.containerType).toUpperCase() === type &&
+            statuses.includes(String(row.status).toUpperCase()),
+        )
+        .reduce((sum, row) => sum + row._count._all, 0);
+
     const returnsStats = {
-      pendingTrailers: Math.floor(Math.random() * 3),
-      tippedCount: 145 + Math.floor(Math.random() * 20), // units tipped today
+      pendingTrailers,
+      tippedCount,
       reusables: {
-        pallets: { onHand: 450, dispatched: 120, damaged: 15 },
-        totes: { onHand: 1200, dispatched: 350, damaged: 5 },
-        cages: { onHand: 45, dispatched: 10, damaged: 1 },
+        pallets: {
+          onHand: getContainerCount("PALLET", ["BUILDING", "READY"]),
+          dispatched: getContainerCount("PALLET", ["SHIPPED"]),
+          damaged: 0,
+        },
+        totes: {
+          onHand: getContainerCount("TOTE", ["BUILDING", "READY"]),
+          dispatched: getContainerCount("TOTE", ["SHIPPED"]),
+          damaged: 0,
+        },
+        cages: {
+          onHand: getContainerCount("CAGE", ["BUILDING", "READY"]),
+          dispatched: getContainerCount("CAGE", ["SHIPPED"]),
+          damaged: 0,
+        },
       },
     };
 

@@ -15,13 +15,13 @@ const ERP_PROVIDERS = [
 // GET /api/integrations/erp
 // Returns all ERP connections for the authenticated org with sync status
 export async function GET(req: NextRequest) {
-  const authResult = await requireApiAuth(req);
-  if (authResult instanceof NextResponse) return authResult;
-  const { orgId } = authResult as { orgId: string };
+  const authResult = await requireApiAuth();
+  if ("error" in authResult) return authResult.error;
+  const { organizationId } = authResult;
 
   const connections = await prisma.externalIntegration.findMany({
     where: {
-      organizationId: orgId,
+      organizationId,
       provider: { in: ERP_PROVIDERS as unknown as string[] },
     },
     select: {
@@ -84,9 +84,9 @@ export async function GET(req: NextRequest) {
 // POST /api/integrations/erp
 // Actions: sync | test | configure
 export async function POST(req: NextRequest) {
-  const authResult = await requireApiAuth(req);
-  if (authResult instanceof NextResponse) return authResult;
-  const { orgId, userId } = authResult as { orgId: string; userId: string };
+  const authResult = await requireApiAuth();
+  if ("error" in authResult) return authResult.error;
+  const { organizationId, userId } = authResult;
 
   const body = await req.json();
   const { action, integrationId, options } = body as {
@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
   }
 
   const integration = await prisma.externalIntegration.findFirst({
-    where: { id: integrationId, organizationId: orgId },
+    where: { id: integrationId, organizationId },
   });
 
   if (!integration) {
@@ -126,7 +126,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: `Connection test for ${integration.provider} completed`,
-      latencyMs: Math.floor(Math.random() * 200) + 50,
+      latencyMs: null,
       timestamp: new Date().toISOString(),
     });
   }

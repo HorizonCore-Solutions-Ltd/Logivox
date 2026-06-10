@@ -164,7 +164,10 @@ export default function HazmatCompliancePage() {
               Hazmat & Regulatory Compliance
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
-              Fail-Safe Regulatory Control. Protect your people and operations. Enforce strict spatial separation rules for hazardous materials instantly. LogiVox checks inbound manifests against DOT/IATA regulations and forces compliant putaway logic automatically.
+              Fail-Safe Regulatory Control. Protect your people and operations.
+              Enforce strict spatial separation rules for hazardous materials
+              instantly. LogiVox checks inbound manifests against DOT/IATA
+              regulations and forces compliant putaway logic automatically.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
@@ -301,8 +304,8 @@ export default function HazmatCompliancePage() {
                 Data-Driven Decision Making
               </h2>
               <p className="text-lg text-muted-foreground mb-6">
-                Our Hazmat Compliance platform delivers measurable improvements across
-                your business.
+                Our Hazmat Compliance platform delivers measurable improvements
+                across your business.
               </p>
               <div className="space-y-3">
                 {benefits.map((benefit) => (
@@ -394,7 +397,8 @@ export default function HazmatCompliancePage() {
             Ready to Unlock Your Data's Potential?
           </h2>
           <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
-            Join leading companies using LogiVox Hazmat Compliance to drive growth
+            Join leading companies using LogiVox Hazmat Compliance to drive
+            growth
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" asChild>

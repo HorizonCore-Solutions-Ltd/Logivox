@@ -164,7 +164,10 @@ export default function LoadPlanningPage() {
               Load Planning & Loadsheets
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
-              Maximize Trailer Utilization. Every cubic foot matters. Automatically generate precise, compliant 3D loadsheets. LogiVox algorithms calculate axle weight distribution and drop-sequence loading, guaranteeing drivers spend less time at the gate.
+              Maximize Trailer Utilization. Every cubic foot matters.
+              Automatically generate precise, compliant 3D loadsheets. LogiVox
+              algorithms calculate axle weight distribution and drop-sequence
+              loading, guaranteeing drivers spend less time at the gate.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
@@ -301,8 +304,8 @@ export default function LoadPlanningPage() {
                 Data-Driven Decision Making
               </h2>
               <p className="text-lg text-muted-foreground mb-6">
-                Our Load Planning platform delivers measurable improvements across
-                your business.
+                Our Load Planning platform delivers measurable improvements
+                across your business.
               </p>
               <div className="space-y-3">
                 {benefits.map((benefit) => (

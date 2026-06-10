@@ -5,26 +5,23 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(req: Request) {
   const session = await getServerSession(authOptions);
-  if (!session) {
+  if (!session?.user?.id) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
   const { searchParams } = new URL(req.url);
   const status = searchParams.get("status");
   const date = searchParams.get("date");
-  const organizationId = session.user.organizationId; // Assuming org context
+  const organizationId = (session.user as any).organizationId;
+  if (!organizationId) {
+    return new NextResponse("No organisation context", { status: 403 });
+  }
 
   try {
     const whereClause: any = {
-      // organizationId: // Wait, schema had organizationId?
-      // Yes, DockAppointment has organizationId.
+      organizationId,
     };
 
-    // If user has organizationId
-    // Need to verify if session.user has organizationId. usually added in callbacks.
-    // If not, maybe query first org.
-
-    // For MVP, I'll filter by status if provided.
     if (status) {
       whereClause.status = status;
     }
@@ -63,8 +60,13 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
-  if (!session) {
+  if (!session?.user?.id) {
     return new NextResponse("Unauthorized", { status: 401 });
+  }
+
+  const organizationId = (session.user as any).organizationId;
+  if (!organizationId) {
+    return new NextResponse("No organisation context", { status: 403 });
   }
 
   try {
@@ -83,12 +85,23 @@ export async function POST(req: Request) {
       return new NextResponse("Missing required fields", { status: 400 });
     }
 
-    // Determine Dock (or leave null for auto-assign later)
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todaysCount = await prisma.dockAppointment.count({
+      where: {
+        organizationId,
+        createdAt: { gte: todayStart },
+      },
+    });
+
+    const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+    const appointmentNumber = `APT-${dateStr}-${String(todaysCount + 1).padStart(4, "0")}`;
+
     // Create Appointment
     const appointment = await prisma.dockAppointment.create({
       data: {
-        organizationId: "org_default", // Placeholder or get from session
-        appointmentNumber: `APT-${Date.now()}`, // Simple generator
+        organizationId,
+        appointmentNumber,
         scheduledDate: new Date(scheduledStart),
         scheduledStart: new Date(scheduledStart),
         scheduledEnd: new Date(scheduledEnd),

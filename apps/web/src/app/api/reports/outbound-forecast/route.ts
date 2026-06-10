@@ -7,11 +7,23 @@ import { prisma } from "@/lib/prisma";
 // Returns predictions for completion of current picking waves
 export async function GET(req: Request) {
   const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const organizationId = (session.user as any).organizationId;
+  if (!organizationId) {
+    return NextResponse.json(
+      { error: "No organisation context" },
+      { status: 403 },
+    );
+  }
 
   try {
     // 1. Get Current Backlog (Pending & In-Progress Tasks)
     const pendingTasks = await prisma.pickingTask.findMany({
       where: {
+        organizationId,
         status: { in: ["PENDING", "IN_PROGRESS"] },
       },
       include: {
@@ -38,6 +50,7 @@ export async function GET(req: Request) {
     const activePickersCount =
       (await prisma.user.count({
         where: {
+          organizationMemberships: { some: { organizationId } },
           role: "PICKER",
           isActive: true, // Simplified "logged in" check
         },
@@ -96,61 +109,9 @@ export async function GET(req: Request) {
     });
   } catch (error: any) {
     console.error("Forecast Error:", error);
-    // Return mock data if DB fails during dev/demo
-    return NextResponse.json(mockForecastData());
+    return NextResponse.json(
+      { error: "Failed to generate outbound forecast" },
+      { status: 500 },
+    );
   }
-}
-
-function mockForecastData() {
-  const now = new Date();
-  return {
-    success: true,
-    timestamp: new Date(),
-    activePickers: 8,
-    hourlyThroughputRate: 480,
-    totalBacklog: 1250,
-    projections: [
-      {
-        hour: 1,
-        timeLabel: "+1h",
-        projectedItemsByUser: 480,
-        remainingItems: 770,
-        percentComplete: 38,
-      },
-      {
-        hour: 2,
-        timeLabel: "+2h",
-        projectedItemsByUser: 960,
-        remainingItems: 290,
-        percentComplete: 76,
-      },
-      {
-        hour: 3,
-        timeLabel: "+3h",
-        projectedItemsByUser: 1250,
-        remainingItems: 0,
-        percentComplete: 100,
-      },
-    ],
-    waveEstimates: [
-      {
-        waveId: "W-101",
-        waveName: "Morning Rush",
-        itemsRemaining: 400,
-        estimatedCompletion: new Date(
-          now.getTime() + 0.8 * 3600000,
-        ).toISOString(),
-        hoursCurrentLoad: "0.8",
-      },
-      {
-        waveId: "W-102",
-        waveName: "Standard",
-        itemsRemaining: 850,
-        estimatedCompletion: new Date(
-          now.getTime() + 2.6 * 3600000,
-        ).toISOString(),
-        hoursCurrentLoad: "2.6",
-      },
-    ],
-  };
 }

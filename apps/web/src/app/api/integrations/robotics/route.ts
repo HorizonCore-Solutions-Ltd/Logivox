@@ -13,13 +13,13 @@ const ROBOTICS_PROVIDERS = [
 // GET /api/integrations/robotics
 // Returns robot fleet status from connected WCS systems
 export async function GET(req: NextRequest) {
-  const authResult = await requireApiAuth(req);
-  if (authResult instanceof NextResponse) return authResult;
-  const { orgId } = authResult as { orgId: string };
+  const authResult = await requireApiAuth();
+  if ("error" in authResult) return authResult.error;
+  const { organizationId } = authResult;
 
   const connections = await prisma.externalIntegration.findMany({
     where: {
-      organizationId: orgId,
+      organizationId,
       provider: { in: ROBOTICS_PROVIDERS as unknown as string[] },
     },
     select: {
@@ -68,9 +68,9 @@ export async function GET(req: NextRequest) {
 // POST /api/integrations/robotics
 // Actions: dispatch | test | sync-fleet | pause | resume
 export async function POST(req: NextRequest) {
-  const authResult = await requireApiAuth(req);
-  if (authResult instanceof NextResponse) return authResult;
-  const { orgId, userId } = authResult as { orgId: string; userId: string };
+  const authResult = await requireApiAuth();
+  if ("error" in authResult) return authResult.error;
+  const { organizationId, userId } = authResult;
 
   const body = await req.json();
   const { action, integrationId, task } = body as {
@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
   }
 
   const integration = await prisma.externalIntegration.findFirst({
-    where: { id: integrationId, organizationId: orgId },
+    where: { id: integrationId, organizationId },
   });
 
   if (!integration) {
@@ -129,7 +129,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const taskId = `TASK-${Date.now()}-${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
+    const existingDispatches = await prisma.integrationLog.count({
+      where: {
+        integrationId,
+        message: { startsWith: "Robot task dispatched" },
+      },
+    });
+    const taskId = `TASK-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}-${String(existingDispatches + 1).padStart(5, "0")}`;
 
     await prisma.integrationLog.create({
       data: {

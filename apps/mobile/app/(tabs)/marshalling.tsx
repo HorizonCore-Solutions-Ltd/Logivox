@@ -274,7 +274,6 @@ function BayBoard() {
                               updateMut.mutate({
                                 id: selectedBay.id,
                                 status: s,
-                                
                               });
                           }
                         },

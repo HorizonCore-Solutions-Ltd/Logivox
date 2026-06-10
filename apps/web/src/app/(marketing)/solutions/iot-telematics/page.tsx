@@ -164,7 +164,9 @@ export default function ActiveIoTTelematicsPage() {
               IoT Forklift Telematics
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
-              Next-Gen Asset Tracking. Deploy an invisible safety net across your MHE fleet. LogiVox tracks forklifts, assets, and operator telemetry in real time—pinpointing impacts and driving speeds.
+              Next-Gen Asset Tracking. Deploy an invisible safety net across
+              your MHE fleet. LogiVox tracks forklifts, assets, and operator
+              telemetry in real time—pinpointing impacts and driving speeds.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
@@ -301,8 +303,8 @@ export default function ActiveIoTTelematicsPage() {
                 Data-Driven Decision Making
               </h2>
               <p className="text-lg text-muted-foreground mb-6">
-                Our Active IoT Telematics platform delivers measurable improvements across
-                your business.
+                Our Active IoT Telematics platform delivers measurable
+                improvements across your business.
               </p>
               <div className="space-y-3">
                 {benefits.map((benefit) => (
@@ -394,7 +396,8 @@ export default function ActiveIoTTelematicsPage() {
             Ready to Unlock Your Data's Potential?
           </h2>
           <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
-            Join leading companies using LogiVox Active IoT Telematics to drive growth
+            Join leading companies using LogiVox Active IoT Telematics to drive
+            growth
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" asChild>

@@ -38,13 +38,11 @@ export async function GET(request: NextRequest) {
       where: { organizationId },
     });
 
-    // Mock staging for now
-    const stagingLanes = [
-      { id: "S1", status: "OCCUPIED", loadSheetId: activeLoadSheets[0]?.id },
-      { id: "S2", status: "AVAILABLE" },
-      { id: "S3", status: "AVAILABLE" },
-      { id: "S4", status: "OCCUPIED", loadSheetId: activeLoadSheets[1]?.id },
-    ];
+    const stagingLanes = activeLoadSheets.slice(0, 10).map((sheet, index) => ({
+      id: `S${index + 1}`,
+      status: sheet.bayDoorId ? "OCCUPIED" : "AVAILABLE",
+      loadSheetId: sheet.id,
+    }));
 
     return NextResponse.json({
       loadSheets: activeLoadSheets,
@@ -76,49 +74,12 @@ export async function POST(request: NextRequest) {
         shipmentDate: body.shipmentDate || new Date(),
         carrierName: body.carrierName || "Internal Fleet",
         status: "BUILDING",
-        totalContainers: 2, // Mocking initial count
-        totalWeight: 450,
+        totalContainers: 0,
+        totalWeight: 0,
         vehicleTypeId: body.vehicleType,
         metadata: {
           stagingLane: body.stagingLane || "S1",
           startedBy: "System (Auto)",
-        },
-        // Create some mock containers with positions for handover demo
-        containers: {
-          create: [
-            {
-              organizationId,
-              containerType: "PALLET",
-              weight: 200,
-              metadata: {
-                position: "Row 1, Left",
-                customFields: { temp: "Ambient" },
-              },
-              containerItems: {
-                create: {
-                  sku: "SKU-123",
-                  quantity: 50,
-                  description: "Widget A",
-                },
-              },
-            },
-            {
-              organizationId,
-              containerType: "CRATE",
-              weight: 250,
-              metadata: {
-                position: "Row 1, Right",
-                customFields: { fragile: true },
-              },
-              containerItems: {
-                create: {
-                  sku: "SKU-456",
-                  quantity: 30,
-                  description: "Glassware",
-                },
-              },
-            },
-          ],
         },
       },
     });

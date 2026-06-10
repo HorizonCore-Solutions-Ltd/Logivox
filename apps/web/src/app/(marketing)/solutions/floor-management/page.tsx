@@ -164,7 +164,11 @@ export default function FloorManagementPage() {
               Warehouse Floor & Wave Management
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
-              Optimize Your Warehouse Blueprint. Transform your facility into a high-efficiency flow-through engine. LogiVox uses dynamic wave picking, intelligent marshalling workflows, and real-time floor topology maps to eliminate deadhead travel and accelerate dock-to-stock throughput.
+              Optimize Your Warehouse Blueprint. Transform your facility into a
+              high-efficiency flow-through engine. LogiVox uses dynamic wave
+              picking, intelligent marshalling workflows, and real-time floor
+              topology maps to eliminate deadhead travel and accelerate
+              dock-to-stock throughput.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
@@ -301,8 +305,8 @@ export default function FloorManagementPage() {
                 Data-Driven Decision Making
               </h2>
               <p className="text-lg text-muted-foreground mb-6">
-                Our Floor Management platform delivers measurable improvements across
-                your business.
+                Our Floor Management platform delivers measurable improvements
+                across your business.
               </p>
               <div className="space-y-3">
                 {benefits.map((benefit) => (
@@ -394,7 +398,8 @@ export default function FloorManagementPage() {
             Ready to Unlock Your Data's Potential?
           </h2>
           <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
-            Join leading companies using LogiVox Floor Management to drive growth
+            Join leading companies using LogiVox Floor Management to drive
+            growth
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" asChild>

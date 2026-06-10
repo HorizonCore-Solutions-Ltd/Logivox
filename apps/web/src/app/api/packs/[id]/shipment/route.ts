@@ -46,6 +46,7 @@ export async function POST(
       },
     });
     const shipmentNumber = `SH-${dateStr}-${String(count + 1).padStart(4, "0")}`;
+    const trackingNumber = `TRK-${dateStr}-${String(count + 1).padStart(4, "0")}`;
 
     // Create Shipment in Transaction
     const shipment = await prisma.$transaction(async (tx) => {
@@ -58,7 +59,7 @@ export async function POST(
           packId: pack.id,
           status: "PENDING", // Initial status
           carrierName: "Manual", // Default for now
-          trackingNumber: `TRK-${dateStr}-${Math.floor(Math.random() * 10000)}`,
+          trackingNumber,
           createdById: session.user.id,
           shippedDate: new Date(),
           recipientName: pack.salesOrder.customer.name,

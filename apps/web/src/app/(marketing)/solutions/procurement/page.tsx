@@ -164,7 +164,10 @@ export default function SupplierB2BProcurementPage() {
               Procurement & Supplier Portals
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
-              Unified Inbound Sourcing. Bring your suppliers into the same zero-latency loop as your warehouse. LogiVox offers dedicated vendor portals, automated reorder triggers, and transparent three-way matching.
+              Unified Inbound Sourcing. Bring your suppliers into the same
+              zero-latency loop as your warehouse. LogiVox offers dedicated
+              vendor portals, automated reorder triggers, and transparent
+              three-way matching.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
@@ -301,8 +304,8 @@ export default function SupplierB2BProcurementPage() {
                 Data-Driven Decision Making
               </h2>
               <p className="text-lg text-muted-foreground mb-6">
-                Our Supplier B2B Procurement platform delivers measurable improvements across
-                your business.
+                Our Supplier B2B Procurement platform delivers measurable
+                improvements across your business.
               </p>
               <div className="space-y-3">
                 {benefits.map((benefit) => (
@@ -394,7 +397,8 @@ export default function SupplierB2BProcurementPage() {
             Ready to Unlock Your Data's Potential?
           </h2>
           <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
-            Join leading companies using LogiVox Supplier B2B Procurement to drive growth
+            Join leading companies using LogiVox Supplier B2B Procurement to
+            drive growth
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" asChild>

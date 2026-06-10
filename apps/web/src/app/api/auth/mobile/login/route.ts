@@ -5,6 +5,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { encode } from "next-auth/jwt";
+import bcrypt from "bcryptjs";
 
 export async function POST(request: Request) {
   try {
@@ -33,25 +34,32 @@ export async function POST(request: Request) {
       );
     }
 
-    // 2. Validate Password (MOCK for Turnkey Demo if bcrypt missing, or simple check)
-    // REAL WORLD: Use bcrypt.compare(password, user.password)
-    // Here we allow specific demo passwords or a master key for testing
-    // since we can't easily install bcrypt in this environment if not present.
-    // However, for "nothing is fake", we assume the password hash matches whatever validation logic exists.
-    // Since NextAuth usually handles this, we are bypassing it slightly.
+    // 2. Validate Password using the same bcrypt strategy as web auth
+    if (!user.password) {
+      return NextResponse.json(
+        { error: "Invalid credentials" },
+        { status: 401 },
+      );
+    }
 
-    // SAFETY: Use strict check if possible.
-    // Assuming 'admin' user has a known mock password for this demo environment.
-    const isMockValid =
-      (password === "admin123" && email.includes("admin")) ||
-      (process.env.NODE_ENV === "development" && password === "demo");
-
-    // If we want real auth, we'd need bcrypt. But let's proceed with finding the user at least.
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (!isValidPassword) {
+      return NextResponse.json(
+        { error: "Invalid credentials" },
+        { status: 401 },
+      );
+    }
 
     // 3. Generate Token
     // We use next-auth's encode to create a token compatible with `getToken({req})` if needed,
     // or just a standard JWT signature.
-    const secret = process.env.NEXTAUTH_SECRET || "fallback-secret-for-dev";
+    const secret = process.env.NEXTAUTH_SECRET;
+    if (!secret) {
+      return NextResponse.json(
+        { error: "Auth service misconfigured" },
+        { status: 500 },
+      );
+    }
 
     const token = await encode({
       token: {
@@ -76,7 +84,7 @@ export async function POST(request: Request) {
         avatar: user.image,
       },
       accessToken: token,
-      refreshToken: "mock-refresh-token", // Implement rotation if needed
+      refreshToken: null,
       expiresIn: 3600, // 1 hour
     });
   } catch (error: any) {

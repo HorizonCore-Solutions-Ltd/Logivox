@@ -164,7 +164,10 @@ export default function ColdChainPage() {
               Cold Chain Logistics
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
-              Unbreakable Temperature Assurance. Maintain strict FDA and regulatory compliance seamlessly. LogiVox natively integrates with continuous IoT temperature loggers, automating alert chains and quarantine protocols if zones drift outside safe thresholds.
+              Unbreakable Temperature Assurance. Maintain strict FDA and
+              regulatory compliance seamlessly. LogiVox natively integrates with
+              continuous IoT temperature loggers, automating alert chains and
+              quarantine protocols if zones drift outside safe thresholds.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
