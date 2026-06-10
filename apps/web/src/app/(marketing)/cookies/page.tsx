@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 export const metadata: Metadata = {
-  title: "Cookie Policy | Flowstock",
+  title: "Cookie Policy | LogiVox",
   description:
-    "How Flowstock uses cookies and similar tracking technologies on our platform.",
+    "How LogiVox uses cookies and similar tracking technologies on our platform.",
 };
 
 const COOKIE_CATEGORIES = [
@@ -60,7 +60,7 @@ export default function CookiePolicyPage() {
         <div className="container flex h-16 items-center justify-between max-w-5xl mx-auto px-6">
           <Button variant="ghost" asChild>
             <Link href="/" className="flex items-center gap-2 font-semibold">
-              ← Flowstock
+              ← LogiVox
             </Link>
           </Button>
           <nav className="flex gap-4 text-sm text-muted-foreground">
@@ -173,10 +173,10 @@ export default function CookiePolicyPage() {
           <p className="text-muted-foreground">
             If you have questions about our use of cookies, please contact us at{" "}
             <a
-              href="mailto:privacy@flowstock.io"
+              href="mailto:privacy@logivox.io"
               className="text-primary hover:underline"
             >
-              privacy@flowstock.io
+              privacy@logivox.io
             </a>
             .
           </p>
@@ -184,7 +184,7 @@ export default function CookiePolicyPage() {
       </main>
 
       <footer className="border-t py-8 text-center text-sm text-muted-foreground">
-        <p>© {new Date().getFullYear()} Flowstock. All rights reserved.</p>
+        <p>© {new Date().getFullYear()} LogiVox. All rights reserved.</p>
         <div className="flex justify-center gap-4 mt-2">
           <Link href="/privacy" className="hover:text-foreground">
             Privacy

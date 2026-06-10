@@ -163,13 +163,13 @@ export default function DocsPage() {
     {
       name: "Python",
       description: "Official Python SDK for LogiVox API",
-      command: "pip install flowstock",
+      command: "pip install logivox",
       docsHref: "/docs/sdks/python",
     },
     {
       name: "Java",
       description: "Official Java SDK for enterprise applications",
-      command: "maven install com.flowstock:sdk",
+      command: "maven install com.logivox:sdk",
       docsHref: "/docs/sdks/java",
     },
     {

@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   CheckCircle,
   XCircle,
@@ -68,82 +67,115 @@ const STATUS_CONFIG: Record<
   },
 };
 
-const MOCK_REVIEWS: EffectivenessReview[] = [
-  {
-    id: "1",
-    capaId: "c1",
-    capaNumber: "CAPA-2026-001",
-    capaTitle: "Reduce packaging defect rate",
-    reviewDate: "2026-03-01",
-    dueDate: "2026-03-15",
-    status: "EFFECTIVE",
-    score: 92,
-    reviewer: "Jane Smith",
-    recurrenceCount: 0,
-    notes: "Defect rate reduced from 4.2% to 0.8% — target met.",
-    criteria: [
-      { name: "Root cause eliminated", met: true, notes: "" },
-      { name: "Recurrence prevented", met: true, notes: "" },
-      { name: "Process documented", met: true, notes: "" },
-    ],
-  },
-  {
-    id: "2",
-    capaId: "c2",
-    capaNumber: "CAPA-2026-003",
-    capaTitle: "Supplier delivery variance correction",
-    reviewDate: "2026-03-01",
-    dueDate: "2026-03-20",
-    status: "PARTIALLY_EFFECTIVE",
-    score: 65,
-    reviewer: "Mark Johnson",
-    recurrenceCount: 2,
-    notes:
-      "Delivery times improved but variance window still exceeds SLA by 1 day.",
-    criteria: [
-      { name: "Root cause eliminated", met: true, notes: "" },
-      {
-        name: "Recurrence prevented",
-        met: false,
-        notes: "2 recurrences in past 30 days",
-      },
-      { name: "Process documented", met: true, notes: "" },
-    ],
-  },
-  {
-    id: "3",
-    capaId: "c3",
-    capaNumber: "CAPA-2026-005",
-    capaTitle: "Calibration non-conformance resolution",
-    reviewDate: "",
-    dueDate: "2026-03-25",
-    status: "PENDING",
-    score: null,
-    reviewer: null,
-    recurrenceCount: 0,
-    notes: null,
-    criteria: [
-      { name: "Root cause eliminated", met: null, notes: "" },
-      { name: "Recurrence prevented", met: null, notes: "" },
-      { name: "Process documented", met: null, notes: "" },
-    ],
-  },
-];
+interface EffectivenessApiItem {
+  capaId: string;
+  capaNumber: string;
+  closedDate: string;
+  monitoringDays: number;
+  recurrenceDetected: boolean;
+  effectivenessScore: number;
+  verificationStatus: "PENDING" | "PASSED" | "FAILED";
+  relatedIncidents: number;
+  recommendation: string;
+}
+
+function mapApiStatus(
+  status: EffectivenessApiItem["verificationStatus"],
+  score: number,
+): EffectivenessReview["status"] {
+  if (status === "PENDING") return "PENDING";
+  if (status === "FAILED") {
+    return score > 0 && score < 70 ? "PARTIALLY_EFFECTIVE" : "INEFFECTIVE";
+  }
+  if (status === "PASSED") return "EFFECTIVE";
+  return "IN_REVIEW";
+}
 
 export default function EffectivenessPage() {
   const [reviews, setReviews] = useState<EffectivenessReview[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("all");
 
   useEffect(() => {
-    // Attempt real API, fall back to mock data
-    fetch("/api/capa/effectiveness")
-      .then((r) => r.json())
-      .then((data) => {
-        setReviews(Array.isArray(data.reviews) ? data.reviews : MOCK_REVIEWS);
-      })
-      .catch(() => setReviews(MOCK_REVIEWS))
-      .finally(() => setLoading(false));
+    const controller = new AbortController();
+
+    async function loadReviews() {
+      try {
+        setError(null);
+        const response = await fetch("/api/capa/effectiveness", {
+          signal: controller.signal,
+          cache: "no-store",
+        });
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.error || "Failed to load CAPA effectiveness data",
+          );
+        }
+
+        const list: EffectivenessApiItem[] = Array.isArray(
+          data.effectivenessData,
+        )
+          ? data.effectivenessData
+          : [];
+
+        setReviews(
+          list.map((item) => {
+            const mappedStatus = mapApiStatus(
+              item.verificationStatus,
+              item.effectivenessScore,
+            );
+
+            return {
+              id: item.capaId,
+              capaId: item.capaId,
+              capaNumber: item.capaNumber,
+              capaTitle: item.recommendation,
+              reviewDate:
+                item.verificationStatus === "PENDING"
+                  ? ""
+                  : new Date().toISOString(),
+              dueDate: new Date(
+                new Date(item.closedDate).getTime() + 30 * 24 * 60 * 60 * 1000,
+              ).toISOString(),
+              status: mappedStatus,
+              score: item.effectivenessScore ?? null,
+              reviewer: null,
+              criteria: [
+                {
+                  name: "Recurrence prevented",
+                  met: !item.recurrenceDetected,
+                  notes: item.recommendation,
+                },
+                {
+                  name: "Effectiveness threshold met",
+                  met: item.effectivenessScore >= 70,
+                  notes: `Score: ${item.effectivenessScore}%`,
+                },
+                {
+                  name: "Monitoring complete",
+                  met: item.monitoringDays >= 30,
+                  notes: `${item.monitoringDays} day(s) monitored`,
+                },
+              ],
+              recurrenceCount: item.relatedIncidents,
+              notes: item.recommendation,
+            };
+          }),
+        );
+      } catch (err: any) {
+        if (err?.name === "AbortError") return;
+        setError(err?.message || "Failed to load CAPA effectiveness data");
+        setReviews([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    void loadReviews();
+    return () => controller.abort();
   }, []);
 
   const filtered =
@@ -258,6 +290,12 @@ export default function EffectivenessPage() {
             </button>
           ))}
         </div>
+
+        {error && (
+          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            {error}
+          </div>
+        )}
 
         {/* Reviews List */}
         {loading ? (

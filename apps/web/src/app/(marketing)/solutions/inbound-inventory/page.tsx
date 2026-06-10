@@ -21,9 +21,9 @@ import {
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Inbound & Inventory Management | Flowstock Enterprise",
+  title: "Inbound & Inventory Management | LogiVox Enterprise",
   description:
-    "Optimize receiving, cross-docking, and smart slotting with Flowstock's advanced inbound module.",
+    "Optimize receiving, cross-docking, and smart slotting with LogiVox's advanced inbound module.",
 };
 
 export default function InboundInventoryPage() {
@@ -244,7 +244,7 @@ export default function InboundInventoryPage() {
                 Ready to optimize your inbound flow?
               </h2>
               <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl">
-                Join high-growth brands using Flowstock to streamline their
+                Join high-growth brands using LogiVox to streamline their
                 warehouse operations.
               </p>
             </div>

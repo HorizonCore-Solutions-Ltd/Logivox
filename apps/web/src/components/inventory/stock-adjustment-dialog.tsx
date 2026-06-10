@@ -48,6 +48,7 @@ const adjustmentSchema = z.object({
   quantity: z.coerce.number().min(1, "Quantity must be at least 1"),
   reference: z.string().optional(),
   notes: z.string().optional(),
+  capaId: z.string().optional(),
 });
 
 type AdjustmentFormValues = z.infer<typeof adjustmentSchema>;
@@ -80,6 +81,7 @@ export function StockAdjustmentDialog({
       quantity: 0,
       reference: "",
       notes: "",
+      capaId: "",
     },
   });
 
@@ -277,6 +279,25 @@ export function StockAdjustmentDialog({
                       {...field}
                     />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* CAPA Link */}
+            <FormField
+              control={form.control}
+              name="capaId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Linked CAPA ID (Optional)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., cm123abc456def" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Link this stock movement to an existing CAPA for full
+                    cross-module traceability.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

@@ -103,11 +103,11 @@ async function dispatchNotification(opts: {
       const fromEmail =
         process.env.SENDGRID_FROM_EMAIL ||
         process.env.EMAIL_FROM ||
-        "noreply@flowstock.app";
+        "noreply@logivox.app";
       await sgMail.send({
         to: recipientEmail,
         from: fromEmail,
-        subject: subject || "Flowstock Notification",
+        subject: subject || "LogiVox Notification",
         text: body,
         html: htmlBody || body,
       });
@@ -124,9 +124,9 @@ async function dispatchNotification(opts: {
           : undefined,
       });
       await transporter.sendMail({
-        from: process.env.EMAIL_FROM || "noreply@flowstock.app",
+        from: process.env.EMAIL_FROM || "noreply@logivox.app",
         to: recipientEmail,
-        subject: subject || "Flowstock Notification",
+        subject: subject || "LogiVox Notification",
         text: body,
         html: htmlBody || body,
       });

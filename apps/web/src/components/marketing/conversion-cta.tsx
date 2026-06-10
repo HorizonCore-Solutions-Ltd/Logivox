@@ -196,12 +196,12 @@ export function ConversionCTA({
 
       case "pricing-focus":
         return {
-          title: title || "Transparent Pricing, No Surprises",
+          title: title || "Clear Enterprise Pricing, No Surprises",
           description:
             description ||
-            "Simple per-user pricing starting at $49/month. No hidden fees, consultants, or long-term contracts.",
+            "Deployment-based pricing by facility, workflow, and SLA scope. Operational users are included and enterprise contracts are quoted clearly up front.",
           icon: DollarSign,
-          urgency: urgency || "Lock in current pricing",
+          urgency: urgency || "Get a structured enterprise quote",
           socialProof: socialProof || "Average 936% ROI in year 1",
           primaryAction: primaryAction || {
             text: "View Pricing",
@@ -212,10 +212,10 @@ export function ConversionCTA({
             href: "/roi-calculator",
           },
           benefits: benefits || [
-            "Starting at $49/user/month",
-            "No setup fees",
-            "Cancel anytime",
-            "All features included",
+            "Facility-based pricing",
+            "Operational users included",
+            "Monthly or annual billing",
+            "Transparent implementation scope",
           ],
           gradient: "from-yellow-500/10 to-yellow-600/5",
           borderColor: "border-yellow-500/20",

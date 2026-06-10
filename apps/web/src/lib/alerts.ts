@@ -446,7 +446,7 @@ export class ReorderAlertEngine {
         from:
           process.env.SENDGRID_FROM_EMAIL ||
           process.env.EMAIL_FROM ||
-          "noreply@flowstock.app",
+          "noreply@logivox.app",
         subject,
         text: message,
         html: `<pre>${message}</pre>`,
@@ -468,7 +468,7 @@ export class ReorderAlertEngine {
       });
 
       await transporter.sendMail({
-        from: process.env.EMAIL_FROM || "noreply@flowstock.app",
+        from: process.env.EMAIL_FROM || "noreply@logivox.app",
         to: recipients.join(","),
         subject,
         text: message,

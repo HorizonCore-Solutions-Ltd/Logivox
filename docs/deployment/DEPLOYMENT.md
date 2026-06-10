@@ -61,6 +61,7 @@ npm start
 
 - [ ] Create production database (PostgreSQL recommended)
 - [ ] Run database migration: `./scripts/setup-production-db.sh`
+- [ ] Or use the operator alias: `npm run enterprise:setup`
 - [ ] Verify database connection
 - [ ] Set up database backups
 
@@ -83,6 +84,7 @@ npm start
 ### 5. Production Validation ✓
 
 - [ ] Run smoke tests: `npm run test:e2e`
+- [ ] Run system validation: `npm run system:validate`
 - [ ] Verify authentication flows
 - [ ] Test core warehouse operations
 - [ ] Check mobile responsiveness

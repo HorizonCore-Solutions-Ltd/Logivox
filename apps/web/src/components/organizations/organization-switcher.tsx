@@ -2,9 +2,12 @@
 
 import * as React from "react";
 import { Check, ChevronsUpDown, Plus, Building2 } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Command,
   CommandEmpty,
@@ -19,6 +22,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface Organization {
   id: string;
@@ -40,6 +51,10 @@ export function OrganizationSwitcher({
   onSwitch,
 }: OrganizationSwitcherProps) {
   const [open, setOpen] = React.useState(false);
+  const [createOpen, setCreateOpen] = React.useState(false);
+  const [newOrgName, setNewOrgName] = React.useState("");
+  const [newOrgDomain, setNewOrgDomain] = React.useState("");
+  const queryClient = useQueryClient();
 
   const { data: organizations, isLoading } = useQuery<Organization[]>({
     queryKey: ["organizations"],
@@ -51,6 +66,37 @@ export function OrganizationSwitcher({
   });
 
   const currentOrg = organizations?.find((org) => org.id === currentOrgId);
+
+  const createOrganization = useMutation({
+    mutationFn: async () => {
+      const response = await fetch("/api/organizations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: newOrgName.trim(),
+          domain: newOrgDomain.trim() || undefined,
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to create organization");
+      }
+
+      return data as Organization;
+    },
+    onSuccess: async (createdOrg) => {
+      await queryClient.invalidateQueries({ queryKey: ["organizations"] });
+      onSwitch(createdOrg.id);
+      setNewOrgName("");
+      setNewOrgDomain("");
+      setCreateOpen(false);
+      toast.success("Organization created");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -105,8 +151,7 @@ export function OrganizationSwitcher({
               <CommandItem
                 onSelect={() => {
                   setOpen(false);
-                  // TODO: Open create organization dialog
-                  console.log("Create new organization");
+                  setCreateOpen(true);
                 }}
               >
                 <Plus className="mr-2 h-4 w-4" />
@@ -116,6 +161,54 @@ export function OrganizationSwitcher({
           </CommandList>
         </Command>
       </PopoverContent>
+
+      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create Organization</DialogTitle>
+            <DialogDescription>
+              Add a new tenant organization and switch context immediately.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="org-name">Organization name</Label>
+              <Input
+                id="org-name"
+                value={newOrgName}
+                onChange={(e) => setNewOrgName(e.target.value)}
+                placeholder="e.g. Acme Logistics"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="org-domain">Domain (optional)</Label>
+              <Input
+                id="org-domain"
+                value={newOrgDomain}
+                onChange={(e) => setNewOrgDomain(e.target.value)}
+                placeholder="acme.example.com"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setCreateOpen(false)}
+              disabled={createOrganization.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => createOrganization.mutate()}
+              disabled={createOrganization.isPending || !newOrgName.trim()}
+            >
+              {createOrganization.isPending ? "Creating..." : "Create"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Popover>
   );
 }

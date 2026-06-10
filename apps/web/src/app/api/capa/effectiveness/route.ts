@@ -84,6 +84,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       effectivenessData,
+      reviews: effectivenessData,
       statistics: stats,
       monitoringPeriod: `Last ${daysBack} days`,
     });
@@ -109,11 +110,22 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = verificationSchema.parse(body);
 
-    // Update CAPA with verification results
-    const capa = await prisma.correctivePreventiveAction.update({
+    const existing = await prisma.correctivePreventiveAction.findFirst({
       where: {
         id: validatedData.capaId,
         organizationId: session.user.organizationId,
+      },
+      select: { id: true },
+    });
+
+    if (!existing) {
+      return NextResponse.json({ error: "CAPA not found" }, { status: 404 });
+    }
+
+    // Update CAPA with verification results
+    const capa = await prisma.correctivePreventiveAction.update({
+      where: {
+        id: existing.id,
       },
       data: {
         verificationMethod: validatedData.verificationMethod,
@@ -201,13 +213,15 @@ async function analyzeEffectiveness(
       OR: [
         {
           title: {
-            contains: extractKeywords(capa.problemStatement)[0],
+            contains:
+              extractKeywords(capa.problemStatement)[0] || capa.capaNumber,
             mode: "insensitive",
           },
         },
         {
           description: {
-            contains: extractKeywords(capa.problemStatement)[0],
+            contains:
+              extractKeywords(capa.problemStatement)[0] || capa.capaNumber,
             mode: "insensitive",
           },
         },
@@ -411,6 +425,7 @@ function calculateAggregateStats(data: EffectivenessMetrics[]) {
  * Extract keywords from problem statement
  */
 function extractKeywords(statement: string): string[] {
+  if (!statement) return [];
   return statement
     .toLowerCase()
     .split(/\s+/)

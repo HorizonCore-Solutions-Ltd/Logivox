@@ -19,18 +19,30 @@ import {
 
 export function HeroSection() {
   const benefits = [
-    { label: "Seamless Enterprise Integration" },
-    { label: "Real-Time End-to-End Visibility" },
-    { label: "Ready for High-Volume Operations" },
-    { label: "Adaptive Inventory Control" },
-    { label: "Automated Fulfillment Engine" },
+    { label: "Voice as the primary operating interface" },
+    { label: "Audit-ready execution across every action" },
+    { label: "Resilient workflows with safe recovery" },
+    { label: "Hybrid choice for every skill level" },
+    { label: "Certified connectors for existing systems" },
   ];
 
   const stats = [
-    { value: "489+", label: "Integrations", sublabel: "Enterprise Ready" },
-    { value: "50%", label: "Throughput Boost", sublabel: "Proven Results" },
-    { value: "99.99%", label: "Uptime SLA", sublabel: "Enterprise Grade" },
-    { value: "99.9%", label: "Inventory Accuracy", sublabel: "Industry Leading" },
+    {
+      value: "Live",
+      label: "Ops visibility",
+      sublabel: "Health, logs, and replay",
+    },
+    { value: "Fast", label: "Deployment", sublabel: "Setup and validation" },
+    {
+      value: "Traceable",
+      label: "Auditability",
+      sublabel: "Every action recorded",
+    },
+    {
+      value: "Adaptive",
+      label: "Operating modes",
+      sublabel: "Screen, voice, or hybrid",
+    },
   ];
 
   return (
@@ -55,27 +67,26 @@ export function HeroSection() {
             role="status"
             aria-label="Product features announcement"
           >
-            🚀 New: Autonomous Replenishment 2.0 — AI · IoT · Robotics · Digital
-            Twin
+            Production-ready with a continuously evolving intelligence layer
           </Badge>
 
           {/* Hero headline */}
           <div className="space-y-6 max-w-5xl">
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] drop-shadow-sm">
-              Enterprise Voice-Native
+              Enterprise Operations
               <span className="block bg-gradient-to-r from-primary via-primary to-primary/70 bg-clip-text text-transparent drop-shadow-lg">
-                Warehouse Management
+                with voice at the center
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-foreground/80 max-w-3xl mx-auto leading-relaxed font-medium">
-              Production-grade execution tailored for global operations
-              dashboards, and complete Next-Gen capabilities. Voice-directed
-              operations, AI optimization, IoT integration, and robotics
-              orchestration — all fully implemented.
+              LogiVox helps your team run the warehouse without touching a
+              screen. The platform combines voice-first execution, AI guidance,
+              compliance traceability, and enterprise integrations in one
+              operating system.
             </p>
             <div className="text-base md:text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed font-semibold">
-              Built for Fortune 500 companies requiring enterprise-grade
-              reliability, security, and unlimited scale.
+              Built for teams that need clarity, resilience, and a continuously
+              evolving intelligence layer.
             </div>
           </div>
 
@@ -143,15 +154,17 @@ export function HeroSection() {
           <div className="flex flex-wrap justify-center items-center gap-6 md:gap-8 pt-8 text-sm text-muted-foreground">
             <div className="flex items-center space-x-2">
               <Shield className="h-4 w-4 text-primary" />
-              <span className="font-medium">ISO 27001 & SOC 2 Certified</span>
+              <span className="font-medium">Audit traceability by design</span>
             </div>
             <div className="flex items-center space-x-2">
               <Zap className="h-4 w-4 text-primary" />
-              <span className="font-medium">Production-Ready Platform</span>
+              <span className="font-medium">Production-ready platform</span>
             </div>
             <div className="flex items-center space-x-2">
               <Target className="h-4 w-4 text-primary" />
-              <span className="font-medium">Enterprise Support & SLA</span>
+              <span className="font-medium">
+                Continuous delivery of intelligence
+              </span>
             </div>
           </div>
 
@@ -196,13 +209,13 @@ export function HeroSection() {
             <div className="flex flex-wrap justify-center items-center gap-4 text-xs text-muted-foreground">
               <div className="flex items-center gap-1">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span>100% Feature Complete</span>
+                <span>Continuously evolving platform intelligence</span>
               </div>
               <div className="flex items-center gap-1">
-                <span>🚀 489 Production APIs</span>
+                <span>Voice-first operating model for your team</span>
               </div>
               <div className="flex items-center gap-1">
-                <span>🔒 ISO 27001 & SOC 2 Type II</span>
+                <span>Audit-ready from day one for enterprise rollout</span>
               </div>
             </div>
           </div>

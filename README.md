@@ -128,6 +128,10 @@ npm run test:integration
 # 4) End-to-end and production validation
 npm run test:e2e
 npm run deploy:validate
+
+# Enterprise setup and validation
+npm run enterprise:setup
+npm run system:validate
 ```
 
 If you want one combined sweep: `npm run test:all`

@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "The Future of Smart Warehousing | Flowstock Blog",
+  title: "The Future of Smart Warehousing | LogiVox Blog",
   description:
     "How AI and smart slotting are revolutionizing modern fulfillment centers.",
 };
@@ -60,7 +60,7 @@ export default function SmartWarehousingBlogPost() {
           Enter Dynamic "Smart" Slotting
         </h2>
         <p className="mb-6">
-          Modern WMS solutions, like Flowstock's new{" "}
+          Modern WMS solutions, like LogiVox's new{" "}
           <strong>Inbound Brain</strong>, use algorithms to determine the best
           location for inventory <em>at the moment of receipt</em>.
         </p>
@@ -105,7 +105,7 @@ export default function SmartWarehousingBlogPost() {
         </p>
 
         <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight mb-4">
-          How Flowstock Helps
+          How LogiVox Helps
         </h2>
         <p className="mb-6">
           We've built these enterprise-grade capabilities directly into our core
@@ -122,8 +122,8 @@ export default function SmartWarehousingBlogPost() {
             Ready to upgrade your warehouse?
           </h3>
           <p className="mb-6 text-muted-foreground">
-            See how Flowstock's Smart Inbound module can reduce your
-            dock-to-stock time by 40%.
+            See how LogiVox's Smart Inbound module can reduce your dock-to-stock
+            time by 40%.
           </p>
           <Button size="lg" asChild>
             <Link href="/solutions/inbound-inventory">

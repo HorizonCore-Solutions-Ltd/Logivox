@@ -5,9 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, BarChart2, Download, Clock, Filter } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Reporting Guide | Flowstock Help",
-  description:
-    "Learn how to create, schedule, and export reports in Flowstock.",
+  title: "Reporting Guide | LogiVox Help",
+  description: "Learn how to create, schedule, and export reports in LogiVox.",
 };
 
 const REPORT_TYPES = [
@@ -47,7 +46,7 @@ const SECTIONS = [
     title: "Overview",
     icon: <BarChart2 className="h-5 w-5" />,
     content:
-      "The Reports module lets you generate, schedule, and export data from across your Flowstock account. Reports can be downloaded as CSV, PDF, or XLSX, or sent automatically to your inbox on a schedule.",
+      "The Reports module lets you generate, schedule, and export data from across your LogiVox account. Reports can be downloaded as CSV, PDF, or XLSX, or sent automatically to your inbox on a schedule.",
   },
   {
     id: "generating",

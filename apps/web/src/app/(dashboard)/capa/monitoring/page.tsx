@@ -152,9 +152,10 @@ export default function EffectivenessMonitoringPage() {
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold">CAPA Effectiveness Monitoring</h1>
+          <h1 className="text-3xl font-bold">CAPA Recovery Monitoring</h1>
           <p className="text-gray-600 mt-1">
-            Real-time monitoring of closed CAPAs · {monitoringPeriod}
+            Real-time recurrence and recovery visibility for closed CAPAs ·{" "}
+            {monitoringPeriod}
           </p>
         </div>
         <div className="flex gap-2">
@@ -216,7 +217,7 @@ export default function EffectivenessMonitoringPage() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">
-                Recurrence Rate
+                Recovery Risk
               </CardTitle>
             </CardHeader>
             <CardContent>

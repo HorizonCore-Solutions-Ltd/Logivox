@@ -12,9 +12,9 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Inventory Management Guide | Flowstock Help",
+  title: "Inventory Management Guide | LogiVox Help",
   description:
-    "Learn how to manage your inventory in Flowstock — adding products, tracking stock, setting reorder points, and more.",
+    "Learn how to manage your inventory in LogiVox — adding products, tracking stock, setting reorder points, and more.",
 };
 
 const SECTIONS = [
@@ -23,7 +23,7 @@ const SECTIONS = [
     title: "Overview",
     icon: <BarChart2 className="h-5 w-5" />,
     content:
-      "The Inventory module is the heart of Flowstock. It tracks all your products, their stock levels across multiple warehouses, and helps you stay ahead of stock-outs with intelligent reorder alerts.",
+      "The Inventory module is the heart of LogiVox. It tracks all your products, their stock levels across multiple warehouses, and helps you stay ahead of stock-outs with intelligent reorder alerts.",
   },
   {
     id: "adding",
@@ -60,7 +60,7 @@ const SECTIONS = [
     title: "Searching & Filtering",
     icon: <Search className="h-5 w-5" />,
     content:
-      "Flowstock provides powerful search and filtering capabilities. You can search by SKU, name, barcode, or supplier. Filter by warehouse, category, stock status, or date added.",
+      "LogiVox provides powerful search and filtering capabilities. You can search by SKU, name, barcode, or supplier. Filter by warehouse, category, stock status, or date added.",
   },
 ];
 
@@ -127,7 +127,7 @@ export default function HelpInventoryPage() {
               </h1>
               <p className="text-xl text-muted-foreground">
                 A complete guide to managing products and stock levels in
-                Flowstock.
+                LogiVox.
               </p>
             </div>
 

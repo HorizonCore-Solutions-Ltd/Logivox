@@ -78,6 +78,14 @@ export default function NewTemplatePage() {
     );
   };
 
+  const updateCheckpointOptions = (id: string, rawValue: string) => {
+    const options = rawValue
+      .split("\n")
+      .map((opt) => opt.trim())
+      .filter(Boolean);
+    updateCheckpoint(id, { options });
+  };
+
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
       const res = await fetch("/api/qc/templates", {
@@ -116,13 +124,30 @@ export default function NewTemplatePage() {
       return;
     }
 
+    const invalidOptionCheckpoint = checkpoints.find(
+      (cp) => cp.type === "OPTION" && (cp.options || []).length < 2,
+    );
+    if (invalidOptionCheckpoint) {
+      toast.error("Multiple choice checkpoints require at least 2 options");
+      return;
+    }
+
+    const normalizedCheckpoints = checkpoints.map((cp) => ({
+      ...cp,
+      label: cp.label.trim(),
+      options:
+        cp.type === "OPTION"
+          ? (cp.options || []).map((opt) => opt.trim()).filter(Boolean)
+          : undefined,
+    }));
+
     createMutation.mutate({
       name,
       code,
       description,
       category,
       samplingType,
-      checkpoints,
+      checkpoints: normalizedCheckpoints,
     });
   };
 
@@ -270,9 +295,13 @@ export default function NewTemplatePage() {
                         <Label>Result Type</Label>
                         <Select
                           value={cp.type}
-                          onValueChange={(val: any) =>
-                            updateCheckpoint(cp.id, { type: val })
-                          }
+                          onValueChange={(val: any) => {
+                            updateCheckpoint(cp.id, {
+                              type: val,
+                              options:
+                                val === "OPTION" ? cp.options || [] : undefined,
+                            });
+                          }}
                         >
                           <SelectTrigger>
                             <SelectValue />
@@ -286,7 +315,7 @@ export default function NewTemplatePage() {
                               Text Observation
                             </SelectItem>
                             <SelectItem value="OPTION">
-                              Multiple Choice (TODO)
+                              Multiple Choice
                             </SelectItem>
                             <SelectItem value="PHOTO">
                               Photo Required
@@ -295,6 +324,22 @@ export default function NewTemplatePage() {
                         </Select>
                       </div>
                     </div>
+
+                    {cp.type === "OPTION" && (
+                      <div className="space-y-2">
+                        <Label>Options (one per line)</Label>
+                        <Textarea
+                          value={(cp.options || []).join("\n")}
+                          onChange={(e) =>
+                            updateCheckpointOptions(cp.id, e.target.value)
+                          }
+                          placeholder={"Pass\nMinor Defect\nMajor Defect"}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          At least 2 options are required.
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   <Button

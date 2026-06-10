@@ -443,11 +443,11 @@ export default function ReturnsManagementPage() {
           <div className="max-w-4xl mx-auto text-center">
             <Clock className="h-16 w-16 mx-auto mb-6 opacity-90" />
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Reduce Return Costs by 15-30%
+              Reduce return friction by 15-30%
             </h2>
             <p className="text-xl mb-8 text-primary-100 max-w-2xl mx-auto">
-              Join hundreds of warehouses processing returns faster, cheaper,
-              and with less fraud. Start your free trial today.
+              Deliver faster resolutions, better visibility, and lower manual
+              effort across returns workflows. Start your free trial today.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button

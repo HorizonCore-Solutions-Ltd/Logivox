@@ -9,19 +9,19 @@ const faqs = [
   },
   {
     q: "How do you secure data?",
-    a: "Role-based access across facilities, secure data synchronization, comprehensive audit trails, and strict SOC 2/ISO compliance. Voice stays in-browser.",
+    a: "Role-based access across facilities, secure synchronization, audit trails, tenant isolation, and explicit backup and restore controls.",
   },
   {
     q: "What if Wi-Fi drops on the floor?",
-    a: "Voice and scans keep working with queued sync. Delivery and retry visibility ensure nothing is lost.",
+    a: "Voice and scans keep working with queued sync. Retry queues, offline recovery, and replay visibility ensure nothing is lost.",
   },
   {
     q: "Do you integrate with our stack?",
-    a: "Yes. Our platform seamlessly synchronizes with leading ERPs, carriers, and ecommerce systems, ensuring order accuracy and continuous updates.",
+    a: "Yes. Certified enterprise connectors, mapping templates, and schema validation support ERPs, carriers, IoT, and other core systems.",
   },
   {
     q: "How fast is time-to-value?",
-    a: "Expedited onboarding programs are available for global sites, ensuring rapid integration and immediate ROI demonstration within the first operational cycle.",
+    a: "The platform is designed for rapid validation and rollout, with health checks and environment validation keeping the deployment path predictable.",
   },
   {
     q: "Do I need special hardware (Vocollect, etc)?",
@@ -29,11 +29,11 @@ const faqs = [
   },
   {
     q: "What is 'Hybrid Choice' voice?",
-    a: "It gives you the best of both worlds. New hires use 'Rookie Mode' (Screen showing images + Voice) for training, while experts use 'Speed Mode' (Screen off/pocketed) for maximum throughput.",
+    a: "It lets LogiVox adapt to the operator. New hires can use screen-plus-voice guidance while experts can move into faster voice-led execution.",
   },
   {
-    q: "How does the 'OLED Black' mode save battery?",
-    a: "In Pro Mode, we turn off 99% of the screen pixels (OLED Black), waking only for exceptions. This extends standard consumer device battery life to cover full 10-hour shifts.",
+    q: "How do you handle failures and recovery?",
+    a: "The system uses retries, circuit breakers, workflow recovery, and clear failure logs so operators can see what failed and what was replayed.",
   },
 ];
 

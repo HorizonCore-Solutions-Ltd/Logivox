@@ -488,60 +488,39 @@ export default function YardManagementPage() {
         <div className="container-enterprise">
           <div className="mb-12 text-center">
             <Badge variant="outline" className="mb-4">
-              Comparison
+              Native capability
             </Badge>
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              LogiVox vs. Legacy YMS Solutions
+              Why native yard control matters
             </h2>
             <p className="mt-4 text-muted-foreground">
-              Most YMS systems bolt on to your WMS and cost $200K+ to integrate.
-              LogiVox Yard Management is native.
+              LogiVox keeps gate check-in, staging, dock moves, and trailer
+              visibility inside one workflow so teams do not bounce between
+              disconnected tools.
             </p>
           </div>
-          <div className="mx-auto max-w-3xl">
-            <div className="overflow-hidden rounded-xl border">
-              <table className="w-full text-sm">
-                <thead className="bg-muted">
-                  <tr>
-                    <th className="px-4 py-3 text-left font-semibold">
-                      Capability
-                    </th>
-                    <th className="px-4 py-3 text-center font-semibold text-blue-700">
-                      LogiVox
-                    </th>
-                    <th className="px-4 py-3 text-center font-semibold text-gray-500">
-                      Legacy YMS
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {comparisonRows.map((row, i) => (
-                    <tr
-                      key={i}
-                      className={i % 2 === 0 ? "bg-white" : "bg-muted/40"}
-                    >
-                      <td className="px-4 py-3">{row.capability}</td>
-                      <td className="px-4 py-3 text-center">
-                        {row.logivox ? (
-                          <CheckCircle2 className="h-5 w-5 text-green-500 mx-auto" />
-                        ) : (
-                          <span className="text-gray-300">—</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        {row.legacy ? (
-                          <CheckCircle2 className="h-5 w-5 text-gray-400 mx-auto" />
-                        ) : (
-                          <span className="text-red-400 text-xs font-medium">
-                            ✗ Not included
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+          <div className="grid gap-4 md:grid-cols-3 max-w-5xl mx-auto">
+            {[
+              {
+                title: "Live yard visibility",
+                desc: "Supervisors can see trailers, doors, and appointments in real time.",
+              },
+              {
+                title: "Unified dispatch",
+                desc: "Pull and spot tasks are generated from the same operational flow.",
+              },
+              {
+                title: "Dock-ready orchestration",
+                desc: "Gate events, staging, and dock moves stay synchronized.",
+              },
+            ].map((item) => (
+              <Card key={item.title} className="border-slate-200">
+                <CardContent className="pt-4">
+                  <div className="font-bold mb-1">{item.title}</div>
+                  <p className="text-sm text-muted-foreground">{item.desc}</p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>

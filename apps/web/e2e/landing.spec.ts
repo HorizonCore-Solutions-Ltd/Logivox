@@ -39,7 +39,9 @@ test.describe("Landing Page", () => {
   test("should navigate to pricing page", async ({ page }) => {
     await page.getByRole("link", { name: "Pricing" }).click();
     await expect(page).toHaveURL("/pricing");
-    await expect(page.getByText(/pricing for everyone/i)).toBeVisible();
+    await expect(
+      page.getByText(/Enterprise Licensing & Deployment Models/i),
+    ).toBeVisible();
   });
 
   test("should display trust section with stats", async ({ page }) => {

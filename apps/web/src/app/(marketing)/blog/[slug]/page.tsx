@@ -640,7 +640,7 @@ Begin with order picking as it shows immediate ROI:
 ### ROI Calculation
 **Investment:**
 - Hardware: $800 per headset
-- Software: $50/user/month
+- Software: deployment-scoped monthly license
 - Implementation: $15,000
 
 **Returns (Year 1):**

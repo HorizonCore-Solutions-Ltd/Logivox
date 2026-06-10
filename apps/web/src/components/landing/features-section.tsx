@@ -27,131 +27,115 @@ import {
 export function FeaturesSection() {
   const coreModules = [
     {
-      title: "Quality Management",
+      title: "Core Operations",
       description:
-        "Never ship defective products again. Track issues from detection to resolution with automated workflows and root cause analysis.",
-      badge: "Complete System",
+        "Inventory, receiving, picking, packing, returns, and dock flow organized as one operational backbone.",
+      badge: "Core",
       icon: ClipboardCheck,
       color: "from-blue-500/10 to-blue-600/10",
       features: [
-        "Catch defects early",
-        "Track financial impact",
-        "Automated workflows",
-        "Prevent repeat issues",
-        "Smart suggestions",
-        "Supplier scorecards",
+        "Inventory control",
+        "Receiving and putaway",
+        "Picking and packing",
+        "Returns and dock flow",
+        "Yard and transfer coordination",
+        "Single operational view",
       ],
     },
     {
-      title: "Quality Control & Inspection",
+      title: "Intelligence & Automation",
       description:
-        "Ensure every product meets your standards. Automated inspections with computer vision and real-time defect tracking.",
-      badge: "Industry-Leading",
+        "AI recommendations, forecasting, anomaly detection, workflow optimization, and decision support that keep the operation moving.",
+      badge: "Intelligence",
       icon: ScanBarcode,
       color: "from-green-500/10 to-green-600/10",
       features: [
-        "Computer vision inspection",
-        "Statistical process control",
-        "Real-time defect tracking",
-        "Custom inspection rules",
-        "Automated workflows",
-        "Compliance reporting",
+        "AI recommendations",
+        "Forecasting",
+        "Anomaly detection",
+        "Workflow optimization",
+        "Digital twin planning",
+        "Decision insights",
       ],
     },
     {
-      title: "Returns Processing",
+      title: "Compliance & Quality",
       description:
-        "Turn returns into opportunities. Automated grading, instant restocking, and seamless customer refunds.",
-      badge: "Comprehensive",
+        "CAPA, inspections, document control, audit trails, and recurrence prevention designed for regulated environments.",
+      badge: "Compliance",
       icon: Package,
       color: "from-purple-500/10 to-purple-600/10",
       features: [
-        "Smart return tracking",
-        "Automatic grading",
-        "Fast restocking",
-        "Instant refunds",
-        "Return analytics",
-        "Customer portal",
+        "CAPA workflow",
+        "Quality control",
+        "Audit evidence",
+        "Root cause tracking",
+        "Document governance",
+        "Prevention loops",
       ],
     },
     {
-      title: "Receiving & Putaway",
+      title: "Voice & Workforce",
       description:
-        "Get inventory in fast and organized. Smart location suggestions and quality checks as products arrive.",
-      badge: "Advanced",
+        "Voice OS, labor management, task orchestration, and skill-aware execution that adapts to the operator.",
+      badge: "Voice",
       icon: Truck,
       color: "from-orange-500/10 to-orange-600/10",
       features: [
-        "Fast receiving",
-        "Cross-docking",
-        "Quality inspections",
-        "Smart putaway",
-        "Batch processing",
-        "Label printing",
+        "Voice-directed work",
+        "Hybrid choice modes",
+        "Task optimization",
+        "Labor visibility",
+        "Skill tracking",
+        "Hands-free execution",
       ],
     },
     {
-      title: "Inventory Management",
+      title: "Integration & Ecosystem",
       description:
-        "Always know what you have and where it is. Real-time tracking with automatic reordering when stock runs low.",
-      badge: "Real-Time",
+        "Certified enterprise connectors, API access, IoT, robotics, and ERP synchronization for the systems you already run.",
+      badge: "Ecosystem",
       icon: Boxes,
       color: "from-cyan-500/10 to-cyan-600/10",
       features: [
-        "Live inventory tracking",
-        "Cycle counting",
-        "ABC analysis",
-        "Auto-reordering",
-        "Demand forecasting",
-        "Multi-location support",
-      ],
-    },
-    {
-      title: "Smart Optimization",
-      description:
-        "Let AI do the heavy lifting. Automatically optimize routes, space, and workload for maximum efficiency.",
-      badge: "AI-Powered",
-      icon: BarChart3,
-      color: "from-pink-500/10 to-pink-600/10",
-      features: [
-        "Load optimization",
-        "Smart slotting",
-        "Route planning",
-        "Labor balancing",
-        "Wave optimization",
-        "Container optimization",
+        "ERP connectors",
+        "IoT and devices",
+        "Robotics readiness",
+        "Schema validation",
+        "Retry handling",
+        "Mapping templates",
       ],
     },
   ];
 
   const advancedCapabilities = [
     {
-      title: "Predictive Ops & Anomaly Defense",
+      title: "System Control Center",
       description:
-        "Real-time anomaly detection on pick/pack/ship signals with auto-alerts and blast-radius rollback to keep SLAs safe.",
+        "A central view for latency, workflow execution, queue health, replay, and the live event stream behind every action.",
       icon: BarChart3,
-      highlights: ["Auto-alerts", "Rollback guardrails", "SLO health"],
+      highlights: ["Live system health", "Workflow replay", "Queue visibility"],
     },
     {
-      title: "Offline & Edge Resilience",
+      title: "AI Decision Insights",
       description:
-        "Voice + scanning that keep working on the floor when Wi‑Fi drops, with smart sync once connectivity returns.",
+        "Show the input data, reasoning summary, and confidence behind each recommendation so teams can trust the output.",
       icon: Zap,
-      highlights: ["Offline picks", "Edge sync", "Low-latency"],
+      highlights: ["Input data", "Reasoning summary", "Confidence level"],
     },
     {
-      title: "Copilot for SOPs & Training",
+      title: "Workflow Visualizer",
       description:
-        "Tenant-aware copilot that pulls your SOPs and work instructions inline so teams execute perfectly, first time.",
+        "Make congestion, picking flow, and task routing visible so leaders can see where throughput stalls before it spreads.",
       icon: CheckCircle,
-      highlights: ["RAG over SOPs", "In-line help", "Fewer errors"],
+      highlights: ["Picking flow", "Congestion heatmaps", "Task routing"],
     },
     {
-      title: "Zero-Trust Everywhere",
+      title: "Resilience Engine",
       description:
-        "Strict role-based permissions across sites, unalterable activity logs, and reliable automated alerts to guarantee compliance and operational security.",
+        "Retry queues, circuit breakers, offline recovery, and safe rollback behavior for failed API calls, IoT signals, and voice commands.",
       icon: Shield,
-      highlights: ["Fine-grain scopes", "Audit trails", "Automated compliance"],
+      highlights: ["Retries", "Circuit breakers", "Offline recovery"],
     },
   ];
 
@@ -163,36 +147,25 @@ export function FeaturesSection() {
       <div className="container-enterprise">
         <div className="text-center mb-16 space-y-4">
           <Badge variant="secondary" className="mb-4">
-            🏆 Industry-Leading Features
+            🏆 Clear enterprise operating model
           </Badge>
           <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
-            Everything Competitors Charge Extra For
+            Five domains, one platform
             <span className="block bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-              Included in Every Plan
+              built for clarity and control
             </span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Replace 5+ different tools with one complete platform. Voice
-            operations, AI optimization, quality management, and security
-            training—competitors charge $500-2,000+ extra for these.
+            Internally the system can keep growing. Externally the story stays
+            simple: core operations, intelligence, compliance, workforce, and
+            ecosystem.
           </p>
-          <div className="mt-6 flex justify-center items-center gap-8 text-sm font-medium">
-            <div className="text-green-600">
-              ✅ Voice Commands (Usually $200/month)
-            </div>
-            <div className="text-green-600">
-              ✅ Label Designer (Usually $150/month)
-            </div>
-            <div className="text-green-600">
-              ✅ Security Training (Usually $40/user/month)
-            </div>
-          </div>
         </div>
 
         {/* Core modules grid */}
         <div className="mb-16">
           <h3 className="text-2xl font-bold mb-8 text-center">
-            Core Warehouse Modules
+            Clear operating domains
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {coreModules.map((module) => (
@@ -238,7 +211,7 @@ export function FeaturesSection() {
         {/* Advanced capabilities */}
         <div className="mb-16">
           <h3 className="text-2xl font-bold mb-8 text-center">
-            Advanced Capabilities
+            Trust and resilience layers
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {advancedCapabilities.map((capability) => (
@@ -276,34 +249,36 @@ export function FeaturesSection() {
         {/* Built for your success */}
         <div className="mt-16 space-y-8">
           <div className="text-center space-y-3">
-            <h3 className="text-2xl font-bold">Built for Your Success</h3>
+            <h3 className="text-2xl font-bold">
+              Built for enterprise confidence
+            </h3>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Enterprise reliability with bank-level security and automation
-              that keeps every shift moving.
+              Production-ready execution with observability, auditability, and
+              safe recovery built into the operating model.
             </p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
               {
-                value: "99.99%",
-                label: "Always Available",
-                helper: "SLO-backed uptime",
+                value: "Live",
+                label: "System health",
+                helper: "Latency, events, and queues",
               },
               {
-                value: "Instant",
-                label: "Lightning Fast",
-                helper: "Global performance",
+                value: "Replay",
+                label: "Workflow recovery",
+                helper: "Retry and rollback visibility",
               },
               {
-                value: "Secure",
-                label: "Bank-Level",
-                helper: "SOC 2 & ISO 27001",
+                value: "Trace",
+                label: "Auditability",
+                helper: "Action, user, timestamp, response",
               },
               {
-                value: "24/7",
-                label: "Support",
-                helper: "Always here to help",
+                value: "Guide",
+                label: "AI transparency",
+                helper: "Inputs, reasoning, confidence",
               },
             ].map((item) => (
               <div key={item.label} className="text-center">
@@ -321,26 +296,27 @@ export function FeaturesSection() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-card/50 rounded-lg p-6">
               <Shield className="h-8 w-8 text-primary mb-3" />
-              <h4 className="font-semibold mb-2">Bank-Level Security</h4>
+              <h4 className="font-semibold mb-2">Audit Traceability</h4>
               <p className="text-sm text-muted-foreground">
-                Rate limiting, DDoS protection, SQL/XSS/CSRF prevention, IP
-                controls, and automated threat detection.
+                Every action is tied to a user, timestamp, and system response.
+                Voice commands can also store transcript, interpreted intent,
+                and executed action.
               </p>
             </div>
             <div className="bg-card/50 rounded-lg p-6">
               <BarChart3 className="h-8 w-8 text-primary mb-3" />
-              <h4 className="font-semibold mb-2">Real-Time Insights</h4>
+              <h4 className="font-semibold mb-2">System Control Center</h4>
               <p className="text-sm text-muted-foreground">
-                Live dashboards, predictive forecasting, AI-powered insights,
-                and custom reporting across all modules.
+                Live dashboards for health, logs, workflow replay, queue
+                visibility, and AI decision insights.
               </p>
             </div>
             <div className="bg-card/50 rounded-lg p-6">
               <Zap className="h-8 w-8 text-primary mb-3" />
-              <h4 className="font-semibold mb-2">Smart Automation</h4>
+              <h4 className="font-semibold mb-2">Resilience Engine</h4>
               <p className="text-sm text-muted-foreground">
-                Automatic reordering, voice-guided picking, smart route
-                planning, and predictive maintenance keep every shift on track.
+                Intelligent retries, circuit breakers, offline recovery, and
+                safe workflow rollback keep operations moving during failures.
               </p>
             </div>
           </div>
@@ -349,11 +325,11 @@ export function FeaturesSection() {
         {/* Integration ecosystem */}
         <div className="mt-16 text-center">
           <h3 className="text-2xl font-bold mb-4">
-            Integrates with Everything
+            Certified enterprise connectors
           </h3>
           <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Connect LogiVox to your existing systems through our comprehensive
-            API and pre-built integrations
+            Keep existing systems in place with validated mappings, schema
+            checks, retry handling, and clear integration ownership.
           </p>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

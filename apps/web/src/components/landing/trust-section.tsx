@@ -17,30 +17,30 @@ import { Badge } from "@/components/ui/badge";
 export function TrustSection() {
   const stats = [
     {
-      value: "$52M+",
-      label: "Average Savings Per Year",
-      description: "For enterprise customers",
+      value: "Hours",
+      label: "To go live",
+      description: "With setup and validation scripts",
       icon: DollarSign,
       color: "from-green-500/10 to-green-600/10",
     },
     {
-      value: "936%",
-      label: "Return on Investment",
-      description: "In your first year",
+      value: "Trace",
+      label: "Every action",
+      description: "User, timestamp, response, and voice intent",
       icon: TrendingDown,
       color: "from-blue-500/10 to-blue-600/10",
     },
     {
-      value: "99.99%",
-      label: "Always Available",
-      description: "Rock-solid reliability",
+      value: "Replay",
+      label: "Failure recovery",
+      description: "Retries, rollback, and offline sync visibility",
       icon: Zap,
       color: "from-purple-500/10 to-purple-600/10",
     },
     {
-      value: "24/7",
-      label: "Expert Support",
-      description: "We're here when you need us",
+      value: "Live",
+      label: "System observability",
+      description: "Health, latency, queues, and workflow logs",
       icon: Shield,
       color: "from-orange-500/10 to-orange-600/10",
     },
@@ -48,21 +48,21 @@ export function TrustSection() {
 
   const guarantees = [
     {
-      title: "Bank-Level Security",
+      title: "Data Governance & Isolation",
       description:
-        "Your data is protected with the same security banks use. SOC 2 and ISO 27001 certified with automatic threat protection.",
+        "Tenant boundaries, encryption, backup/restore, and export controls are explicit and visible to buyers.",
       icon: Shield,
     },
     {
-      title: "Rapid Deployment",
+      title: "Deployment Simplicity",
       description:
-        "Try everything with no commitments. No credit card required. Get full access to all features from day one.",
+        "One-command setup, environment validation, and health checks reduce the risk of a difficult rollout.",
       icon: CheckCircle,
     },
     {
-      title: "Setup in Hours, Not Months",
+      title: "Resilience by Design",
       description:
-        "Start using LogiVox the same day. Pre-built workflows and smart setup get you running fast.",
+        "Failed API calls, IoT signals, and voice commands can retry safely without losing operational continuity.",
       icon: Clock,
     },
   ];
@@ -94,23 +94,18 @@ export function TrustSection() {
         <div className="mb-20">
           <div className="text-center mb-12">
             <Badge variant="secondary" className="mb-4">
-              ✅ Verified Customer Results
+              ✅ Enterprise trust signals
             </Badge>
             <h2 className="text-3xl md:text-5xl font-bold mb-4">
-              Real ROI from
+              Enterprise confidence comes from
               <span className="block bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                real customers
+                visibility and control
               </span>
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              500+ warehouses across healthcare, manufacturing & retail trust
-              LogiVox
+              Prospective customers need clear proof of observability,
+              traceability, resilience, and safe deployment.
             </p>
-            <div className="mt-4 flex justify-center items-center gap-6 text-sm text-muted-foreground">
-              <span>🏥 Healthcare: 180+ facilities</span>
-              <span>🏭 Manufacturing: 240+ plants</span>
-              <span>🛍️ Retail: 80+ distribution centers</span>
-            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -145,11 +140,11 @@ export function TrustSection() {
         <div>
           <div className="text-center mb-12">
             <h3 className="text-2xl md:text-3xl font-bold mb-4">
-              Enterprise-Grade Guarantees
+              Non-negotiable enterprise requirements
             </h3>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Built for mission-critical operations with zero compromises on
-              security, performance, or reliability
+              Designed for mission-critical teams that need governance, audit,
+              resilience, and deployment confidence before anything else.
             </p>
           </div>
 
@@ -179,28 +174,26 @@ export function TrustSection() {
         <div className="mt-20 bg-gradient-to-r from-primary/5 to-primary/10 rounded-2xl p-8 md:p-12">
           <div className="grid md:grid-cols-3 gap-8 text-center">
             <div>
-              <div className="text-3xl font-bold mb-2">Complete</div>
-              <div className="text-sm font-semibold mb-1">
-                Everything Included
-              </div>
+              <div className="text-3xl font-bold mb-2">Core</div>
+              <div className="text-sm font-semibold mb-1">Five domains</div>
               <div className="text-xs text-muted-foreground">
-                From receiving to shipping
+                Operations, intelligence, compliance, workforce, ecosystem
               </div>
             </div>
             <div>
-              <div className="text-3xl font-bold mb-2">44+</div>
-              <div className="text-sm font-semibold mb-1">
-                Powerful Features
-              </div>
+              <div className="text-3xl font-bold mb-2">Control</div>
+              <div className="text-sm font-semibold mb-1">Observability</div>
               <div className="text-xs text-muted-foreground">
-                Quality, returns, optimization & more
+                Health, logs, replay, and AI decision visibility
               </div>
             </div>
             <div>
-              <div className="text-3xl font-bold mb-2">Instant</div>
-              <div className="text-sm font-semibold mb-1">Lightning Fast</div>
+              <div className="text-3xl font-bold mb-2">Trust</div>
+              <div className="text-sm font-semibold mb-1">
+                Traceable by design
+              </div>
               <div className="text-xs text-muted-foreground">
-                Global performance, no lag
+                Every action, response, and recovery path recorded
               </div>
             </div>
           </div>

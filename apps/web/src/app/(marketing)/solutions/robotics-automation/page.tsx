@@ -159,22 +159,21 @@ const DEVICE_TYPES = [
   },
 ];
 
-const COMPETITOR_GAPS = [
+const CONTROL_BENEFITS = [
   {
-    competitor: "SAP EWM",
-    gap: "Robot integration requires separate SAP automation module (+$80K/yr). No unified fleet dashboard.",
+    title: "Unified fleet control",
+    description:
+      "AMRs, AGVs, cobots, conveyors, and AS/RS equipment are managed from one dashboard.",
   },
   {
-    competitor: "Manhattan Associates",
-    gap: "MHE integration via third-party MFC layer. No native AMR dispatch or sortation analytics.",
+    title: "Task-aware dispatch",
+    description:
+      "Device selection uses location, battery, urgency, and task type to keep throughput moving.",
   },
   {
-    competitor: "Oracle WMS",
-    gap: "Robotics automation not included in standard WMS tier. Custom integrations billed separately.",
-  },
-  {
-    competitor: "Standalone RCS",
-    gap: "Robot control systems operate in silos — no connection to WMS inventory, picks, or order data.",
+    title: "Live recovery signals",
+    description:
+      "Operators can see device health, queue behavior, and exception handling in real time.",
   },
 ];
 
@@ -528,34 +527,34 @@ export default function RoboticsAutomationPage() {
         <div className="container-enterprise">
           <div className="text-center mb-12">
             <Badge className="mb-4 bg-red-100 text-red-800 border-red-300">
-              Competitive Gap
+              Robotics control model
             </Badge>
             <h2 className="text-3xl font-bold mb-4">
-              Why Legacy WMS Fails at Robotics
+              Why native robotics control matters
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Traditional warehouse systems were designed before warehouse
-              robots existed at scale. Here is what your competitors charge for
-              the equivalent functionality.
+              Robots are most valuable when dispatch, inventory context, and
+              exception handling live in the same operating model.
             </p>
           </div>
-          <div className="grid md:grid-cols-2 gap-4 max-w-3xl mx-auto">
-            {COMPETITOR_GAPS.map((item) => (
-              <Card key={item.competitor} className="border-red-200">
+          <div className="grid md:grid-cols-3 gap-4 max-w-5xl mx-auto">
+            {CONTROL_BENEFITS.map((item) => (
+              <Card key={item.title} className="border-red-200">
                 <CardContent className="pt-4">
                   <div className="font-bold text-red-800 mb-1">
-                    {item.competitor}
+                    {item.title}
                   </div>
-                  <p className="text-sm text-muted-foreground">{item.gap}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {item.description}
+                  </p>
                 </CardContent>
               </Card>
             ))}
           </div>
           <div className="text-center mt-8">
             <p className="text-lg font-semibold">
-              LogiVox includes native robotics integration in{" "}
-              <span className="text-violet-600">every plan</span> — no add-ons,
-              no middleware.
+              LogiVox includes native robotics integration, voice operations,
+              and audit-ready workflows in one platform.
             </p>
           </div>
         </div>

@@ -17,12 +17,10 @@ import {
   ArrowRight,
   Star,
   Zap,
-  Building2,
   Phone,
   Mail,
   Calculator,
   TrendingUp,
-  Users,
   Package,
   Truck,
   BarChart3,
@@ -42,19 +40,25 @@ export default function PricingPage() {
     "qc",
     "optimization",
   ]);
-  const [calculatorUsers, setCalculatorUsers] = React.useState(10);
+  const [calculatorFacilities, setCalculatorFacilities] = React.useState(3);
   const [calculatorOrders, setCalculatorOrders] = React.useState(5000);
 
   const getPrice = (monthlyPrice: number) => {
     if (billingCycle === "annual") {
-      return Math.floor(monthlyPrice * 0.8); // 20% discount
+      return Math.floor(monthlyPrice * 0.85); // 15% discount
     }
     return monthlyPrice;
   };
 
+  const estimateMonthlyLicense = (facilities: number) => {
+    if (facilities <= 3) return getPrice(1500);
+    if (facilities <= 10) return getPrice(4500);
+    return getPrice(10000);
+  };
+
   const calculateROI = () => {
     const currentCost = calculatorOrders * 8.5; // Industry avg $8.50 per order
-    const logivoxCost = calculatorUsers * getPrice(99) + calculatorOrders * 0.5;
+    const logivoxCost = estimateMonthlyLicense(calculatorFacilities);
     const savings = currentCost - logivoxCost;
     const roi = ((savings / logivoxCost) * 100).toFixed(0);
     return { savings: Math.floor(savings), roi };
@@ -62,17 +66,18 @@ export default function PricingPage() {
 
   const plans = [
     {
-      name: "Starter",
+      name: "Growth",
       description:
-        "Perfect for teams scaling from manual to automated warehouse operations",
-      monthlyPrice: 49,
+        "For a first production site that needs predictable licensing and guided rollout",
+      monthlyPrice: 1500,
       popular: false,
       badge: null,
-      tagline: "Perfect for 1-5 users • ~5K-10K SKUs",
+      tagline: "1 facility • Operational users included",
       features: {
         core: [
           "1 warehouse location",
           "Up to 10,000 SKUs",
+          "Operational users included",
           "Basic inventory tracking",
           "Order management",
           "Mobile app with barcode scanning",
@@ -96,17 +101,18 @@ export default function PricingPage() {
       },
     },
     {
-      name: "Professional",
+      name: "3PL Operations",
       description:
-        "The complete solution for mid-market operations that need speed, scale, and advanced features",
-      monthlyPrice: 99,
+        "For multi-client operations that need stronger controls and billing automation",
+      monthlyPrice: 4500,
       popular: true,
       badge: "Most Popular",
-      tagline: "Best for 5-50 users • 10K+ unlimited SKUs",
+      tagline: "Up to 5 facilities • Operational users included",
       features: {
         core: [
           "Up to 5 warehouse locations",
           "Unlimited SKUs",
+          "Operational users included",
           "Real-time inventory tracking",
           "Advanced order management",
           "Mobile app with offline mode",
@@ -133,15 +139,16 @@ export default function PricingPage() {
     {
       name: "Enterprise",
       description:
-        "Built for Fortune 500 companies and complex global operations requiring unlimited scale & customization",
-      monthlyPrice: 0, // Custom pricing
+        "For large distribution networks requiring custom deployment scope, integrations, and SLAs",
+      monthlyPrice: 10000,
       popular: false,
-      badge: "Best Value",
-      tagline: "Unlimited users & locations • Custom integrations",
+      badge: "Enterprise",
+      tagline: "Custom agreement • Deployment-scoped billing",
       features: {
         core: [
           "Unlimited warehouse locations",
           "Unlimited SKUs & products",
+          "Operational users included",
           "Real-time multi-site inventory",
           "Custom workflow automation",
           "White-label mobile apps",
@@ -187,7 +194,7 @@ export default function PricingPage() {
       name: "Quality Control",
       description: "Industry-leading inspection system",
       badge: "Comprehensive",
-      price: "+$20/user",
+      price: "Quoted per deployment",
       icon: Shield,
     },
     {
@@ -195,7 +202,7 @@ export default function PricingPage() {
       name: "AI Optimization",
       description: "Smart load, slotting & route planning",
       badge: "Intelligent",
-      price: "+$30/user",
+      price: "Quoted per deployment",
       icon: Zap,
     },
     {
@@ -203,7 +210,7 @@ export default function PricingPage() {
       name: "CAPA Management",
       description: "Corrective & preventive actions",
       badge: "Quality First",
-      price: "+$25/user",
+      price: "Quoted per deployment",
       icon: BarChart3,
     },
     {
@@ -211,7 +218,7 @@ export default function PricingPage() {
       name: "Voice Operations",
       description: "Hands-free warehouse control",
       badge: "Hands-Free",
-      price: "+$15/user",
+      price: "Quoted per deployment",
       icon: HeadphonesIcon,
     },
     {
@@ -219,7 +226,7 @@ export default function PricingPage() {
       name: "Returns Processing",
       description: "Complete RMA system",
       badge: "Essential",
-      price: "+$18/user",
+      price: "Quoted per deployment",
       icon: Truck,
     },
     {
@@ -228,7 +235,7 @@ export default function PricingPage() {
       description:
         "Predictive AI forecasting, IoT smart-shelf triggers, AMR robot dispatch, and cost-optimised off-peak scheduling — the full digital-twin replenishment engine.",
       badge: "New 🚀",
-      price: "+$35/user",
+      price: "Quoted per deployment",
       icon: Sparkles,
     },
     {
@@ -237,7 +244,7 @@ export default function PricingPage() {
       description:
         "Yard slot management, dock scheduling, load marshalling, and vehicle check-in/out — with 1-tap mobile actions for marshallers.",
       badge: "Add-On",
-      price: "+$22/user",
+      price: "Quoted per deployment",
       icon: Globe,
     },
     {
@@ -246,7 +253,7 @@ export default function PricingPage() {
       description:
         "Driver dispatch, live stop tracking, proof-of-delivery scanning, and route management — all accessible in 1-2 taps on mobile.",
       badge: "Add-On",
-      price: "+$20/user",
+      price: "Quoted per deployment",
       icon: Truck,
     },
   ];
@@ -268,10 +275,10 @@ export default function PricingPage() {
           enterprise: "Unlimited",
         },
         {
-          name: "Users",
-          starter: "1-5",
-          professional: "5-50",
-          enterprise: "Unlimited",
+          name: "Operational Users",
+          starter: "Included",
+          professional: "Included",
+          enterprise: "Included",
         },
         {
           name: "Mobile App",
@@ -505,7 +512,7 @@ export default function PricingPage() {
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Production-ready enterprise WMS with flexible deployment models.
               Cloud SaaS, Private Cloud, On-Premise, or Hybrid deployment with
-              customized licensing agreements tailored to your organization.
+              licensing agreements tailored to your deployment scope.
             </p>
 
             {/* Contact CTA */}
@@ -523,6 +530,56 @@ export default function PricingPage() {
                 </Link>
               </Button>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Billing Clarity */}
+      <section className="py-12 border-b bg-muted/20">
+        <div className="container-enterprise">
+          <div className="grid md:grid-cols-3 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">How We Bill</CardTitle>
+                <CardDescription>
+                  Pricing is based on facilities, workflows, and support level.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  We do not charge one license per warehouse employee.
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Large Teams</CardTitle>
+                <CardDescription>
+                  Example: a 3,000-employee business is quoted as a deployment
+                  agreement.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Operational users are included; quote drivers are sites,
+                  integrations, and SLA requirements.
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Payment Terms</CardTitle>
+                <CardDescription>
+                  Monthly invoicing or annual prepay with discount.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Annual prepay receives a 15% discount. Multi-year and volume
+                  terms are available for enterprise contracts.
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
@@ -603,6 +660,25 @@ export default function PricingPage() {
       {/* Pricing Cards */}
       <section className="py-16 relative">
         <div className="container-enterprise">
+          <div className="flex items-center justify-center gap-3 mb-10">
+            <Button
+              variant={billingCycle === "monthly" ? "default" : "outline"}
+              onClick={() => setBillingCycle("monthly")}
+            >
+              Monthly Invoice
+            </Button>
+            <Button
+              variant={billingCycle === "annual" ? "default" : "outline"}
+              onClick={() => setBillingCycle("annual")}
+              className="relative"
+            >
+              Annual Prepay
+              <Badge className="absolute -top-2 -right-2 bg-green-500">
+                Save 15%
+              </Badge>
+            </Button>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-20">
             {plans.map((plan) => (
               <Card
@@ -632,21 +708,25 @@ export default function PricingPage() {
                   </div>
 
                   <div className="pt-6">
-                    {plan.monthlyPrice === 0 ? (
-                      <div className="text-4xl font-bold">Custom</div>
+                    {plan.name === "Enterprise" ? (
+                      <div className="text-4xl font-bold">From $10,000</div>
                     ) : (
                       <>
                         <div className="flex items-baseline justify-center space-x-2">
                           <span className="text-5xl font-bold text-primary">
-                            ${getPrice(plan.monthlyPrice)}
+                            ${getPrice(plan.monthlyPrice).toLocaleString()}
                           </span>
                           <span className="text-muted-foreground">
-                            /user/month
+                            /site/month
                           </span>
                         </div>
                         {billingCycle === "annual" && (
                           <p className="text-sm text-green-600 mt-2 font-medium">
-                            ${plan.monthlyPrice * 12 * 0.8}/user/year • Save 20%
+                            $
+                            {Math.floor(
+                              plan.monthlyPrice * 12 * 0.85,
+                            ).toLocaleString()}
+                            /site/year • Save 15%
                           </p>
                         )}
                       </>
@@ -808,7 +888,7 @@ export default function PricingPage() {
                     </div>
                     {module.id !== "core" && (
                       <p className="text-xs text-muted-foreground mt-2">
-                        {module.price.includes("$") ? "per month" : ""}
+                        Scaled to deployment scope
                       </p>
                     )}
                   </CardContent>
@@ -834,20 +914,20 @@ export default function PricingPage() {
                   <div className="space-y-4">
                     <div>
                       <label className="text-sm font-semibold mb-2 block">
-                        Number of Users
+                        Number of Facilities
                       </label>
                       <input
                         type="range"
                         min="1"
-                        max="100"
-                        value={calculatorUsers}
+                        max="20"
+                        value={calculatorFacilities}
                         onChange={(e) =>
-                          setCalculatorUsers(Number(e.target.value))
+                          setCalculatorFacilities(Number(e.target.value))
                         }
                         className="w-full"
                       />
                       <div className="text-2xl font-bold text-primary mt-2">
-                        {calculatorUsers} users
+                        {calculatorFacilities} facilities
                       </div>
                     </div>
 
@@ -878,7 +958,11 @@ export default function PricingPage() {
                         LogiVox Cost
                       </span>
                       <span className="text-2xl font-bold">
-                        ${(calculatorUsers * getPrice(99)).toLocaleString()}/mo
+                        $
+                        {estimateMonthlyLicense(
+                          calculatorFacilities,
+                        ).toLocaleString()}
+                        /mo
                       </span>
                     </div>
 
@@ -1030,7 +1114,7 @@ export default function PricingPage() {
               <CardContent className="space-y-4">
                 <ul className="space-y-2">
                   {[
-                    "Custom pricing for 50+ users",
+                    "Custom pricing for multi-site rollouts",
                     "On-premise deployment options",
                     "Dedicated implementation team",
                     "24/7 premium support",

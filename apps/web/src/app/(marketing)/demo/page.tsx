@@ -78,7 +78,7 @@ export default function DemoPage() {
       <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
         <div className="container flex h-16 items-center justify-between max-w-6xl mx-auto px-6">
           <Link href="/" className="font-bold text-xl">
-            Flowstock
+            LogiVox
           </Link>
           <nav className="flex gap-6 text-sm">
             <Link
@@ -107,12 +107,12 @@ export default function DemoPage() {
                 Request a Demo
               </div>
               <h1 className="text-4xl font-bold leading-tight">
-                See Flowstock in action
+                See LogiVox in action
               </h1>
               <p className="text-xl text-muted-foreground">
                 Get a personalised walkthrough of our warehouse management
-                platform. We&apos;ll show you exactly how Flowstock can
-                streamline your operations.
+                platform. We&apos;ll show you exactly how LogiVox can streamline
+                your operations.
               </p>
             </div>
 
@@ -120,19 +120,19 @@ export default function DemoPage() {
               {[
                 {
                   title: "Personalised demo",
-                  desc: "Tailored to your industry and use case",
+                  desc: "Tailored to your operating model and workflows",
                 },
                 {
                   title: "Live Q&A",
-                  desc: "Ask our experts anything about the platform",
+                  desc: "Ask about deployment, governance, and scale",
                 },
                 {
                   title: "Implementation plan",
-                  desc: "Get a timeline for going live",
+                  desc: "Understand rollout milestones and validation",
                 },
                 {
                   title: "Pricing overview",
-                  desc: "Receive a custom quote for your team",
+                  desc: "Review the commercial model for your team",
                 },
               ].map((item) => (
                 <div key={item.title} className="flex items-start gap-3">

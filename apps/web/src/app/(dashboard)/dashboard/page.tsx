@@ -30,6 +30,10 @@ import {
   ShieldAlert,
   FileWarning,
   Map,
+  Server,
+  Database,
+  ShieldCheck,
+  Workflow,
 } from "lucide-react";
 
 interface DashboardStats {
@@ -64,6 +68,27 @@ interface LowStockItem {
   availableQty: number;
 }
 
+interface SystemHealthSnapshot {
+  status: "healthy" | "degraded" | "unhealthy";
+  timestamp: string;
+  version: string;
+  uptime: number;
+  database?: {
+    status: string;
+    error?: string | null;
+  };
+  memory?: {
+    used: number;
+    total: number;
+    external?: number;
+  };
+  services?: {
+    prisma?: string;
+    nextauth?: string;
+    uploads?: string;
+  };
+}
+
 export default function DashboardPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -83,36 +108,60 @@ export default function DashboardPage() {
   const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([]);
   const [lowStockItems, setLowStockItems] = useState<LowStockItem[]>([]);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [systemHealth, setSystemHealth] = useState<SystemHealthSnapshot | null>(
+    null,
+  );
+  const [auditTrailCount, setAuditTrailCount] = useState(0);
 
   const fetchDashboardData = async () => {
     try {
-      const [invRes, soRes, poRes, shipRes, ncrRes, capaRes, dutyKpisRes] =
-        await Promise.all([
-          fetch("/api/inventory?limit=500"),
-          fetch("/api/sales-orders?limit=10&page=1"),
-          fetch("/api/purchase-orders?status=PENDING,SENT&limit=1"),
-          fetch("/api/shipments?status=SHIPPED&limit=1"),
-          fetch("/api/qc/ncr?status=OPEN&limit=1"),
-          fetch("/api/qc/capa/overdue"),
-          fetch("/api/duties/kpis?days=1"),
-        ]);
+      const [
+        invRes,
+        soRes,
+        poRes,
+        shipRes,
+        ncrRes,
+        capaRes,
+        dutyKpisRes,
+        healthRes,
+        activityRes,
+      ] = await Promise.all([
+        fetch("/api/inventory?limit=500"),
+        fetch("/api/sales-orders?limit=10&page=1"),
+        fetch("/api/purchase-orders?status=PENDING,SENT&limit=1"),
+        fetch("/api/shipments?status=SHIPPED&limit=1"),
+        fetch("/api/qc/ncr?status=OPEN&limit=1"),
+        fetch("/api/qc/capa/overdue"),
+        fetch("/api/duties/kpis?days=1"),
+        fetch("/api/health/detailed"),
+        fetch("/api/activity-logs?limit=1&page=1"),
+      ]);
 
-      const [invData, soData, poData, shipData, ncrData, capaData, dutyKpis] =
-        await Promise.all([
-          invRes.ok ? invRes.json() : { items: [], pagination: { total: 0 } },
-          soRes.ok ? soRes.json() : { salesOrders: [], total: 0 },
-          poRes.ok
-            ? poRes.json()
-            : { purchaseOrders: [], total: 0, pagination: { total: 0 } },
-          shipRes.ok
-            ? shipRes.json()
-            : { shipments: [], total: 0, pagination: { total: 0 } },
-          ncrRes.ok ? ncrRes.json() : { total: 0, data: [] },
-          capaRes.ok ? capaRes.json() : [],
-          dutyKpisRes?.ok
-            ? dutyKpisRes.json()
-            : { byStatus: {}, slaBreached: 0 },
-        ]);
+      const [
+        invData,
+        soData,
+        poData,
+        shipData,
+        ncrData,
+        capaData,
+        dutyKpis,
+        healthData,
+        activityData,
+      ] = await Promise.all([
+        invRes.ok ? invRes.json() : { items: [], pagination: { total: 0 } },
+        soRes.ok ? soRes.json() : { salesOrders: [], total: 0 },
+        poRes.ok
+          ? poRes.json()
+          : { purchaseOrders: [], total: 0, pagination: { total: 0 } },
+        shipRes.ok
+          ? shipRes.json()
+          : { shipments: [], total: 0, pagination: { total: 0 } },
+        ncrRes.ok ? ncrRes.json() : { total: 0, data: [] },
+        capaRes.ok ? capaRes.json() : [],
+        dutyKpisRes?.ok ? dutyKpisRes.json() : { byStatus: {}, slaBreached: 0 },
+        healthRes.ok ? healthRes.json() : null,
+        activityRes.ok ? activityRes.json() : { pagination: { total: 0 } },
+      ]);
 
       const items: any[] = invData.items || [];
       const totalValue = items.reduce((sum: number, item: any) => {
@@ -176,6 +225,8 @@ export default function DashboardPage() {
           availableQty: i.availableQty,
         })),
       );
+      setSystemHealth(healthData);
+      setAuditTrailCount(activityData?.pagination?.total || 0);
       setLastUpdated(new Date());
     } catch (error) {
       console.error("Failed to load dashboard data:", error);
@@ -323,6 +374,62 @@ export default function DashboardPage() {
     },
   ];
 
+  const systemControlCards = [
+    {
+      title: "Live System Health",
+      icon: Server,
+      value: systemHealth?.status?.toUpperCase() || "UNKNOWN",
+      description: systemHealth
+        ? `Database ${systemHealth.database?.status || "unknown"} · Uptime ${Math.floor(
+            systemHealth.uptime / 60,
+          )} min`
+        : "API health, database, and environment status",
+      href: "/dashboard/brain",
+      tone:
+        systemHealth?.status === "healthy"
+          ? "text-green-600"
+          : systemHealth?.status === "degraded"
+            ? "text-yellow-600"
+            : "text-red-600",
+      bg:
+        systemHealth?.status === "healthy"
+          ? "bg-green-50 dark:bg-green-950"
+          : systemHealth?.status === "degraded"
+            ? "bg-yellow-50 dark:bg-yellow-950"
+            : "bg-red-50 dark:bg-red-950",
+    },
+    {
+      title: "Audit Traceability",
+      icon: ShieldCheck,
+      value: auditTrailCount.toLocaleString(),
+      description: "Action, user, timestamp, and response on record",
+      href: "/dashboard/activity",
+      tone: "text-blue-600",
+      bg: "bg-blue-50 dark:bg-blue-950",
+    },
+    {
+      title: "Workflow Recovery",
+      icon: Workflow,
+      value: `${stats.overdueCAPAs}`,
+      description: "Replay, retry, and rollback visibility through CAPA",
+      href: "/capa/monitoring",
+      tone: stats.overdueCAPAs > 0 ? "text-orange-600" : "text-green-600",
+      bg:
+        stats.overdueCAPAs > 0
+          ? "bg-orange-50 dark:bg-orange-950"
+          : "bg-green-50 dark:bg-green-950",
+    },
+    {
+      title: "AI Transparency",
+      icon: Database,
+      value: "Explain",
+      description: "Inputs, reasoning summary, and confidence for AI guidance",
+      href: "/dashboard/brain",
+      tone: "text-violet-600",
+      bg: "bg-violet-50 dark:bg-violet-950",
+    },
+  ];
+
   return (
     <>
       <div className="p-6 lg:p-8 space-y-6">
@@ -412,6 +519,56 @@ export default function DashboardPage() {
             );
           })}
         </div>
+
+        {/* System Control Center */}
+        <Card>
+          <CardHeader>
+            <CardTitle>System Control Center</CardTitle>
+            <CardDescription>
+              Live system health, audit traceability, workflow recovery, and AI
+              decision visibility.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              {systemControlCards.map((card) => {
+                const Icon = card.icon;
+                return (
+                  <button
+                    key={card.title}
+                    onClick={() => router.push(card.href)}
+                    className="text-left rounded-xl border p-4 hover:border-primary/40 hover:shadow-sm transition-all"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div
+                        className={`h-10 w-10 rounded-full ${card.bg} flex items-center justify-center`}
+                      >
+                        <Icon className={`h-5 w-5 ${card.tone}`} />
+                      </div>
+                      <Badge
+                        variant="outline"
+                        className="text-[10px] uppercase tracking-wide"
+                      >
+                        Control
+                      </Badge>
+                    </div>
+                    <div className="mt-4 space-y-1">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                        {card.title}
+                      </p>
+                      <p className={`text-2xl font-bold ${card.tone}`}>
+                        {card.value}
+                      </p>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {card.description}
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
 
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Recent Sales Orders */}

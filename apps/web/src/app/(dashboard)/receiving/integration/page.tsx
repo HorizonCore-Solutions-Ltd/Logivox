@@ -502,7 +502,7 @@ export default function ReceivingIntegration() {
               <div className="space-y-4">
                 <div className="p-4 bg-blue-50 border border-blue-200 rounded">
                   <div className="font-medium mb-2">Base URL</div>
-                  <code className="text-sm">https://api.flowstock.com/v1</code>
+                  <code className="text-sm">https://api.logivox.com/v1</code>
                 </div>
 
                 <div>
@@ -530,7 +530,7 @@ export default function ReceivingIntegration() {
                 <div>
                   <div className="font-medium mb-2">Sample Request</div>
                   <pre className="p-4 bg-gray-900 text-gray-100 rounded overflow-x-auto text-xs">
-                    {`curl -X POST https://api.flowstock.com/v1/receiving/shipments \\
+                    {`curl -X POST https://api.logivox.com/v1/receiving/shipments \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -625,9 +625,9 @@ export default function ReceivingIntegration() {
                 <div>
                   <h3 className="font-medium mb-2">📖 Getting Started</h3>
                   <p className="text-sm text-gray-700">
-                    Learn how to integrate your systems with Flowstock's
-                    receiving platform. Our RESTful API provides comprehensive
-                    access to all receiving operations.
+                    Learn how to integrate your systems with LogiVox's receiving
+                    platform. Our RESTful API provides comprehensive access to
+                    all receiving operations.
                   </p>
                 </div>
 

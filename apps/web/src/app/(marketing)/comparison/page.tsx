@@ -4,28 +4,20 @@ import { LeadCaptureForm } from "@/components/marketing/lead-capture-form";
 import { ConversionCTA } from "@/components/marketing/conversion-cta";
 
 export const metadata: Metadata = {
-  title: "LogiVox vs SAP vs Manhattan vs Oracle WMS Comparison",
+  title: "LogiVox Platform Overview",
   description:
-    "Compare LogiVox to SAP WM, Manhattan Associates, Oracle WMS, and other warehouse management systems. See why modern warehouses choose LogiVox.",
+    "Explore how LogiVox brings core operations, intelligence, compliance, voice, and integrations into one enterprise platform.",
   keywords: [
-    "warehouse management system comparison",
-    "LogiVox vs SAP",
-    "LogiVox vs Manhattan Associates",
-    "LogiVox vs Oracle WMS",
-    "WMS comparison chart",
-    "best warehouse management software",
+    "LogiVox platform overview",
+    "warehouse operations platform",
+    "voice-led warehouse management",
+    "enterprise operations software",
     "WMS with yard management",
     "WMS with AMR integration",
     "WMS with robotics fleet management",
-    "WMS sortation control",
-    "automated warehouse management system comparison",
-    "warehouse automation software comparison",
+    "warehouse automation software",
     "WMS with IoT sensor integration",
-    "SAP EWM alternative",
-    "Manhattan WMS alternative",
-    "Oracle WMS alternative",
-    "cloud WMS comparison",
-    "modern WMS platform",
+    "cloud warehouse operations platform",
     "warehouse management system with voice AI",
     "WMS with real-time analytics",
   ],
@@ -40,64 +32,63 @@ export default function ComparisonPage() {
         </div>
       </section>
 
-      {/* Detailed Comparison Section */}
+      {/* Detailed Platform Section */}
       <section className="py-16 bg-muted/30">
         <div className="container-enterprise">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">
-              Why Warehouses Switch to LogiVox
+              Why Warehouses Choose LogiVox
             </h2>
             <p className="text-muted-foreground max-w-3xl mx-auto">
-              Legacy WMS systems were built for a different era. LogiVox is
-              purpose-built for modern warehouse operations with voice AI,
-              real-time analytics, and instant deployment.
+              LogiVox is purpose-built for modern warehouse operations with
+              voice AI, real-time analytics, auditability, and fast deployment.
             </p>
           </div>
 
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="space-y-6">
               <h3 className="text-xl font-bold text-red-600">
-                Legacy WMS Problems
+                What LogiVox replaces
               </h3>
 
               <div className="space-y-4">
                 <div className="bg-red-50 dark:bg-red-950/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
                   <h4 className="font-semibold text-red-800 dark:text-red-200">
-                    Expensive Total Cost
+                    Fragmented workflows
                   </h4>
                   <p className="text-sm text-red-700 dark:text-red-300">
-                    $500K+ implementations, plus consultants, customizations,
-                    and ongoing maintenance fees
+                    Separate tools for operations, quality, voice, and reporting
+                    slow teams down.
                   </p>
                 </div>
 
                 <div className="bg-red-50 dark:bg-red-950/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
                   <h4 className="font-semibold text-red-800 dark:text-red-200">
-                    Slow Implementation
+                    Manual execution
                   </h4>
                   <p className="text-sm text-red-700 dark:text-red-300">
-                    12-36 month implementations that disrupt operations and
-                    delay ROI
+                    Screen-heavy processes increase training time and reduce
+                    floor speed.
                   </p>
                 </div>
 
                 <div className="bg-red-50 dark:bg-red-950/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
                   <h4 className="font-semibold text-red-800 dark:text-red-200">
-                    Limited Mobile Support
+                    Weak visibility
                   </h4>
                   <p className="text-sm text-red-700 dark:text-red-300">
-                    Desktop-first design that doesn't work well on warehouse
-                    floors
+                    Teams need a clearer view of health, recovery, and audit
+                    evidence.
                   </p>
                 </div>
 
                 <div className="bg-red-50 dark:bg-red-950/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
                   <h4 className="font-semibold text-red-800 dark:text-red-200">
-                    No Voice Operations
+                    Limited resilience
                   </h4>
                   <p className="text-sm text-red-700 dark:text-red-300">
-                    Workers still tied to handheld scanners, slowing down
-                    operations
+                    Recovery paths need to be visible when APIs, devices, or
+                    networks fail.
                   </p>
                 </div>
               </div>
@@ -105,46 +96,47 @@ export default function ComparisonPage() {
 
             <div className="space-y-6">
               <h3 className="text-xl font-bold text-green-600">
-                LogiVox Advantages
+                LogiVox capabilities
               </h3>
 
               <div className="space-y-4">
                 <div className="bg-green-50 dark:bg-green-950/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
                   <h4 className="font-semibold text-green-800 dark:text-green-200">
-                    Transparent Pricing
+                    Clear operating model
                   </h4>
                   <p className="text-sm text-green-700 dark:text-green-300">
-                    Starting at $49/user/month with no hidden fees or consultant
-                    requirements
+                    Five domains keep the product story simple and easy to
+                    understand.
                   </p>
                 </div>
 
                 <div className="bg-green-50 dark:bg-green-950/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
                   <h4 className="font-semibold text-green-800 dark:text-green-200">
-                    Rapid Deployment
+                    Rapid deployment
                   </h4>
                   <p className="text-sm text-green-700 dark:text-green-300">
-                    30-90 day implementation with immediate productivity gains
+                    Setup and validation can move quickly with the right
+                    environment readiness.
                   </p>
                 </div>
 
                 <div className="bg-green-50 dark:bg-green-950/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
                   <h4 className="font-semibold text-green-800 dark:text-green-200">
-                    Mobile-First Design
+                    Voice-led execution
                   </h4>
                   <p className="text-sm text-green-700 dark:text-green-300">
-                    Built for mobile devices and warehouse environments from day
-                    one
+                    The platform is designed to let teams work without touching
+                    a screen.
                   </p>
                 </div>
 
                 <div className="bg-green-50 dark:bg-green-950/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
                   <h4 className="font-semibold text-green-800 dark:text-green-200">
-                    Revolutionary Voice AI
+                    Resilience and auditability
                   </h4>
                   <p className="text-sm text-green-700 dark:text-green-300">
-                    Hands-free operations increase productivity 35% with zero
-                    training time
+                    Recovery, traceability, and AI decision visibility are built
+                    into the operating model.
                   </p>
                 </div>
               </div>
@@ -173,22 +165,22 @@ export default function ComparisonPage() {
           {/* Primary CTA */}
           <ConversionCTA
             variant="demo-primary"
-            urgency="See the difference in 30 minutes"
-            socialProof="500+ companies switched to LogiVox from legacy WMS"
+            urgency="See LogiVox in 30 minutes"
+            socialProof="Enterprise teams choose LogiVox for clarity and control"
           />
 
           {/* Alternative CTAs Grid */}
           <div className="grid md:grid-cols-2 gap-6">
             <ConversionCTA
               variant="roi-calculator"
-              title="Calculate ROI vs Your Current WMS"
-              socialProof="Average 67% cost savings vs SAP/Oracle"
+              title="Calculate LogiVox ROI"
+              socialProof="Estimate savings from speed, control, and recovery"
             />
 
             <ConversionCTA
               variant="video-demo"
-              title="5-Min Video: LogiVox vs Legacy WMS"
-              socialProof="See real warehouse transformations"
+              title="5-Min Video: LogiVox Overview"
+              socialProof="See the operating model in action"
             />
           </div>
         </div>

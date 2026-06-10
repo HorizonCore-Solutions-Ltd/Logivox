@@ -62,6 +62,17 @@ interface ActivityLogsResponse {
   };
 }
 
+interface AuditDetails {
+  voiceTranscript?: string;
+  interpretedIntent?: string;
+  executedAction?: string;
+  systemResponse?: string;
+  result?: string;
+  status?: string;
+  errorMessage?: string;
+  [key: string]: unknown;
+}
+
 export default function ActivityLogsPage() {
   const [page, setPage] = React.useState(1);
   const [actionFilter, setActionFilter] = React.useState<string>("all");
@@ -116,6 +127,15 @@ export default function ActivityLogsPage() {
 
   const getEntityTypeIcon = (entityType: string) => {
     return <Shield className="h-4 w-4 text-muted-foreground" />;
+  };
+
+  const parseAuditDetails = (details: string): AuditDetails | null => {
+    try {
+      const parsed = JSON.parse(details);
+      return parsed && typeof parsed === "object" ? parsed : null;
+    } catch {
+      return null;
+    }
   };
 
   const formatDetails = (details: string) => {
@@ -253,9 +273,10 @@ export default function ActivityLogsPage() {
         {/* Activity Logs Table */}
         <Card>
           <CardHeader>
-            <CardTitle>Activity History</CardTitle>
+            <CardTitle>Activity History and Audit Trace</CardTitle>
             <CardDescription>
-              Detailed log of all activities in your organization
+              Every action is tied to a user, timestamp, and supporting system
+              evidence when available.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -281,58 +302,112 @@ export default function ActivityLogsPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {data.logs.map((log) => (
-                      <TableRow key={log.id}>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            {log.user.image ? (
-                              <img
-                                src={log.user.image}
-                                alt={log.user.name || ""}
-                                className="h-8 w-8 rounded-full"
-                              />
-                            ) : (
-                              <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                                <User className="h-4 w-4 text-primary" />
+                    {data.logs.map((log) =>
+                      (() => {
+                        const auditDetails = parseAuditDetails(log.details);
+
+                        return (
+                          <TableRow key={log.id}>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                {log.user.image ? (
+                                  <img
+                                    src={log.user.image}
+                                    alt={log.user.name || ""}
+                                    className="h-8 w-8 rounded-full"
+                                  />
+                                ) : (
+                                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                                    <User className="h-4 w-4 text-primary" />
+                                  </div>
+                                )}
+                                <div>
+                                  <p className="font-medium text-sm">
+                                    {log.user.name || "Unknown"}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {log.user.email}
+                                  </p>
+                                </div>
                               </div>
-                            )}
-                            <div>
-                              <p className="font-medium text-sm">
-                                {log.user.name || "Unknown"}
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                {log.user.email}
-                              </p>
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>{getActionBadge(log.action)}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            {getEntityTypeIcon(log.entityType)}
-                            <span className="text-sm font-medium">
-                              {log.entityType}
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <details className="cursor-pointer">
-                            <summary className="text-sm text-muted-foreground">
-                              View details
-                            </summary>
-                            <pre className="mt-2 text-xs bg-muted p-2 rounded max-w-xs overflow-x-auto">
-                              {formatDetails(log.details)}
-                            </pre>
-                          </details>
-                        </TableCell>
-                        <TableCell className="text-sm font-mono">
-                          {log.ipAddress}
-                        </TableCell>
-                        <TableCell className="text-sm">
-                          {new Date(log.createdAt).toLocaleString()}
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                            </TableCell>
+                            <TableCell>{getActionBadge(log.action)}</TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                {getEntityTypeIcon(log.entityType)}
+                                <span className="text-sm font-medium">
+                                  {log.entityType}
+                                </span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <details className="cursor-pointer">
+                                <summary className="text-sm text-muted-foreground">
+                                  View details
+                                </summary>
+                                <div className="mt-2 space-y-2 max-w-xs">
+                                  {auditDetails ? (
+                                    <div className="space-y-1 text-xs">
+                                      {auditDetails.voiceTranscript && (
+                                        <p>
+                                          <span className="font-semibold">
+                                            Transcript:
+                                          </span>{" "}
+                                          {String(auditDetails.voiceTranscript)}
+                                        </p>
+                                      )}
+                                      {auditDetails.interpretedIntent && (
+                                        <p>
+                                          <span className="font-semibold">
+                                            Intent:
+                                          </span>{" "}
+                                          {String(
+                                            auditDetails.interpretedIntent,
+                                          )}
+                                        </p>
+                                      )}
+                                      {auditDetails.executedAction && (
+                                        <p>
+                                          <span className="font-semibold">
+                                            Action:
+                                          </span>{" "}
+                                          {String(auditDetails.executedAction)}
+                                        </p>
+                                      )}
+                                      {auditDetails.systemResponse && (
+                                        <p>
+                                          <span className="font-semibold">
+                                            Response:
+                                          </span>{" "}
+                                          {String(auditDetails.systemResponse)}
+                                        </p>
+                                      )}
+                                      {auditDetails.errorMessage && (
+                                        <p className="text-red-600">
+                                          <span className="font-semibold">
+                                            Error:
+                                          </span>{" "}
+                                          {String(auditDetails.errorMessage)}
+                                        </p>
+                                      )}
+                                    </div>
+                                  ) : null}
+                                  <pre className="text-xs bg-muted p-2 rounded overflow-x-auto whitespace-pre-wrap">
+                                    {formatDetails(log.details)}
+                                  </pre>
+                                </div>
+                              </details>
+                            </TableCell>
+                            <TableCell className="text-sm font-mono">
+                              {log.ipAddress}
+                            </TableCell>
+                            <TableCell className="text-sm">
+                              {new Date(log.createdAt).toLocaleString()}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })(),
+                    )}
                   </TableBody>
                 </Table>
 

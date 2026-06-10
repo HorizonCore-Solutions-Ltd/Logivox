@@ -128,7 +128,7 @@ export default function MarshallingBoard() {
       // Header
       doc.setFontSize(22);
       doc.setTextColor(30, 58, 138); // blue-900
-      doc.text("Flowstock WMS - Load Sheet", 14, 20);
+      doc.text("LogiVox WMS - Load Sheet", 14, 20);
 
       doc.setFontSize(10);
       doc.setTextColor(100);

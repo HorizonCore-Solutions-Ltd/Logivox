@@ -5,9 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, ShoppingBag, MapPin, CheckSquare, Zap } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Picking Guide | Flowstock Help",
+  title: "Picking Guide | LogiVox Help",
   description:
-    "Learn how to efficiently pick orders in Flowstock using pick lists, wave picking, and mobile scanners.",
+    "Learn how to efficiently pick orders in LogiVox using pick lists, wave picking, and mobile scanners.",
 };
 
 const SECTIONS = [
@@ -16,7 +16,7 @@ const SECTIONS = [
     title: "Overview",
     icon: <ShoppingBag className="h-5 w-5" />,
     content:
-      "Flowstock's picking module optimises the order fulfilment process by generating efficient pick lists, grouping orders into waves, and guiding warehouse staff to the exact bin location for each item.",
+      "LogiVox's picking module optimises the order fulfilment process by generating efficient pick lists, grouping orders into waves, and guiding warehouse staff to the exact bin location for each item.",
   },
   {
     id: "pick-lists",
@@ -37,7 +37,7 @@ const SECTIONS = [
     title: "Wave Picking",
     icon: <Zap className="h-5 w-5" />,
     content:
-      "Wave picking batches multiple orders into a single pick run, reducing travel time by up to 60%. Flowstock groups orders by warehouse zone, shipping carrier, or due time. To enable wave picking, go to Settings → Fulfilment.",
+      "Wave picking batches multiple orders into a single pick run, reducing travel time by up to 60%. LogiVox groups orders by warehouse zone, shipping carrier, or due time. To enable wave picking, go to Settings → Fulfilment.",
     steps: [
       "Enable Wave Picking in Settings → Fulfilment",
       "Configure wave parameters (max orders, zone grouping)",

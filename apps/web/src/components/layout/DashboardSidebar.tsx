@@ -53,7 +53,9 @@ import {
   FileCheck,
   TrendingUp,
   AlertCircle,
+  Brain,
   Car,
+  Clock,
   GitMerge,
   MapPin,
   HelpCircle,
@@ -73,14 +75,11 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
   const [expandedSections, setExpandedSections] = React.useState<
     Record<string, boolean>
   >({
-    Inventory: true,
-    Fulfillment: false,
-    Procurement: false,
-    Operations: false,
-    Quality: false,
-    Billing: false,
-    Duties: false,
-    "Next-Gen": false,
+    "Core Operations": true,
+    "Intelligence & Automation": false,
+    "Compliance & Quality": false,
+    "Voice & Workforce": false,
+    Ecosystem: false,
   });
   const [currentOrgId, setCurrentOrgId] = React.useState<string>("");
 
@@ -108,38 +107,30 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
   };
 
   const navigation = [
-    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     {
-      name: "Inventory",
-      href: "/dashboard/inventory",
-      icon: Package,
+      name: "Core Operations",
+      href: "/dashboard",
+      icon: LayoutDashboard,
       subItems: [
-        { name: "All Items", href: "/dashboard/inventory", icon: Package },
+        { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+        { name: "Inventory", href: "/dashboard/inventory", icon: Package },
+        { name: "Orders", href: "/orders", icon: ShoppingCart },
+        { name: "Bookings", href: "/dashboard/bookings", icon: FileText },
+        { name: "Returns", href: "/returns", icon: RotateCcw },
+        { name: "Fulfillment", href: "/dashboard/fulfillment", icon: Globe2 },
         {
-          name: "Import Data",
-          href: "/dashboard/inventory/import",
-          icon: FileInput,
+          name: "Procurement",
+          href: "/dashboard/purchase-orders",
+          icon: PackagePlus,
         },
         { name: "Warehouses", href: "/dashboard/warehouses", icon: Warehouse },
         { name: "Categories", href: "/dashboard/categories", icon: FolderTree },
         {
-          name: "Replenishment",
-          href: "/dashboard/replenishment",
-          icon: ArrowDownCircle,
+          name: "Receiving",
+          href: "/dashboard/receiving",
+          icon: ClipboardCheck,
         },
-      ],
-    },
-    {
-      name: "Fulfillment",
-      href: "/dashboard/fulfillment",
-      icon: Globe2,
-      subItems: [
-        { name: "Hub Overview", href: "/dashboard/fulfillment", icon: Globe2 },
-        {
-          name: "Sales Orders",
-          href: "/dashboard/sales-orders",
-          icon: ShoppingCart,
-        },
+        { name: "GRN", href: "/dashboard/grn", icon: ClipboardCheck },
         {
           name: "Pick Lists",
           href: "/dashboard/pick-lists",
@@ -147,228 +138,160 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
         },
         { name: "Packing", href: "/dashboard/packs", icon: BoxSelect },
         { name: "Shipments", href: "/dashboard/shipments", icon: Truck },
-        { name: "Invoices", href: "/billing/invoices", icon: Receipt },
-        { name: "Orders", href: "/orders", icon: ShoppingCart },
-        { name: "Delivery", href: "/delivery", icon: MapPin },
-      ],
-    },
-    {
-      name: "Procurement",
-      href: "/dashboard/purchase-orders",
-      icon: PackagePlus,
-      subItems: [
         {
-          name: "Purchase Orders",
-          href: "/dashboard/purchase-orders",
-          icon: PackagePlus,
+          name: "Import Data",
+          href: "/dashboard/inventory/import",
+          icon: FileInput,
         },
         {
-          name: "GRN / Receiving",
-          href: "/dashboard/receiving",
-          icon: ClipboardCheck,
-        },
-        {
-          name: "GRN Detail View",
-          href: "/dashboard/grn",
-          icon: ClipboardCheck,
-        },
-        { name: "Suppliers", href: "/dashboard/suppliers", icon: Building },
-        {
-          name: "ASN Processing",
-          href: "/receiving/asn-processing",
-          icon: FileCheck,
-        },
-      ],
-    },
-    {
-      name: "Operations",
-      href: "/operations",
-      icon: Activity,
-      subItems: [
-        {
-          name: "Ops Cockpit",
-          href: "/operations",
-          icon: LayoutDashboard,
-        },
-        {
-          name: "Planning Board",
-          href: "/operations/planning",
-          icon: Waves,
-        },
-        {
-          name: "Task Orchestration",
-          href: "/operations/tasks",
-          icon: GitMerge,
-        },
-        {
-          name: "Marshalling",
-          href: "/operations/marshalling",
-          icon: Truck,
-        },
-        {
-          name: "QC Inspections",
-          href: "/quality/inspections",
-          icon: ClipboardCheck,
+          name: "Replenishment",
+          href: "/dashboard/replenishment",
+          icon: ArrowDownCircle,
         },
         {
           name: "Cycle Counts",
           href: "/dashboard/cycle-counts",
           icon: ClipboardList,
         },
-        {
-          name: "Exceptions",
-          href: "/dashboard/exceptions",
-          icon: AlertCircle,
-        },
-        {
-          name: "Returns & RMAs",
-          href: "/returns",
-          icon: RotateCcw,
-        },
-        {
-          name: "Cross Docking",
-          href: "/dashboard/cross-dock",
-          icon: Package,
-        },
+        { name: "Cross Docking", href: "/dashboard/cross-dock", icon: Package },
       ],
     },
     {
-      name: "Quality",
+      name: "Intelligence & Automation",
+      href: "/dashboard/analytics",
+      icon: BarChart3,
+      subItems: [
+        { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
+        { name: "Reports", href: "/dashboard/reports", icon: FileBarChart },
+        {
+          name: "Forecasting",
+          href: "/dashboard/forecasting",
+          icon: TrendingUp,
+        },
+        {
+          name: "AI Forecasting",
+          href: "/dashboard/ai-forecasting",
+          icon: Brain,
+        },
+        { name: "Duties", href: "/dashboard/duties", icon: ClipboardList },
+        {
+          name: "Task Interleaving",
+          href: "/dashboard/task-interleaving",
+          icon: GitMerge,
+        },
+        { name: "Planning", href: "/operations/planning", icon: Waves },
+        { name: "Load Planning", href: "/dock/load-planning", icon: Truck },
+      ],
+    },
+    {
+      name: "Compliance & Quality",
       href: "/capa/hub",
       icon: ShieldAlert,
       subItems: [
         { name: "CAPA Hub", href: "/capa/hub", icon: ShieldAlert },
-        { name: "NCR List", href: "/capa/monitoring", icon: FileWarning },
+        { name: "Monitoring", href: "/capa/monitoring", icon: Activity },
         {
           name: "Risk Scoring",
           href: "/capa/risk-scoring",
           icon: AlertTriangle,
         },
-      ],
-    },
-    {
-      name: "Duties",
-      href: "/dashboard/duties",
-      icon: ClipboardList,
-      subItems: [
-        { name: "Duty Board", href: "/dashboard/duties", icon: ClipboardList },
-        { name: "Auto-Planner", href: "/dashboard/duties/planner", icon: Zap },
-      ],
-    },
-    {
-      name: "Next-Gen",
-      href: "/dashboard/labor",
-      icon: Zap,
-      badge: "Advanced",
-      subItems: [
         {
-          name: "Yard Management",
-          href: "/yard",
-          icon: Car,
-        },
-        {
-          name: "Marshalling",
-          href: "/marshalling",
-          icon: GitMerge,
-        },
-      ],
-    },
-    {
-      name: "Billing",
-      href: "/billing",
-      icon: DollarSign,
-      subItems: [
-        { name: "Command Center", href: "/billing", icon: LayoutDashboard },
-        { name: "Invoices", href: "/billing/invoices", icon: Receipt },
-        {
-          name: "Accessorial Charges",
-          href: "/billing/accessorial",
-          icon: TrendingUp,
-        },
-        {
-          name: "Invoice Settings",
-          href: "/organization/invoice-settings",
+          name: "CAPA Thresholds",
+          href: "/organization/capa-inventory-settings",
           icon: Settings,
         },
+        {
+          name: "Inspections",
+          href: "/quality/inspections",
+          icon: ClipboardCheck,
+        },
+        {
+          name: "QC Dashboard",
+          href: "/dashboard/qc-inspections",
+          icon: FileCheck,
+        },
+        { name: "NCR List", href: "/dashboard/exceptions", icon: FileWarning },
+        { name: "Activity Logs", href: "/dashboard/activity", icon: Activity },
       ],
     },
     {
-      name: "Customers",
-      href: "/dashboard/customers",
-      icon: Users,
+      name: "Voice & Workforce",
+      href: "/dashboard/labor",
+      icon: Zap,
+      badge: "Adaptive",
       subItems: [
-        { name: "All Customers", href: "/dashboard/customers", icon: Users },
+        { name: "Labor", href: "/dashboard/labor", icon: Zap },
+        { name: "Time Clock", href: "/time-clock", icon: Clock },
+        { name: "Yard Management", href: "/yard", icon: Car },
+        { name: "Marshalling", href: "/marshalling", icon: GitMerge },
+        { name: "Mobile", href: "/capa/mobile", icon: Smartphone },
         {
-          name: "Contracts",
-          href: "/dashboard/customers/contracts",
-          icon: FileCheck,
+          name: "PWA Settings",
+          href: "/dashboard/pwa-settings",
+          icon: Smartphone,
         },
       ],
     },
-    { name: "Bookings", href: "/dashboard/bookings", icon: FileText },
-    { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
-    { name: "Reports", href: "/dashboard/reports", icon: FileBarChart },
-    { name: "Webhooks", href: "/dashboard/webhooks", icon: Webhook },
-    { name: "API Keys", href: "/dashboard/api-keys", icon: Key },
-    { name: "API Docs", href: "/dashboard/api-docs", icon: Book },
-    { name: "Activity Logs", href: "/dashboard/activity", icon: Activity },
-    { name: "PWA Settings", href: "/dashboard/pwa-settings", icon: Smartphone },
-    { name: "Help & Support", href: "/help", icon: HelpCircle },
-    { name: "Settings", href: "/dashboard/settings", icon: Settings },
+    {
+      name: "Ecosystem",
+      href: "/integrations",
+      icon: Globe2,
+      subItems: [
+        { name: "Integrations", href: "/integrations", icon: Globe2 },
+        { name: "Webhooks", href: "/dashboard/webhooks", icon: Webhook },
+        { name: "API Keys", href: "/dashboard/api-keys", icon: Key },
+        { name: "API Docs", href: "/dashboard/api-docs", icon: Book },
+        { name: "Billing", href: "/billing", icon: DollarSign },
+        { name: "Customers", href: "/dashboard/customers", icon: Users },
+        { name: "Settings", href: "/dashboard/settings", icon: Settings },
+        { name: "Help & Support", href: "/help", icon: HelpCircle },
+      ],
+    },
   ];
 
   const isActive = (href: string) => pathname === href;
-  const isInventoryActive =
-    pathname.startsWith("/dashboard/inventory") ||
-    pathname.startsWith("/dashboard/warehouses") ||
-    pathname.startsWith("/dashboard/categories");
-  const isFulfillmentActive =
-    pathname.startsWith("/dashboard/fulfillment") ||
-    pathname.startsWith("/dashboard/sales-orders") ||
-    pathname.startsWith("/dashboard/pick-lists") ||
-    pathname.startsWith("/dashboard/packs") ||
-    pathname.startsWith("/dashboard/shipments") ||
+  const isCoreOperationsActive =
+    pathname.startsWith("/dashboard") ||
     pathname.startsWith("/orders") ||
-    pathname.startsWith("/delivery");
-  const isProcurementActive =
-    pathname.startsWith("/dashboard/purchase-orders") ||
-    pathname.startsWith("/dashboard/receiving") ||
-    pathname.startsWith("/dashboard/grn") ||
-    pathname.startsWith("/dashboard/suppliers");
-  const isOperationsActive =
-    pathname.startsWith("/dashboard/operations") ||
-    pathname.startsWith("/dashboard/returns") ||
     pathname.startsWith("/returns") ||
-    pathname.startsWith("/dashboard/rmas") ||
-    pathname.startsWith("/dashboard/qc-inspections") ||
-    pathname.startsWith("/dashboard/cycle-counts");
-  const isQualityActive =
-    pathname.startsWith("/capa") || pathname.startsWith("/dashboard/ncr");
-  const isDutiesActive = pathname.startsWith("/dashboard/duties");
-  const isNextGenActive =
-    pathname.startsWith("/dashboard/labor") ||
-    pathname.startsWith("/dashboard/task-interleaving") ||
-    pathname.startsWith("/dashboard/yard-management") ||
+    pathname.startsWith("/billing") ||
     pathname.startsWith("/yard") ||
     pathname.startsWith("/marshalling") ||
-    pathname.startsWith("/dashboard/floor-heatmap") ||
-    pathname.startsWith("/dashboard/automation") ||
-    pathname.startsWith("/dashboard/iot") ||
-    pathname.startsWith("/dashboard/ai-forecasting") ||
+    pathname.startsWith("/dock");
+  const isIntelligenceActive =
+    pathname.startsWith("/dashboard/analytics") ||
+    pathname.startsWith("/dashboard/reports") ||
     pathname.startsWith("/dashboard/forecasting") ||
-    pathname.startsWith("/dashboard/computer-vision") ||
-    pathname.startsWith("/dashboard/customer-analytics") ||
-    pathname.startsWith("/dashboard/sustainability") ||
-    pathname.startsWith("/dashboard/blockchain");
+    pathname.startsWith("/dashboard/ai-forecasting") ||
+    pathname.startsWith("/dashboard/duties") ||
+    pathname.startsWith("/dashboard/task-interleaving") ||
+    pathname.startsWith("/operations/planning");
+  const isComplianceActive =
+    pathname.startsWith("/capa") ||
+    pathname.startsWith("/organization/capa-inventory-settings") ||
+    pathname.startsWith("/quality") ||
+    pathname.startsWith("/dashboard/exceptions") ||
+    pathname.startsWith("/dashboard/activity");
+  const isVoiceActive =
+    pathname.startsWith("/dashboard/labor") ||
+    pathname.startsWith("/time-clock") ||
+    pathname.startsWith("/capa/mobile") ||
+    pathname.startsWith("/dashboard/pwa-settings");
+  const isEcosystemActive =
+    pathname.startsWith("/integrations") ||
+    pathname.startsWith("/dashboard/webhooks") ||
+    pathname.startsWith("/dashboard/api-keys") ||
+    pathname.startsWith("/dashboard/api-docs") ||
+    pathname.startsWith("/dashboard/customers") ||
+    pathname.startsWith("/dashboard/settings") ||
+    pathname.startsWith("/help");
 
   const isSectionActive = (name: string) => {
-    if (name === "Inventory") return isInventoryActive;
-    if (name === "Fulfillment") return isFulfillmentActive;
-    if (name === "Procurement") return isProcurementActive;
-    if (name === "Operations") return isOperationsActive;
-    if (name === "Quality") return isQualityActive;
-    if (name === "Duties") return isDutiesActive;
-    if (name === "Next-Gen") return isNextGenActive;
+    if (name === "Core Operations") return isCoreOperationsActive;
+    if (name === "Intelligence & Automation") return isIntelligenceActive;
+    if (name === "Compliance & Quality") return isComplianceActive;
+    if (name === "Voice & Workforce") return isVoiceActive;
+    if (name === "Ecosystem") return isEcosystemActive;
     return false;
   };
 

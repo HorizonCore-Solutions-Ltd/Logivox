@@ -11,8 +11,8 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Webhooks | Flowstock Docs",
-  description: "Configure webhooks to receive real-time events from Flowstock.",
+  title: "Webhooks | LogiVox Docs",
+  description: "Configure webhooks to receive real-time events from LogiVox.",
 };
 
 const EVENT_TYPES = [
@@ -64,7 +64,7 @@ export default function WebhooksDocsPage() {
             <div>
               <h1 className="text-3xl font-bold">Webhooks</h1>
               <p className="text-muted-foreground">
-                Receive real-time event notifications from Flowstock
+                Receive real-time event notifications from LogiVox
               </p>
             </div>
           </div>
@@ -78,8 +78,8 @@ export default function WebhooksDocsPage() {
           <h2 className="text-xl font-semibold">Overview</h2>
           <p className="text-muted-foreground leading-relaxed">
             Webhooks allow your application to be notified automatically when
-            events occur in Flowstock. When a configured event occurs, we send
-            an HTTP POST request to your endpoint URL with a JSON payload
+            events occur in LogiVox. When a configured event occurs, we send an
+            HTTP POST request to your endpoint URL with a JSON payload
             describing the event.
           </p>
           <div className="bg-muted/50 border rounded-xl p-6 space-y-3">
@@ -133,7 +133,7 @@ export default function WebhooksDocsPage() {
           <p className="text-muted-foreground text-sm leading-relaxed">
             All webhook deliveries include a{" "}
             <code className="bg-muted px-1 rounded text-xs">
-              X-Flowstock-Signature
+              X-LogiVox-Signature
             </code>{" "}
             header. This is an HMAC-SHA256 signature of the raw request body
             using your webhook signing secret. Always verify this signature
@@ -162,7 +162,7 @@ function verifySignature(payload, signature, secret) {
             Retry Policy
           </h2>
           <p className="text-muted-foreground text-sm leading-relaxed">
-            Flowstock will retry failed webhook deliveries up to{" "}
+            LogiVox will retry failed webhook deliveries up to{" "}
             <strong>5 times</strong> with exponential backoff (5s, 30s, 5min,
             30min, 2h). An endpoint is considered failed if it returns a non-2xx
             status code or times out after 30 seconds. After all retries are

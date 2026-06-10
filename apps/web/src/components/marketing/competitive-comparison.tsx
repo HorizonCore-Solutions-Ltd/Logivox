@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,647 +12,187 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-  Check,
-  X,
-  Star,
-  Zap,
-  DollarSign,
-  Clock,
-  Users,
-  Shield,
-  Mic,
+  ArrowRight,
+  BarChart3,
   Brain,
-  Smartphone,
+  Check,
   CloudCog,
-  Truck,
-  Bot,
+  Clock,
+  Globe2,
+  Mic,
   Network,
+  Shield,
+  Smartphone,
+  Truck,
   Wifi,
 } from "lucide-react";
 
-interface CompetitorData {
-  name: string;
-  logo: string;
-  tagline: string;
-  pricing: {
-    starting: string;
-    model: string;
-  };
-  deployment: string;
-  implementation: string;
-  support: string;
-  features: {
-    voiceOperations: boolean | "limited";
-    aiOptimization: boolean | "limited";
-    mobileFirst: boolean | "limited";
-    realTimeAnalytics: boolean | "limited";
-    cloudNative: boolean | "limited";
-    customization: boolean | "limited";
-    integrations: boolean | "limited";
-    multiTenant: boolean | "limited";
-    yardManagement: boolean | "limited";
-    amrRoboticsFleet: boolean | "limited";
-    sortationControl: boolean | "limited";
-    iotSensorIntegration: boolean | "limited";
-  };
-  pros: string[];
-  cons: string[];
-}
-
 export function CompetitiveComparison() {
-  const competitors: CompetitorData[] = [
+  const capabilityPillars = [
     {
-      name: "LogiVox",
-      logo: "LV",
-      tagline: "Voice-Powered Future of Warehousing",
-      pricing: {
-        starting: "$49/month",
-        model: "Per user, transparent pricing",
-      },
-      deployment: "Cloud-native SaaS",
-      implementation: "30-90 days",
-      support: "24/7 expert support",
-      features: {
-        voiceOperations: true,
-        aiOptimization: true,
-        mobileFirst: true,
-        realTimeAnalytics: true,
-        cloudNative: true,
-        customization: true,
-        integrations: true,
-        multiTenant: true,
-        yardManagement: true,
-        amrRoboticsFleet: true,
-        sortationControl: true,
-        iotSensorIntegration: true,
-      },
-      pros: [
-        "Revolutionary voice AI technology",
-        "95% error reduction proven",
-        "ROI visible in 30 days",
-        "Modern cloud-native architecture",
-        "Transparent pricing model",
-        "Industry-leading support",
-      ],
-      cons: [
-        "Newer player (established 2023)",
-        "Best suited for modern operations",
+      title: "Core Operations",
+      icon: Truck,
+      description:
+        "Inventory, receiving, picking, packing, returns, and yard control in one operational flow.",
+      bullets: [
+        "Single task model",
+        "Real-time visibility",
+        "Live execution across sites",
       ],
     },
     {
-      name: "SAP Extended Warehouse Management",
-      logo: "SAP",
-      tagline: "Enterprise Resource Planning Giant",
-      pricing: {
-        starting: "$150/user/month",
-        model: "Complex licensing + consultants",
-      },
-      deployment: "On-premise or cloud",
-      implementation: "12-24 months",
-      support: "Partner-dependent",
-      features: {
-        voiceOperations: false,
-        aiOptimization: "limited",
-        mobileFirst: "limited",
-        realTimeAnalytics: true,
-        cloudNative: "limited",
-        customization: true,
-        integrations: true,
-        multiTenant: false,
-        yardManagement: "limited",
-        amrRoboticsFleet: "limited",
-        sortationControl: false,
-        iotSensorIntegration: "limited",
-      },
-      pros: [
-        "Deep ERP integration",
-        "Enterprise scalability",
-        "Comprehensive functionality",
-        "Strong financial modules",
-      ],
-      cons: [
-        "Extremely high total cost",
-        "Complex implementation",
-        "Requires dedicated IT team",
-        "Legacy architecture",
-        "No voice operations",
+      title: "Voice & Workforce",
+      icon: Mic,
+      description:
+        "Voice-led work for fast execution, hybrid choice training, and hands-free floor productivity.",
+      bullets: [
+        "Primary operating interface",
+        "Hybrid choice modes",
+        "Operator guidance",
       ],
     },
     {
-      name: "Manhattan Associates WMS",
-      logo: "MA",
-      tagline: "Supply Chain Commerce Solutions",
-      pricing: {
-        starting: "$200+/user/month",
-        model: "Enterprise licensing only",
-      },
-      deployment: "On-premise primary",
-      implementation: "18-36 months",
-      support: "Professional services",
-      features: {
-        voiceOperations: "limited",
-        aiOptimization: "limited",
-        mobileFirst: false,
-        realTimeAnalytics: true,
-        cloudNative: false,
-        customization: true,
-        integrations: true,
-        multiTenant: false,
-        yardManagement: "limited",
-        amrRoboticsFleet: false,
-        sortationControl: false,
-        iotSensorIntegration: false,
-      },
-      pros: [
-        "Mature WMS platform",
-        "Strong optimization algorithms",
-        "Retail/fashion focus",
-        "Omnichannel capabilities",
-      ],
-      cons: [
-        "Very expensive ($500K+ implementations)",
-        "Complex and slow to deploy",
-        "Limited voice capabilities",
-        "Legacy technology stack",
-        "Requires significant IT resources",
-      ],
+      title: "Intelligence & Automation",
+      icon: Brain,
+      description:
+        "AI guidance, forecasting, and anomaly detection with enough context for teams to trust the recommendation.",
+      bullets: ["Decision insights", "Forecasting", "Anomaly detection"],
     },
     {
-      name: "Oracle WMS Cloud",
-      logo: "ORA",
-      tagline: "Database and Enterprise Software",
-      pricing: {
-        starting: "$180/user/month",
-        model: "Subscription + services",
-      },
-      deployment: "Oracle Cloud only",
-      implementation: "12-18 months",
-      support: "Oracle support",
-      features: {
-        voiceOperations: false,
-        aiOptimization: "limited",
-        mobileFirst: "limited",
-        realTimeAnalytics: true,
-        cloudNative: true,
-        customization: "limited",
-        integrations: true,
-        multiTenant: "limited",
-        yardManagement: false,
-        amrRoboticsFleet: false,
-        sortationControl: false,
-        iotSensorIntegration: "limited",
-      },
-      pros: [
-        "Strong database foundation",
-        "Cloud-native platform",
-        "Good integration ecosystem",
-        "Enterprise security",
-      ],
-      cons: [
-        "Expensive total cost",
-        "Complex configuration",
-        "Limited customization",
-        "No voice operations",
-        "Oracle ecosystem lock-in",
-      ],
+      title: "Compliance & Quality",
+      icon: Shield,
+      description:
+        "CAPA, inspections, audit trails, document governance, and recovery loops that keep operations accountable.",
+      bullets: ["CAPA loop", "Audit readiness", "Traceable actions"],
     },
     {
-      name: "Fishbowl Inventory",
-      logo: "FB",
-      tagline: "Small Business Inventory Management",
-      pricing: {
-        starting: "$4,395 one-time",
-        model: "Perpetual license + maintenance",
-      },
-      deployment: "On-premise",
-      implementation: "3-6 months",
-      support: "Email/phone support",
-      features: {
-        voiceOperations: false,
-        aiOptimization: false,
-        mobileFirst: false,
-        realTimeAnalytics: "limited",
-        cloudNative: false,
-        customization: "limited",
-        integrations: "limited",
-        multiTenant: false,
-        yardManagement: false,
-        amrRoboticsFleet: false,
-        sortationControl: false,
-        iotSensorIntegration: false,
-      },
-      pros: [
-        "Lower upfront cost",
-        "QuickBooks integration",
-        "Simple for small businesses",
-        "Established in SMB market",
-      ],
-      cons: [
-        "Limited scalability",
-        "No advanced features",
-        "Desktop-based (outdated)",
-        "No voice or AI capabilities",
-        "Limited mobile functionality",
-      ],
+      title: "Integration & Ecosystem",
+      icon: Network,
+      description:
+        "ERP connectors, IoT devices, APIs, and validated schema mappings keep LogiVox aligned with existing systems.",
+      bullets: ["ERP connections", "API access", "IoT support"],
+    },
+    {
+      title: "Resilience Layer",
+      icon: Wifi,
+      description:
+        "Retry queues, offline recovery, and workflow replay help teams keep working when systems or networks degrade.",
+      bullets: ["Retry handling", "Offline sync", "Workflow replay"],
     },
   ];
 
-  const [selectedCompetitor, setSelectedCompetitor] = React.useState<string>(
-    "SAP Extended Warehouse Management",
-  );
-  const logiVox = competitors.find((c) => c.name === "LogiVox")!;
-  const competitor = competitors.find((c) => c.name === selectedCompetitor)!;
-
-  const FeatureIcon = ({
-    feature,
-    value,
-  }: {
-    feature: string;
-    value: boolean | "limited";
-  }) => {
-    if (value === true) {
-      return <Check className="h-4 w-4 text-green-500" />;
-    } else if (value === "limited") {
-      return (
-        <div className="h-4 w-4 rounded-full bg-yellow-400 flex items-center justify-center">
-          <div className="h-2 w-2 bg-white rounded-full" />
-        </div>
-      );
-    } else {
-      return <X className="h-4 w-4 text-red-500" />;
-    }
-  };
+  const proofPoints = [
+    { value: "Live", label: "System health", icon: CloudCog },
+    { value: "Trace", label: "Audit trail", icon: Shield },
+    { value: "Guide", label: "AI transparency", icon: BarChart3 },
+    { value: "Fast", label: "Deployment", icon: Clock },
+    { value: "Mobile", label: "Floor access", icon: Smartphone },
+    { value: "Connected", label: "Integrations", icon: Globe2 },
+  ];
 
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <Badge className="mb-4">⚔️ Competitive Analysis</Badge>
-        <h2 className="text-3xl font-bold mb-4">
-          How LogiVox Compares to Traditional WMS
+    <div className="space-y-8">
+      <div className="text-center space-y-4">
+        <Badge className="mb-2">Enterprise platform pillars</Badge>
+        <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+          Everything LogiVox is built to do
         </h2>
         <p className="text-muted-foreground max-w-3xl mx-auto">
-          See why modern warehouses are choosing LogiVox over legacy systems
-          that cost more, take longer to implement, and deliver less value.
+          The platform is organized around the outcomes enterprise buyers care
+          about most: control, visibility, recovery, and clean integration.
         </p>
       </div>
 
-      {/* Competitor Selector */}
-      <div className="flex flex-wrap justify-center gap-2">
-        {competitors
-          .filter((c) => c.name !== "LogiVox")
-          .map((comp) => (
-            <Button
-              key={comp.name}
-              variant={selectedCompetitor === comp.name ? "default" : "outline"}
-              size="sm"
-              onClick={() => setSelectedCompetitor(comp.name)}
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        {capabilityPillars.map((pillar) => {
+          const Icon = pillar.icon;
+          return (
+            <Card
+              key={pillar.title}
+              className="hover:shadow-lg transition-shadow"
             >
-              {comp.logo} {comp.name}
-            </Button>
-          ))}
+              <CardHeader>
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 mb-3">
+                  <Icon className="h-6 w-6 text-primary" />
+                </div>
+                <CardTitle className="text-xl">{pillar.title}</CardTitle>
+                <CardDescription>{pillar.description}</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {pillar.bullets.map((bullet) => (
+                  <div key={bullet} className="flex items-center gap-2 text-sm">
+                    <Check className="h-4 w-4 text-green-500 shrink-0" />
+                    <span>{bullet}</span>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
-      {/* Comparison Cards */}
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* LogiVox Card */}
-        <Card className="border-primary/50 bg-primary/5">
-          <CardHeader className="text-center">
-            <div className="h-12 w-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xl font-bold mx-auto mb-2">
-              {logiVox.logo}
-            </div>
-            <CardTitle className="text-primary">{logiVox.name}</CardTitle>
-            <CardDescription className="text-primary/80">
-              {logiVox.tagline}
-            </CardDescription>
-            <Badge className="w-fit mx-auto">⭐ Recommended</Badge>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <div className="font-medium flex items-center gap-2">
-                  <DollarSign className="h-4 w-4" />
-                  Pricing
+      <Card className="border-primary/30 bg-primary/5">
+        <CardContent className="pt-8 pb-8">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {proofPoints.map((point) => {
+              const Icon = point.icon;
+              return (
+                <div key={point.label} className="text-center">
+                  <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-background shadow-sm">
+                    <Icon className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="text-2xl font-bold">{point.value}</div>
+                  <div className="text-sm font-semibold">{point.label}</div>
                 </div>
-                <div className="text-muted-foreground">
-                  {logiVox.pricing.starting}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {logiVox.pricing.model}
-                </div>
-              </div>
-              <div>
-                <div className="font-medium flex items-center gap-2">
-                  <Clock className="h-4 w-4" />
-                  Implementation
-                </div>
-                <div className="text-muted-foreground">
-                  {logiVox.implementation}
-                </div>
-              </div>
-              <div>
-                <div className="font-medium flex items-center gap-2">
-                  <CloudCog className="h-4 w-4" />
-                  Deployment
-                </div>
-                <div className="text-muted-foreground">
-                  {logiVox.deployment}
-                </div>
-              </div>
-              <div>
-                <div className="font-medium flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  Support
-                </div>
-                <div className="text-muted-foreground">{logiVox.support}</div>
-              </div>
-            </div>
-
-            <div className="border-t pt-4">
-              <h4 className="font-medium mb-3">Key Features</h4>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-sm">
-                    <Mic className="h-4 w-4" />
-                    Voice Operations
-                  </span>
-                  <FeatureIcon
-                    feature="voiceOperations"
-                    value={logiVox.features.voiceOperations}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-sm">
-                    <Brain className="h-4 w-4" />
-                    AI Optimization
-                  </span>
-                  <FeatureIcon
-                    feature="aiOptimization"
-                    value={logiVox.features.aiOptimization}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-sm">
-                    <Smartphone className="h-4 w-4" />
-                    Mobile-First Design
-                  </span>
-                  <FeatureIcon
-                    feature="mobileFirst"
-                    value={logiVox.features.mobileFirst}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-sm">
-                    <Zap className="h-4 w-4" />
-                    Real-time Analytics
-                  </span>
-                  <FeatureIcon
-                    feature="realTimeAnalytics"
-                    value={logiVox.features.realTimeAnalytics}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-sm">
-                    <Truck className="h-4 w-4" />
-                    Yard Management (YMS)
-                  </span>
-                  <FeatureIcon
-                    feature="yardManagement"
-                    value={logiVox.features.yardManagement}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-sm">
-                    <Bot className="h-4 w-4" />
-                    AMR / Robotics Fleet
-                  </span>
-                  <FeatureIcon
-                    feature="amrRoboticsFleet"
-                    value={logiVox.features.amrRoboticsFleet}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-sm">
-                    <Network className="h-4 w-4" />
-                    Sortation Control
-                  </span>
-                  <FeatureIcon
-                    feature="sortationControl"
-                    value={logiVox.features.sortationControl}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-sm">
-                    <Wifi className="h-4 w-4" />
-                    IoT Sensor Integration
-                  </span>
-                  <FeatureIcon
-                    feature="iotSensorIntegration"
-                    value={logiVox.features.iotSensorIntegration}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="border-t pt-4">
-              <h4 className="font-medium mb-2 text-green-700">Advantages</h4>
-              <ul className="space-y-1">
-                {logiVox.pros.map((pro, index) => (
-                  <li key={index} className="text-sm flex items-start gap-2">
-                    <Check className="h-3 w-3 text-green-500 mt-0.5" />
-                    <span>{pro}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Competitor Card */}
-        <Card>
-          <CardHeader className="text-center">
-            <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-xl font-bold mx-auto mb-2">
-              {competitor.logo}
-            </div>
-            <CardTitle>{competitor.name}</CardTitle>
-            <CardDescription>{competitor.tagline}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <div className="font-medium flex items-center gap-2">
-                  <DollarSign className="h-4 w-4" />
-                  Pricing
-                </div>
-                <div className="text-muted-foreground">
-                  {competitor.pricing.starting}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {competitor.pricing.model}
-                </div>
-              </div>
-              <div>
-                <div className="font-medium flex items-center gap-2">
-                  <Clock className="h-4 w-4" />
-                  Implementation
-                </div>
-                <div className="text-muted-foreground">
-                  {competitor.implementation}
-                </div>
-              </div>
-              <div>
-                <div className="font-medium flex items-center gap-2">
-                  <CloudCog className="h-4 w-4" />
-                  Deployment
-                </div>
-                <div className="text-muted-foreground">
-                  {competitor.deployment}
-                </div>
-              </div>
-              <div>
-                <div className="font-medium flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  Support
-                </div>
-                <div className="text-muted-foreground">
-                  {competitor.support}
-                </div>
-              </div>
-            </div>
-
-            <div className="border-t pt-4">
-              <h4 className="font-medium mb-3">Key Features</h4>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-sm">
-                    <Mic className="h-4 w-4" />
-                    Voice Operations
-                  </span>
-                  <FeatureIcon
-                    feature="voiceOperations"
-                    value={competitor.features.voiceOperations}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-sm">
-                    <Brain className="h-4 w-4" />
-                    AI Optimization
-                  </span>
-                  <FeatureIcon
-                    feature="aiOptimization"
-                    value={competitor.features.aiOptimization}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-sm">
-                    <Smartphone className="h-4 w-4" />
-                    Mobile-First Design
-                  </span>
-                  <FeatureIcon
-                    feature="mobileFirst"
-                    value={competitor.features.mobileFirst}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-sm">
-                    <Zap className="h-4 w-4" />
-                    Real-time Analytics
-                  </span>
-                  <FeatureIcon
-                    feature="realTimeAnalytics"
-                    value={competitor.features.realTimeAnalytics}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-sm">
-                    <Truck className="h-4 w-4" />
-                    Yard Management (YMS)
-                  </span>
-                  <FeatureIcon
-                    feature="yardManagement"
-                    value={competitor.features.yardManagement}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-sm">
-                    <Bot className="h-4 w-4" />
-                    AMR / Robotics Fleet
-                  </span>
-                  <FeatureIcon
-                    feature="amrRoboticsFleet"
-                    value={competitor.features.amrRoboticsFleet}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-sm">
-                    <Network className="h-4 w-4" />
-                    Sortation Control
-                  </span>
-                  <FeatureIcon
-                    feature="sortationControl"
-                    value={competitor.features.sortationControl}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-sm">
-                    <Wifi className="h-4 w-4" />
-                    IoT Sensor Integration
-                  </span>
-                  <FeatureIcon
-                    feature="iotSensorIntegration"
-                    value={competitor.features.iotSensorIntegration}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="border-t pt-4">
-              <h4 className="font-medium mb-2">Advantages</h4>
-              <ul className="space-y-1">
-                {competitor.pros.map((pro, index) => (
-                  <li key={index} className="text-sm flex items-start gap-2">
-                    <Check className="h-3 w-3 text-green-500 mt-0.5" />
-                    <span>{pro}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="border-t pt-4">
-              <h4 className="font-medium mb-2 text-red-700">Disadvantages</h4>
-              <ul className="space-y-1">
-                {competitor.cons.map((con, index) => (
-                  <li key={index} className="text-sm flex items-start gap-2">
-                    <X className="h-3 w-3 text-red-500 mt-0.5" />
-                    <span>{con}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Bottom CTA */}
-      <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
-        <CardContent className="p-6 text-center">
-          <h3 className="text-xl font-bold mb-2">
-            Ready to Make the Smart Choice?
-          </h3>
-          <p className="text-muted-foreground mb-4">
-            See why LogiVox delivers faster ROI, better user experience, and
-            lower total cost than legacy WMS systems.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg">
-              Get Personalized Demo
-              <Star className="ml-2 h-4 w-4" />
-            </Button>
-            <Button size="lg" variant="outline">
-              Download Comparison Guide
-            </Button>
+              );
+            })}
           </div>
         </CardContent>
       </Card>
+
+      <div className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
+        <Card>
+          <CardHeader>
+            <CardTitle>How the platform presents value</CardTitle>
+            <CardDescription>
+              Focused on operator speed, leader visibility, and technical trust.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm text-muted-foreground">
+            <p>
+              LogiVox is designed to help teams run the warehouse without
+              cluttered messaging or feature overload.
+            </p>
+            <p>
+              Public positioning should stay on outcomes: faster execution,
+              fewer errors, stronger audit readiness, and smoother deployment.
+            </p>
+            <p>
+              Technical depth belongs in documentation; the marketing layer
+              should stay clear and buyer-friendly.
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Next step</CardTitle>
+            <CardDescription>
+              Move from browsing to a working session.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Button asChild className="w-full">
+              <Link href="/contact">
+                Request Demo <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="w-full">
+              <Link href="/pricing">View Pricing</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

@@ -131,9 +131,9 @@ export default function ReplenishmentPage() {
               Never run out of stock — or overstock — again
             </h1>
             <p className="text-xl text-muted-foreground leading-relaxed">
-              Flowstock's replenishment engine combines AI demand forecasting
-              with rule-based automation to keep every SKU at the perfect
-              inventory level across all your warehouses.
+              LogiVox's replenishment engine combines AI demand forecasting with
+              rule-based automation to keep every SKU at the perfect inventory
+              level across all your warehouses.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
               <Button size="lg" asChild>
@@ -174,7 +174,7 @@ export default function ReplenishmentPage() {
             </h2>
             <p className="text-muted-foreground text-lg">
               From simple min/max rules to AI-driven demand forecasting —
-              Flowstock scales with your operation.
+              LogiVox scales with your operation.
             </p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -238,7 +238,7 @@ export default function ReplenishmentPage() {
                 </span>
               </div>
               <p className="text-sm text-muted-foreground max-w-lg">
-                Flowstock integrates with leading procurement and ERP systems
+                LogiVox integrates with leading procurement and ERP systems
                 including SAP, QuickBooks, Xero, and custom supplier portals.
               </p>
             </div>
@@ -268,7 +268,7 @@ export default function ReplenishmentPage() {
             overstock annually
           </h2>
           <p className="text-muted-foreground text-lg">
-            Flowstock's automated replenishment eliminates both problems
+            LogiVox's automated replenishment eliminates both problems
             simultaneously — with zero manual spreadsheet work.
           </p>
           <Button size="lg" asChild>

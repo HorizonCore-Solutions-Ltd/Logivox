@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
 
     // Send email
     await transporter.sendMail({
-      from: process.env.SMTP_FROM || "noreply@flowstock.com",
+      from: process.env.SMTP_FROM || "noreply@logivox.com",
       to: recipients.join(", "),
       subject,
       html: htmlContent,

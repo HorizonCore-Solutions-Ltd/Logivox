@@ -5,9 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Package, ArrowLeft } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Shipments API Reference | Flowstock Docs",
+  title: "Shipments API Reference | LogiVox Docs",
   description:
-    "API reference for the Flowstock Shipments API — create, track, and manage shipments.",
+    "API reference for the LogiVox Shipments API — create, track, and manage shipments.",
 };
 
 const ENDPOINTS = [

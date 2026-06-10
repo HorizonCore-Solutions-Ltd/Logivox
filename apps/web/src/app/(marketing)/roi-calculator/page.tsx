@@ -40,6 +40,7 @@ interface ROICalculation {
 export default function ROICalculatorPage() {
   // Input states
   const [employees, setEmployees] = useState(25);
+  const [facilities, setFacilities] = useState(3);
   const [ordersPerDay, setOrdersPerDay] = useState(150);
   const [errorRate, setErrorRate] = useState(8); // percentage
   const [avgOrderValue, setAvgOrderValue] = useState(125);
@@ -74,8 +75,9 @@ export default function ROICalculatorPage() {
     const newErrorCost = currentErrorCost * (1 - errorReduction / 100);
     const newLaborCost = currentLaborCost * (1 - timeReduction / 100);
 
-    // LogiVox pricing (simplified - $99/user/month for Professional)
-    const monthlyLogiVoxCost = employees * 99;
+    // LogiVox deployment pricing model (facility/scoped agreement)
+    const monthlyLogiVoxCost =
+      facilities <= 3 ? 1500 : facilities <= 10 ? 4500 : 10000;
     const annualLogiVoxCost = monthlyLogiVoxCost * 12;
 
     const annualSavings =
@@ -96,6 +98,7 @@ export default function ROICalculatorPage() {
     });
   }, [
     employees,
+    facilities,
     ordersPerDay,
     errorRate,
     avgOrderValue,
@@ -153,6 +156,25 @@ export default function ROICalculatorPage() {
                     <div className="flex justify-between text-sm text-muted-foreground">
                       <span>5 employees</span>
                       <span>200+ employees</span>
+                    </div>
+                  </div>
+
+                  {/* Orders Per Day */}
+                  <div className="space-y-3">
+                    <Label className="text-base font-semibold">
+                      Facilities in Scope: {facilities}
+                    </Label>
+                    <Slider
+                      value={[facilities]}
+                      onValueChange={(value) => setFacilities(value[0])}
+                      max={20}
+                      min={1}
+                      step={1}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between text-sm text-muted-foreground">
+                      <span>1 facility</span>
+                      <span>20+ facilities</span>
                     </div>
                   </div>
 
@@ -370,13 +392,13 @@ export default function ROICalculatorPage() {
                 Ready to Achieve These Results?
               </h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                Start your 30-day free trial today and see these savings in
-                action. No credit card required, full access to all features.
+                Request a tailored deployment quote and see these savings in
+                action with your actual facility profile and workflow scope.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button size="lg" asChild>
-                  <Link href="/sign-up">
-                    Start Free Trial - See Results
+                  <Link href="/contact?type=sales">
+                    Request Enterprise Quote
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>

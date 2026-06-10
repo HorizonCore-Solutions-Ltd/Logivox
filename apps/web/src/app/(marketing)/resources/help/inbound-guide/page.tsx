@@ -6,7 +6,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export const metadata: Metadata = {
-  title: "Inbound & Inventory User Guide | Flowstock Help Center",
+  title: "Inbound & Inventory User Guide | LogiVox Help Center",
   description:
     "Detailed documentation on using the Inbound, Receiving, and Smart Slotting features.",
 };
@@ -66,7 +66,7 @@ export default function InboundGuidePage() {
             </h1>
             <p className="text-xl text-muted-foreground">
               Learn how to efficiently receive, inspect, and store inventory
-              using Flowstock's advanced inbound tools.
+              using LogiVox's advanced inbound tools.
             </p>
           </div>
 

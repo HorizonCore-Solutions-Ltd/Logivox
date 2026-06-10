@@ -5,40 +5,42 @@ describe("FeaturesSection", () => {
   it("renders the section headline", () => {
     render(<FeaturesSection />);
 
+    expect(screen.getByText(/Five domains, one platform/i)).toBeInTheDocument();
     expect(
-      screen.getByText(/Everything Competitors Charge Extra For/i),
+      screen.getByText(/built for clarity and control/i),
     ).toBeInTheDocument();
-    expect(screen.getByText(/Included in Every Plan/i)).toBeInTheDocument();
   });
 
   it("displays primary features with icons and descriptions", () => {
     render(<FeaturesSection />);
 
-    expect(screen.getByText("Quality Management")).toBeInTheDocument();
-    expect(
-      screen.getByText("Quality Control & Inspection"),
-    ).toBeInTheDocument();
-    expect(screen.getByText("Returns Processing")).toBeInTheDocument();
-    expect(screen.getByText("Receiving & Putaway")).toBeInTheDocument();
+    expect(screen.getByText("Core Operations")).toBeInTheDocument();
+    expect(screen.getByText("Intelligence & Automation")).toBeInTheDocument();
+    expect(screen.getByText("Compliance & Quality")).toBeInTheDocument();
+    expect(screen.getByText("Voice & Workforce")).toBeInTheDocument();
   });
 
   it("shows feature benefits", () => {
     render(<FeaturesSection />);
 
-    expect(screen.getByText(/Voice Commands/)).toBeInTheDocument();
-    expect(screen.getByText(/Label Designer/)).toBeInTheDocument();
-    expect(screen.getByText(/Security Training/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Voice as the primary operating interface/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Audit-ready execution across every action/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Certified connectors for existing systems/i),
+    ).toBeInTheDocument();
   });
 
   it("displays additional features", () => {
     render(<FeaturesSection />);
 
-    expect(
-      screen.getByText("Predictive Ops & Anomaly Defense"),
-    ).toBeInTheDocument();
-    expect(screen.getByText("Offline & Edge Resilience")).toBeInTheDocument();
-    expect(screen.getByText("Copilot for SOPs & Training")).toBeInTheDocument();
-    expect(screen.getByText("Zero-Trust Everywhere")).toBeInTheDocument();
+    expect(screen.getByText("System Control Center")).toBeInTheDocument();
+    expect(screen.getByText("AI Decision Insights")).toBeInTheDocument();
+    expect(screen.getByText("Workflow Visualizer")).toBeInTheDocument();
+    expect(screen.getByText("Resilience Engine")).toBeInTheDocument();
   });
 
   it("has link to integrations page", () => {

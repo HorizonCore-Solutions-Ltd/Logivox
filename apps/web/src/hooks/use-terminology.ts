@@ -30,7 +30,8 @@ export const useTerminology = create<TerminologyState>()(
         set((state) => ({ terms: { ...state.terms, [key]: value } })),
     }),
     {
-      name: "flowstock-terminology",
+      name: "logivox-terminology",
+      migrate: (persistedState: any) => persistedState,
     },
   ),
 );

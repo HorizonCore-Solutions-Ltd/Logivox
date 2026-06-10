@@ -2,6 +2,38 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireApiAuth } from "@/lib/api-guard";
 import { prisma } from "@/lib/prisma";
 import { InspectionCategory, SamplingType } from "@prisma/client";
+import { z } from "zod";
+
+const checkpointSchema = z
+  .object({
+    id: z.string().optional(),
+    label: z.string().min(1, "Checkpoint label is required"),
+    type: z.enum(["BOOLEAN", "NUMERIC", "TEXT", "OPTION", "PHOTO"]),
+    required: z.boolean(),
+    options: z.array(z.string().min(1)).optional(),
+  })
+  .superRefine((value, ctx) => {
+    if (
+      value.type === "OPTION" &&
+      (!value.options || value.options.length < 2)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "OPTION checkpoints require at least 2 options",
+        path: ["options"],
+      });
+    }
+  });
+
+const createTemplateSchema = z.object({
+  name: z.string().min(1),
+  code: z.string().min(1),
+  description: z.string().optional(),
+  category: z.nativeEnum(InspectionCategory).optional(),
+  checkpoints: z.array(checkpointSchema).min(1),
+  samplingType: z.nativeEnum(SamplingType).optional(),
+  requiresApproval: z.boolean().optional(),
+});
 
 export async function GET(request: NextRequest) {
   const auth = await requireApiAuth();
@@ -34,6 +66,14 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
+    const parsed = createTemplateSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Validation failed", details: parsed.error.flatten() },
+        { status: 400 },
+      );
+    }
+
     const {
       name,
       code,
@@ -42,14 +82,7 @@ export async function POST(request: NextRequest) {
       checkpoints,
       samplingType,
       requiresApproval,
-    } = body;
-
-    if (!name || !code || !checkpoints) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 },
-      );
-    }
+    } = parsed.data;
 
     const template = await prisma.inspectionTemplate.create({
       data: {
@@ -61,7 +94,7 @@ export async function POST(request: NextRequest) {
           (category as InspectionCategory) || InspectionCategory.INCOMING,
         samplingType: (samplingType as SamplingType) || SamplingType.FULL,
         requiresApproval: requiresApproval ?? true,
-        checkpoints: checkpoints, // JSON
+        checkpoints,
         isActive: true,
       },
     });

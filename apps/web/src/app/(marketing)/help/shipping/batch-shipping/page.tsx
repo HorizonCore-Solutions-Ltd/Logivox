@@ -12,9 +12,9 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Batch Shipping Guide | Flowstock Help",
+  title: "Batch Shipping Guide | LogiVox Help",
   description:
-    "Learn how to process multiple shipments at once using Flowstock's batch shipping feature.",
+    "Learn how to process multiple shipments at once using LogiVox's batch shipping feature.",
 };
 
 const SECTIONS = [
@@ -23,7 +23,7 @@ const SECTIONS = [
     title: "What is Batch Shipping?",
     icon: <Truck className="h-5 w-5" />,
     content:
-      "Batch shipping lets you process dozens or hundreds of shipments simultaneously. Instead of creating labels one at a time, you select a group of orders, choose carrier service settings, and Flowstock purchases all labels in a single operation — saving hours of processing time.",
+      "Batch shipping lets you process dozens or hundreds of shipments simultaneously. Instead of creating labels one at a time, you select a group of orders, choose carrier service settings, and LogiVox purchases all labels in a single operation — saving hours of processing time.",
   },
   {
     id: "how-to",
@@ -33,7 +33,7 @@ const SECTIONS = [
       "Navigate to Dashboard → Shipping → Batch Shipping",
       "Select orders to ship using the checkboxes, or use filters to auto-select (e.g., all STANDARD orders due today)",
       "Click Process Batch",
-      "Choose a default carrier and service — or let Flowstock use the rate shopping rules",
+      "Choose a default carrier and service — or let LogiVox use the rate shopping rules",
       "Review the batch summary: total packages, estimated cost, carrier breakdown",
       "Click Confirm & Purchase Labels",
       "Labels are generated asynchronously — you'll receive a notification when complete",
@@ -45,7 +45,7 @@ const SECTIONS = [
     title: "CSV Import",
     icon: <Upload className="h-5 w-5" />,
     content:
-      "You can also create a batch by uploading a CSV file. This is useful when orders originate outside Flowstock.",
+      "You can also create a batch by uploading a CSV file. This is useful when orders originate outside LogiVox.",
     steps: [
       "Go to Batch Shipping → Import CSV",
       "Download the CSV template",

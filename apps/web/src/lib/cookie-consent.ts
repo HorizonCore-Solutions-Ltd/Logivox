@@ -65,7 +65,7 @@ export const COOKIE_CATEGORIES: CookieCategory[] = [
 ];
 
 export const CONSENT_VERSION = "1.0";
-export const CONSENT_COOKIE_NAME = "flowstock_cookie_consent";
+export const CONSENT_COOKIE_NAME = "logivox_cookie_consent";
 export const CONSENT_DURATION_DAYS = 365;
 
 // ==========================================
@@ -329,7 +329,7 @@ export class CookieConsentManager {
 
   private initializeFunctional(): void {
     // Hook for functional scripts (e.g., chat widgets). Expect downstream init to check this flag.
-    (window as any).__flowstockFunctionalAllowed = true;
+    (window as any).__logivoxFunctionalAllowed = true;
 
     this.functionalInitCallbacks.forEach((cb) => {
       try {
@@ -341,7 +341,7 @@ export class CookieConsentManager {
   }
 
   private disableFunctional(): void {
-    (window as any).__flowstockFunctionalAllowed = false;
+    (window as any).__logivoxFunctionalAllowed = false;
   }
 
   public onFunctionalReady(callback: () => void): void {
@@ -389,7 +389,7 @@ export class CookieConsentManager {
       "next-auth.session-token",
       "next-auth.csrf-token",
       "next-auth.callback-url",
-      "flowstock_session",
+      "logivox_session",
       CONSENT_COOKIE_NAME,
     ];
 
