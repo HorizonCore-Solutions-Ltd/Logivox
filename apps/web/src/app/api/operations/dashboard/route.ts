@@ -60,7 +60,10 @@ export async function GET(request: NextRequest) {
         where: { organizationId, doorType: "OUTBOUND" },
       }),
       prisma.user.findMany({
-        where: { organizationMemberships: { some: { organizationId } }, isActive: true },
+        where: {
+          organizationMemberships: { some: { organizationId } },
+          isActive: true,
+        },
         select: {
           id: true,
           name: true,
