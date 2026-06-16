@@ -3,6 +3,7 @@
 Use this template to run delivery against the approved stabilization plan.
 
 ## Sprint Metadata
+
 - Sprint Name:
 - Sprint Window:
 - Sprint Goal:
@@ -10,19 +11,23 @@ Use this template to run delivery against the approved stabilization plan.
 - Release Train:
 
 ## Capacity and Commitments
+
 - Engineering Capacity (points or ideal days):
 - QA Capacity:
 - Platform/SRE Capacity:
 - Planned vs Stretch Scope:
 
 ## Epic 1
+
 - Epic Name:
 - Domain:
 - Owner:
 - Status: Not Started / In Progress / Blocked / Done
 
 Stories:
+
 1. Story Title:
+
 - Description:
 - Acceptance Criteria:
   - [ ]
@@ -37,6 +42,7 @@ Stories:
 - Estimate:
 
 2. Story Title:
+
 - Description:
 - Acceptance Criteria:
   - [ ]
@@ -51,13 +57,16 @@ Stories:
 - Estimate:
 
 ## Epic 2
+
 - Epic Name:
 - Domain:
 - Owner:
 - Status: Not Started / In Progress / Blocked / Done
 
 Stories:
+
 1. Story Title:
+
 - Description:
 - Acceptance Criteria:
   - [ ]
@@ -72,6 +81,7 @@ Stories:
 - Estimate:
 
 ## Mandatory Quality Gates (Per Sprint)
+
 - [ ] Contract tests pass for changed API contracts
 - [ ] Tenant and auth tests pass for changed protected routes
 - [ ] Integration tests pass for event/webhook/integration changes
@@ -79,6 +89,7 @@ Stories:
 - [ ] Docs updated for behavior changes
 
 ## Done Definition (Per Story)
+
 - [ ] Code merged with review approval
 - [ ] Acceptance criteria validated
 - [ ] Tests implemented and passing in CI
@@ -87,25 +98,30 @@ Stories:
 - [ ] Documentation updated
 
 ## Blockers Log
+
 1. Blocker:
+
 - Impact:
 - Owner:
 - Mitigation:
 - ETA:
 
 2. Blocker:
+
 - Impact:
 - Owner:
 - Mitigation:
 - ETA:
 
 ## Sprint Demo Checklist
+
 - [ ] Voice flow changes demonstrated
 - [ ] Contract tests demonstrated
 - [ ] Security/tenant controls demonstrated
 - [ ] Risk burndown reviewed
 
 ## Sprint Retrospective Prompts
+
 1. What reduced platform risk this sprint?
 2. What created avoidable churn?
 3. Which repeated patterns should move into shared primitives?
